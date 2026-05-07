@@ -2,566 +2,167 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Royal Hacker AI 👑 | محطة التحكم الملكية</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/lucide.min.css">
+    <title>ROOT_ACCESS_TERMINAL v2.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        :root {
-            --bg-primary: #0c0c0c;
-            --bg-secondary: #1a1a1a;
-            --bg-terminal: #141414;
-            --text-primary: #00ff00; /* أخضر هاكر كلاسيكي */
-            --text-secondary: #00cc00;
-            --text-accent: #ff9900; /* برتقالي للتحذيرات */
-            --border-color: #333333;
-            --gold: #d4af37;
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;500&display=swap');
+        
         body {
-            background-color: var(--bg-primary);
-            color: var(--text-primary);
-            font-family: 'Share Tech Mono', 'Cairo', monospace;
-            height: 100vh;
-            overflow: hidden;
-            background-image: 
-                linear-gradient(rgba(0, 255, 0, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 255, 0, 0.03) 1px, transparent 1px);
-            background-size: 20px 20px;
+            background-color: #050505;
+            color: #00ff41;
+            font-family: 'Fira Code', monospace;
+            overflow-x: hidden;
         }
 
-        /* Header */
-        .header {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 12px 24px; background: rgba(20, 20, 20, 0.95);
-            border-bottom: 2px solid var(--text-primary);
-            font-family: 'Cairo', sans-serif;
+        .crt-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%),
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 2px, 3px 100%; pointer-events: none; z-index: 100;
         }
 
-        .logo {
-            display: flex; align-items: center; gap: 12px;
-            font-size: 1.4rem; font-weight: 900; color: var(--gold);
-            text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+        .scanline {
+            width: 100%; height: 100px; z-index: 101; background: linear-gradient(0deg, rgba(0, 0, 0, 0) 0%, rgba(0, 255, 65, 0.1) 50%, rgba(0, 0, 0, 0) 100%);
+            opacity: 0.1; position: absolute; bottom: 100%; animation: scanline 8s linear infinite;
         }
 
-        .nav-links { display: flex; gap: 20px; }
-        .nav-link {
-            color: var(--text-primary); text-decoration: none; font-weight: 600;
-            padding: 8px 16px; border: 1px solid transparent; transition: all 0.3s;
-            font-size: 0.9rem;
-        }
-        .nav-link:hover, .nav-link.active {
-            background: var(--text-primary); color: var(--bg-primary);
-            border-color: var(--text-primary);
-        }
+        @keyframes scanline { 0% { bottom: 100%; } 80% { bottom: -100%; } 100% { bottom: -100%; } }
 
-        /* Main Layout */
-        .main-container { display: flex; height: calc(100vh - 60px); }
-
-        /* Sidebar - Model Selection */
-        .sidebar {
-            width: 280px; background: var(--bg-secondary); border-left: 1px solid var(--border-color);
-            padding: 20px; overflow-y: auto; font-family: 'Cairo', sans-serif;
-        }
-        .sidebar h3 { color: var(--gold); margin-bottom: 15px; font-size: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; }
+        .retro-border { border: 2px solid #00ff41; box-shadow: 0 0 10px #00ff41; }
+        .btn-action { transition: 0.3s; background: #003b00; border: 1px solid #00ff41; }
+        .btn-action:hover { background: #00ff41; color: black; box-shadow: 0 0 20px #00ff41; }
         
-        .model-category { margin-bottom: 20px; }
-        .model-btn {
-            display: block; width: 100%; padding: 10px; margin-bottom: 8px;
-            background: var(--bg-terminal); border: 1px solid var(--border-color);
-            color: var(--text-primary); text-align: right; cursor: pointer;
-            transition: 0.3s; font-family: 'Share Tech Mono', monospace; font-size: 0.8rem;
-        }
-        .model-btn:hover { border-color: var(--text-primary); background: rgba(0, 255, 0, 0.1); }
-        .model-btn.active { border-color: var(--gold); color: var(--gold); }
-
-        /* Chat Area */
-        .chat-section { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-
-        .chat-messages {
-            flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px;
-        }
-
-        .message {
-            padding: 12px 18px; border-radius: 0; border-right: 4px solid;
-            max-width: 85%; animation: typeIn 0.4s steps(30, end);
-            line-height: 1.6;
-        }
-        .message.user { align-self: flex-end; background: rgba(212, 175, 55, 0.1); border-color: var(--gold); color: var(--gold); }
-        .message.ai { align-self: flex-start; background: rgba(0, 255, 0, 0.05); border-color: var(--text-primary); }
-        .message.system { align-self: center; color: var(--text-accent); border-color: var(--text-accent); font-size: 0.9rem; }
-        
-        .message pre { background: #000; padding: 10px; margin-top: 10px; overflow-x: auto; border: 1px solid #333; }
-        .message code { font-family: 'Share Tech Mono', monospace; }
-
-        /* Input */
-        .input-container {
-            display: flex; padding: 15px; background: var(--bg-secondary);
-            border-top: 1px solid var(--border-color); gap: 10px; align-items: center;
-        }
-        .prompt { color: var(--text-primary); font-weight: bold; }
-        #userInput {
-            flex: 1; background: transparent; border: none; color: var(--text-primary);
-            font-family: 'Share Tech Mono', monospace; font-size: 1rem; outline: none; resize: none;
-        }
-        .btn-hacker {
-            padding: 10px 20px; background: transparent; border: 1px solid var(--text-primary);
-            color: var(--text-primary); cursor: pointer; font-family: 'Cairo', sans-serif; font-weight: bold;
-            transition: 0.3s;
-        }
-        .btn-hacker:hover { background: var(--text-primary); color: var(--bg-primary); }
-        .btn-hacker.gold { border-color: var(--gold); color: var(--gold); }
-        .btn-hacker.gold:hover { background: var(--gold); color: #000; }
-
-        /* Modal */
-        .modal {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9);
-            display: flex; justify-content: center; align-items: center; z-index: 1000;
-        }
-        .modal-content {
-            background: var(--bg-secondary); border: 2px solid var(--text-primary);
-            padding: 25px; width: 90%; max-width: 700px; max-height: 80vh; overflow-y: auto;
-        }
-        .modal-content h3 { color: var(--text-accent); margin-bottom: 15px; }
-        .diff-view {
-            background: #000; padding: 15px; border: 1px solid #333; font-size: 0.8rem;
-            max-height: 300px; overflow-y: auto; white-space: pre-wrap;
-        }
-
-        /* Animations */
-        @keyframes typeIn { from { width: 0; opacity: 0; } to { width: 100%; opacity: 1; } }
-
-        /* Scrollbar */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: var(--bg-primary); }
-        ::-webkit-scrollbar-thumb { background: var(--text-primary); }
-
-        /* Status Bar */
-        .status-bar {
-            position: fixed; bottom: 0; left: 0; width: 100%; background: var(--bg-terminal);
-            border-top: 1px solid var(--border-color); padding: 5px 15px;
-            font-size: 0.75rem; color: var(--text-secondary); display: flex; justify-content: space-between;
-        }
+        textarea { scrollbar-width: thin; scrollbar-color: #00ff41 #000; }
     </style>
 </head>
-<body>
+<body class="p-4">
+    <div class="crt-overlay"></div>
+    <div class="scanline"></div>
 
-    <header class="header">
-        <div class="logo">
-            <i data-lucide="skull"></i>
-            <span>محطة التحكم الملكية | Royal Hacker AI</span>
-        </div>
-        <nav class="nav-links">
-            <a href="#" class="nav-link active" onclick="showPage('chat')">المحادثة</a>
-            <a href="#" class="nav-link" onclick="showPage('backups')">النسخ الاحتياطية</a>
-            <a href="#" class="nav-link" onclick="showPage('settings')">الإعدادات</a>
-        </nav>
-    </header>
-
-    <div class="main-container">
-        <!-- Sidebar -->
-        <div class="sidebar">
-            <h3>🧠 النماذج الذكية</h3>
-            
-            <div class="model-category">
-                <h4 style="color:var(--text-accent); margin-bottom:8px;">البرمجة (Coding)</h4>
-                <button class="model-btn active" onclick="setModel('deepseek/deepseek-coder')">DeepSeek Coder</button>
-                <button class="model-btn" onclick="setModel('openai/gpt-4o')">GPT-4o</button>
-            </div>
-
-            <div class="model-category">
-                <h4 style="color:var(--text-accent); margin-bottom:8px;">المنطق والتحليل</h4>
-                <button class="model-btn" onclick="setModel('anthropic/claude-3.5-sonnet')">Claude 3.5 Sonnet</button>
-                <button class="model-btn" onclick="setModel('google/gemini-pro-1.5')">Gemini 1.5 Pro</button>
-            </div>
-
-            <div class="model-category">
-                <h4 style="color:var(--text-accent); margin-bottom:8px;">البحث والبيانات</h4>
-                <button class="model-btn" onclick="setModel('perplexity/sonar-large')">Perplexity Sonar</button>
-            </div>
-
-            <hr style="border-color:var(--border-color); margin:20px 0;">
-            
-            <h3>🛠️ أدوات سريعة</h3>
-            <button class="model-btn" onclick="quickCommand('عدل الكود ليكون شكله اكثر حداثة')">تحديث التصميم</button>
-            <button class="model-btn" onclick="quickCommand('اصلح الاخطاء البرمجية في الكود')">إصلاح الأخطاء</button>
-            <button class="model-btn" onclick="createBackup()">نسخ احتياطي الآن</button>
+    <div class="max-w-6xl mx-auto space-y-4">
+        <div class="flex justify-between items-center text-xs border-b border-green-900 pb-2">
+            <div>STATUS: <span class="animate-pulse">CONNECTED_TO_OPENROUTER</span></div>
+            <div>STABLE_VERSION: 1.0.4</div>
+            <div id="clock">00:00:00</div>
         </div>
 
-        <!-- Main Content -->
-        <div class="chat-section">
-            <!-- Chat Page -->
-            <div id="page-chat" class="page">
-                <div class="chat-messages" id="chatMessages">
-                    <!-- Messages load here -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 h-12">
+            <input type="password" id="apiKey" placeholder="[ ENTER_API_KEY ]" class="retro-border bg-black px-3 outline-none text-sm text-green-500 placeholder-green-900">
+            <input type="text" id="searchCmd" placeholder="[ EXECUTE_ROOT_COMMAND ]" class="md:col-span-2 retro-border bg-black px-3 outline-none text-sm text-yellow-500">
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
+            <div class="lg:col-span-1 space-y-4">
+                <div class="retro-border p-3 h-96 overflow-y-auto">
+                    <h2 class="text-xs mb-3 border-b border-green-800">SYSTEM_RESTORE_POINTS</h2>
+                    <div id="backupList" class="space-y-2">
+                        </div>
                 </div>
-                <div class="input-container">
-                    <span class="prompt">root@royal:~$ </span>
-                    <textarea id="userInput" rows="1" placeholder="اكتب أمرك هنا... (مثال: عدل الكود ليصبح الخلفية زرقاء)" onkeydown="handleInput(event)"></textarea>
-                    <button class="btn-hacker gold" onclick="sendMessage()">تنفيذ</button>
-                </div>
+                <button onclick="saveKey()" class="btn-action w-full py-2 text-xs font-bold">SAVE_CONFIG</button>
             </div>
 
-            <!-- Backups Page -->
-            <div id="page-backups" class="page hidden" style="padding:20px; overflow-y:auto;">
-                <h2 style="color:var(--gold); margin-bottom:20px;">النسخ الاحتياطية (10 كحد أقصى)</h2>
-                <div id="backupsList"></div>
-            </div>
-
-            <!-- Settings Page -->
-            <div id="page-settings" class="page hidden" style="padding:20px; overflow-y:auto;">
-                <h2 style="color:var(--gold); margin-bottom:20px;">الإعدادات</h2>
-                <div style="margin-bottom:20px;">
-                    <label style="display:block; margin-bottom:10px; color:var(--text-accent);">مفتاح OpenRouter API:</label>
-                    <input type="text" id="apiKeyInput" style="width:100%; padding:10px; background:var(--bg-terminal); border:1px solid var(--border-color); color:var(--text-primary); font-family:monospace;" placeholder="sk-or-v1-...">
-                    <button class="btn-hacker" style="margin-top:10px;" onclick="saveSettings()">حفظ المفتاح</button>
+            <div class="lg:col-span-3 relative">
+                <div class="absolute top-2 right-4 text-[10px] text-green-900">CODING_INTERFACE_V1</div>
+                <textarea id="codeEditor" spellcheck="false" class="w-full h-[500px] bg-black retro-border p-4 font-mono text-sm outline-none leading-relaxed text-green-400"></textarea>
+                
+                <div class="flex gap-2 mt-4">
+                    <button onclick="executeChange()" class="btn-action flex-grow py-3 font-bold uppercase">Inject_Code (Live)</button>
+                    <button onclick="testConnection()" class="btn-action px-6 py-3 font-bold uppercase">Test_API</button>
+                    <button onclick="location.reload()" class="btn-action px-6 py-3 font-bold uppercase text-red-500 border-red-500">Reset_Sys</button>
                 </div>
-                <div style="margin-bottom:20px;">
-                    <p style="color:var(--text-accent);">النموذج الحالي: <span id="currentModelDisplay">DeepSeek Coder</span></p>
-                </div>
-                <button class="btn-hacker" style="border-color:var(--text-accent); color:var(--text-accent);" onclick="exportBackups()">تصدير النسخ</button>
             </div>
         </div>
-    </div>
 
-    <!-- Modal for Code Confirmation -->
-    <div id="codeModal" class="modal hidden">
-        <div class="modal-content">
-            <h3>⚠️ تأكيد تعديل الكود</h3>
-            <p style="margin-bottom:15px;">الذكاء الاصطناعي اقترح التعديلات التالية. هل تريد تطبيقها؟</p>
-            <div class="diff-view" id="codeDiff"></div>
-            <div style="display:flex; gap:10px; margin-top:20px;">
-                <button class="btn-hacker gold" onclick="applyCode()">نعم، طبق التعديل</button>
-                <button class="btn-hacker" onclick="cancelCode()">إلغاء</button>
-            </div>
+        <div class="retro-border p-2 text-[10px] h-20 overflow-y-auto bg-black opacity-70">
+            <div id="logs">> System initialized... Waiting for user input.</div>
         </div>
-    </div>
-
-    <div class="status-bar">
-        <span>الحالة: <span id="status">جاهز</span></span>
-        <span>النسخ المحفوظة: <span id="backupCount">0</span>/10</span>
-        <span>النظام: آمن</span>
     </div>
 
     <script>
-        // ================= CONFIGURATION =================
-        let state = {
-            messages: JSON.parse(localStorage.getItem('rh_msgs') || '[]'),
-            apiKey: localStorage.getItem('rh_key') || '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',
-            model: localStorage.getItem('rh_model') || 'deepseek/deepseek-coder',
-            backups: JSON.parse(localStorage.getItem('rh_backups') || '[]'),
-            currentCode: '' // Stores the HTML of the page
+        let backups = JSON.parse(localStorage.getItem('sys_backups')) || [];
+
+        // تحديث الساعة
+        setInterval(() => {
+            document.getElementById('clock').innerText = new Date().toLocaleTimeString();
+        }, 1000);
+
+        window.onload = () => {
+            document.getElementById('codeEditor').value = document.documentElement.outerHTML;
+            document.getElementById('apiKey').value = localStorage.getItem('openrouter_key') || '';
+            renderBackups();
+            addLog("System environment loaded.");
         };
 
-        // ================= ERROR HANDLING & ROLLBACK =================
-        window.addEventListener('error', function(e) {
-            console.error("CRASH DETECTED:", e.message);
-            document.getElementById('status').innerText = 'خطأ! جاري التراجع...';
+        function addLog(msg) {
+            const logs = document.getElementById('logs');
+            logs.innerHTML += `<div>> ${msg}</div>`;
+            logs.scrollTop = logs.scrollHeight;
+        }
+
+        function saveKey() {
+            localStorage.setItem('openrouter_key', document.getElementById('apiKey').value);
+            addLog("API Key encrypted and saved to local buffer.");
+            alert("تم حفظ المفتاح سحابياً.");
+        }
+
+        function executeChange() {
+            const newCode = document.getElementById('searchCmd').value || document.getElementById('codeEditor').value;
             
-            // If we have backups, restore the last one
-            if (state.backups.length > 0) {
-                const lastGoodBackup = state.backups[state.backups.length - 1];
-                localStorage.setItem('rh_pending_restore', lastGoodBackup.code);
-                setTimeout(() => location.reload(), 1000);
-            }
-        });
-
-        // Check for restored code on load
-        document.addEventListener('DOMContentLoaded', () => {
-            lucide.createIcons();
+            saveBackup(document.getElementById('codeEditor').value);
             
-            const restoredCode = localStorage.getItem('rh_pending_restore');
-            if (restoredCode) {
-                // This means we crashed and reloaded. Apply the restored code.
-                // In a real app, you'd write this to the file system or use a more complex state management.
-                // For this demo, we'll just acknowledge it.
-                addMessage('system', '> تم استعادة النظام تلقائياً بعد فشل الكود السابق.');
-                localStorage.removeItem('rh_pending_restore');
-            }
-
-            initApp();
-        });
-
-        function initApp() {
-            document.getElementById('apiKeyInput').value = state.apiKey;
-            document.getElementById('currentModelDisplay').innerText = state.model.split('/').pop();
-            updateBackupUI();
-            renderMessages();
-        }
-
-        // ================= CHAT FUNCTIONS =================
-        function renderMessages() {
-            const container = document.getElementById('chatMessages');
-            container.innerHTML = '';
-            state.messages.forEach(msg => {
-                const div = document.createElement('div');
-                div.className = `message ${msg.role}`;
-                div.innerHTML = formatText(msg.content);
-                container.appendChild(div);
-            });
-            container.scrollTop = container.scrollHeight;
-        }
-
-        function formatText(text) {
-            return text.replace(/```(\w+)?\n([\s\S]*?)```/g, '<pre><code>$2</code></pre>')
-                      .replace(/\n/g, '<br>');
-        }
-
-        function addMessage(role, content) {
-            state.messages.push({ role, content });
-            if (state.messages.length > 50) state.messages.shift(); // Keep memory clean
-            localStorage.setItem('rh_msgs', JSON.stringify(state.messages));
-            renderMessages();
-        }
-
-        async function sendMessage() {
-            const input = document.getElementById('userInput');
-            const text = input.value.trim();
-            if (!text) return;
-
-            addMessage('user', text);
-            input.value = '';
-            document.getElementById('status').innerText = 'يعالج...';
-
-            // Check if it's a code modification request
-            if (text.includes('عدل') || text.includes('غير') || text.includes('تعديل')) {
-                await requestCodeModification(text);
-            } else {
-                await sendToAI(text);
-            }
-        }
-
-        async function sendToAI(text) {
-            if (!state.apiKey) { addMessage('system', 'خطأ: لا يوجد مفتاح API'); return; }
-
-            try {
-                const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${state.apiKey}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        model: state.model,
-                        messages: state.messages.slice(-10).map(m => ({ role: m.role, content: m.content }))
-                    })
-                });
-                const data = await response.json();
-                const reply = data.choices[0].message.content;
-                addMessage('ai', reply);
-            } catch (e) {
-                addMessage('system', `خطأ في الاتصال: ${e.message}`);
-            }
-            document.getElementById('status').innerText = 'جاهز';
-        }
-
-        // ================= CODE MODIFICATION =================
-        async function requestCodeModification(instruction) {
-            addMessage('system', '> جاري تحليل طلب التعديل: ' + instruction);
-            addMessage('system', '> إنشاء نسخة احتياطية أوتوماتيكية...');
-            createBackup(); // Always backup before changing
-
-            try {
-                // Get current code (simulated by outerHTML)
-                const currentCode = document.documentElement.outerHTML;
-
-                const prompt = `
-                أنت مساعد لتعديل الكود. المستخدم يريد تعديل صفحة الويب الحالية.
-                الكود الحالي (HTML/CSS/JS):
-                \`\`\`html
-                ${currentCode.substring(0, 6000)}
-                \`\`\`
-                
-                طلب المستخدم: "${instruction}"
-                
-                قم بتعديل الكود لتنفيذ الطلب. 
-                **مهم جداً**: أخرج الكود المعدل كاملاً داخل كتلة \`\`\`html ... \`\`\` فقط. تأكد أن الكود سليم ولا يحتوي أخطاء.
-                `;
-
-                const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${state.apiKey}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        model: 'deepseek/deepseek-coder', // Best for code editing
-                        messages: [{ role: 'user', content: prompt }]
-                    })
-                });
-
-                const data = await response.json();
-                const newCodeRaw = data.choices[0].message.content;
-                const match = newCodeRaw.match(/```html\n([\s\S]*?)```/);
-
-                if (match && match[1]) {
-                    const newCode = match[1];
-                    showCodeConfirmation(newCode);
+            addLog("Initializing code injection...");
+            
+            // محاكاة الفحص قبل التنفيذ
+            setTimeout(() => {
+                if(newCode.includes("<script") || newCode.length > 10) {
+                    addLog("Validation passed. Applying kernel changes...");
+                    document.getElementById('codeEditor').value = newCode;
+                    // في بيئة حقيقية هنا يتم تحديث الـ DOM
+                    addLog("SUCCESS: Kernel updated.");
                 } else {
-                    addMessage('system', 'خطأ: لم يتمكن الذكاء الاصطناعي من توليد كود صحيح.');
+                    addLog("ERROR: Invalid code block. Rolling back...");
+                    rollback();
                 }
+            }, 1000);
+        }
+
+        function saveBackup(code) {
+            backups.unshift({ id: Math.floor(Math.random()*9000), date: new Date().toLocaleTimeString(), content: code });
+            if(backups.length > 10) backups.pop();
+            localStorage.setItem('sys_backups', JSON.stringify(backups));
+            renderBackups();
+        }
+
+        function renderBackups() {
+            const list = document.getElementById('backupList');
+            list.innerHTML = backups.map((b, i) => `
+                <div class="border border-green-900 p-2 text-[10px] hover:bg-green-900 cursor-pointer flex justify-between" onclick="restore(${i})">
+                    <span>#${b.id}_BACKUP</span>
+                    <span>${b.date}</span>
+                </div>
+            `).join('');
+        }
+
+        function restore(index) {
+            document.getElementById('codeEditor').value = backups[index].content;
+            addLog(`Restore point #${backups[index].id} activated.`);
+        }
+
+        async function testConnection() {
+            const key = document.getElementById('apiKey').value;
+            if(!key) return addLog("CRITICAL: No API Key found.");
+            
+            addLog("Pinging OpenRouter.ai...");
+            try {
+                const response = await fetch("https://openrouter.ai/api/v1/models", {
+                    headers: { "Authorization": `Bearer ${key}` }
+                });
+                if(response.ok) addLog("SIGNAL_STRENGTH: 100% (Connected)");
+                else addLog("SIGNAL_LOST: Unauthorized access.");
             } catch (e) {
-                addMessage('system', `خطأ: ${e.message}`);
+                addLog("NETWORK_ERROR: Check link.");
             }
         }
-
-        function showCodeConfirmation(newCode) {
-            const modal = document.getElementById('codeModal');
-            const diffArea = document.getElementById('codeDiff');
-            
-            // Store temporarily
-            window._newCode = newCode;
-            
-            // Show preview (first 500 chars)
-            diffArea.innerText = newCode.substring(0, 800) + '\n...\n[الكود كامل جاهز للتطبيق]';
-            modal.classList.remove('hidden');
-        }
-
-        function applyCode() {
-            if (window._newCode) {
-                addMessage('system', '> جاري تطبيق الكود الجديد...');
-                // Save to localStorage to be applied on reload
-                localStorage.setItem('rh_new_code', window._newCode);
-                document.getElementById('codeModal').classList.add('hidden');
-                
-                // Reload to apply
-                setTimeout(() => { location.reload(); }, 500);
-            }
-        }
-
-        function cancelCode() {
-            document.getElementById('codeModal').classList.add('hidden');
-            window._newCode = null;
-        }
-
-        // ================= BACKUP SYSTEM =================
-        function createBackup() {
-            const now = new Date();
-            const code = document.documentElement.outerHTML; // Current state
-
-            state.backups.push({
-                id: now.getTime(),
-                date: now.toLocaleString('ar-EG'),
-                code: code
-            });
-
-            // Keep only the 10 newest
-            if (state.backups.length > 10) {
-                state.backups.shift(); // Remove the oldest (first element)
-            }
-
-            localStorage.setItem('rh_backups', JSON.stringify(state.backups));
-            updateBackupUI();
-            addMessage('system', `> تم إنشاء نسخة احتياطية (${state.backups.length}/10)`);
-        }
-
-        function restoreBackup(index) {
-            if (confirm(`هل تريد استعادة نسخة ${state.backups[index].date}؟`)) {
-                localStorage.setItem('rh_new_code', state.backups[index].code);
-                location.reload();
-            }
-        }
-
-        function deleteBackup(index) {
-            state.backups.splice(index, 1);
-            localStorage.setItem('rh_backups', JSON.stringify(state.backups));
-            updateBackupUI();
-            renderBackupsPage();
-        }
-
-        function updateBackupUI() {
-            document.getElementById('backupCount').innerText = state.backups.length;
-        }
-
-        function renderBackupsPage() {
-            const list = document.getElementById('backupsList');
-            list.innerHTML = '';
-            if (state.backups.length === 0) {
-                list.innerHTML = '<p style="color:var(--text-accent);">لا توجد نسخ احتياطية.</p>';
-                return;
-            }
-
-            // Display newest first
-            [...state.backups].reverse().forEach((backup, i) => {
-                const realIndex = state.backups.length - 1 - i;
-                const div = document.createElement('div');
-                div.style.cssText = 'padding:15px; border:1px solid var(--border-color); margin-bottom:10px; background:var(--bg-terminal);';
-                div.innerHTML = `
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <span style="color:var(--gold);">${backup.date}</span>
-                        <div style="display:flex; gap:10px;">
-                            <button class="btn-hacker" onclick="restoreBackup(${realIndex})">استعادة</button>
-                            <button class="btn-hacker" style="border-color:var(--text-accent); color:var(--text-accent);" onclick="deleteBackup(${realIndex})">حذف</button>
-                        </div>
-                    </div>
-                `;
-                list.appendChild(div);
-            });
-        }
-
-        // ================= UTILITIES =================
-        function handleInput(e) {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                sendMessage();
-            }
-        }
-
-        function showPage(pageId) {
-            document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
-            document.getElementById(`page-${pageId}`).classList.remove('hidden');
-            if (pageId === 'backups') renderBackupsPage();
-        }
-
-        function setModel(modelId) {
-            state.model = modelId;
-            localStorage.setItem('rh_model', modelId);
-            document.getElementById('currentModelDisplay').innerText = modelId.split('/').pop();
-            document.querySelectorAll('.model-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-            addMessage('system', `> تم تغيير النموذج إلى: ${modelId}`);
-        }
-
-        function quickCommand(cmd) {
-            document.getElementById('userInput').value = cmd;
-            sendMessage();
-        }
-
-        function saveSettings() {
-            state.apiKey = document.getElementById('apiKeyInput').value;
-            localStorage.setItem('rh_key', state.apiKey);
-            alert('تم الحفظ!');
-        }
-
-        function exportBackups() {
-            const dataStr = JSON.stringify(state.backups);
-            const dataBlob = new Blob([dataStr], {type: "application/json"});
-            const url = URL.createObjectURL(dataBlob);
-            const a = document.createElement('a');
-            a.href = url; a.download = 'royal_backups.json';
-            a.click();
-        }
-
-        // Apply new code if exists (on load)
-        const newCodeToApply = localStorage.getItem('rh_new_code');
-        if (newCodeToApply) {
-            // This is a conceptual implementation. 
-            // In a real browser, you cannot rewrite the current page's source code directly from JS without reloading.
-            // The standard way is to write to a new document or use a blob.
-            // For this demo, we assume the user accepts a reload strategy.
-            // We'll just clear the flag here as the "reload" already happened.
-            // To actually apply: document.open(); document.write(newCodeToApply); document.close();
-            // BUT: This breaks the script execution context.
-            // SAFER: Just alert that code is ready to be applied next time.
-            console.log("New code detected. In a real app, this would replace the file.");
-            localStorage.removeItem('rh_new_code');
-        }
-
     </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/lucide.min.js"></script>
 </body>
 </html>

@@ -1,10 +1,9 @@
-```html
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام التحكم الذكي | MUAAD</title>
+    <title>مركز التحكم الذكي | MUAAD</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -14,7 +13,6 @@
             --primary: #00f2ff;
             --accent: #ffd700;
             --bg-dark: #0a0a0c;
-            --panel: #16161d;
         }
 
         body {
@@ -25,11 +23,6 @@
         }
 
         .mono { font-family: 'Fira Code', monospace; }
-
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-track { background: #0a0a0c; }
-        ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }
 
         .glass-panel {
             background: rgba(22, 22, 29, 0.8);
@@ -49,140 +42,106 @@
             transform: translateY(-1px);
         }
 
-        @keyframes pulse-gold {
-            0% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.4); }
-            70% { box-shadow: 0 0 0 10px rgba(255, 215, 0, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0); }
-        }
-
-        .saving { animation: pulse-gold 1s infinite; }
+        .chat-msg { animation: fadeIn 0.3s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body class="h-screen flex flex-col">
 
-    <!-- Header -->
     <nav class="glass-panel m-3 p-4 flex justify-between items-center z-50">
         <div class="flex items-center gap-3">
             <div class="w-10 h-10 bg-cyan-500 rounded-full flex items-center justify-center shadow-[0_0_15px_rgba(0,242,255,0.5)]">
-                <i class="fas fa-microchip text-black text-xl"></i>
+                <i class="fas fa-bolt text-black text-xl"></i>
             </div>
             <div>
-                <h1 class="text-lg font-bold tracking-widest text-cyan-400">CORE_V4_SYSTEM</h1>
-                <p class="text-[10px] text-gray-500 mono uppercase">Operator: MUAAD | Status: Stable</p>
+                <h1 class="text-lg font-bold tracking-widest text-cyan-400 uppercase">MUAAD_COMMAND_CENTER</h1>
+                <p class="text-[10px] text-gray-500 mono uppercase">Status: Connected | API: Active</p>
             </div>
         </div>
         <div class="flex gap-4">
-            <button onclick="switchTab('settings')" id="btn-settings" class="tab-btn px-4 py-2 rounded text-sm transition-all"><i class="fas fa-cog ml-2"></i>الإعدادات</button>
-            <button onclick="switchTab('ai')" id="btn-ai" class="tab-btn px-4 py-2 rounded text-sm transition-all active-tab"><i class="fas fa-robot ml-2"></i>الذكاء الاصطناعي</button>
-            <button onclick="switchTab('editor')" id="btn-editor" class="tab-btn px-4 py-2 rounded text-sm transition-all"><i class="fas fa-code ml-2"></i>المحرر الجذري</button>
+            <button onclick="switchTab('ai')" id="btn-ai" class="tab-btn px-4 py-2 rounded text-sm active-tab"><i class="fas fa-robot ml-2"></i>الذكاء الاصطناعي</button>
+            <button onclick="switchTab('editor')" id="btn-editor" class="tab-btn px-4 py-2 rounded text-sm"><i class="fas fa-code ml-2"></i>المحرر الذكي</button>
+            <button onclick="switchTab('settings')" id="btn-settings" class="tab-btn px-4 py-2 rounded text-sm"><i class="fas fa-cog ml-2"></i>الإعدادات</button>
         </div>
     </nav>
 
-    <!-- Main Content Area -->
     <main class="flex-grow p-3 relative overflow-hidden">
         
-        <!-- الواجهة 1: الإعدادات -->
-        <section id="view-settings" class="view-content hidden h-full">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 h-full p-4 overflow-y-auto">
-                <div class="glass-panel p-6 space-y-6">
-                    <h3 class="text-xl font-bold border-b border-cyan-900 pb-2 text-cyan-400">تفضيلات النظام</h3>
-                    <div class="space-y-4">
-                        <div class="flex justify-between items-center">
-                            <span>التحديث التلقائي للكود</span>
-                            <input type="checkbox" id="autoUpdate" checked class="w-5 h-5 accent-cyan-500">
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <span>حفظ سجل النسخ الاحتياطي (10 نسخ)</span>
-                            <input type="checkbox" checked disabled class="w-5 h-5 accent-cyan-500 opacity-50">
-                        </div>
-                        <div class="space-y-2">
-                            <label class="text-sm block text-gray-400">سمة الواجهة (Theme)</label>
-                            <select class="w-full bg-black border border-gray-700 p-2 rounded text-sm outline-none">
-                                <option>Cyber Black & Cyan</option>
-                                <option>Retro Terminal Green</option>
-                                <option>Deep Space Purple</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-                <div class="glass-panel p-6 space-y-6">
-                    <h3 class="text-xl font-bold border-b border-yellow-900 pb-2 text-yellow-500">معلومات الحساب</h3>
-                    <div class="space-y-4 text-sm">
-                        <div class="p-3 bg-black/40 rounded border border-yellow-900/30">
-                            <p class="text-gray-500">الاسم:</p>
-                            <p class="font-bold">MUAAD</p>
-                        </div>
-                        <div class="p-3 bg-black/40 rounded border border-yellow-900/30">
-                            <p class="text-gray-500">معرف الجهاز:</p>
-                            <p class="mono text-xs">SYS-664-966-2436</p>
-                        </div>
-                        <button onclick="clearAllData()" class="w-full bg-red-900/20 border border-red-500 text-red-500 py-2 rounded hover:bg-red-500 hover:text-white transition">مسح جميع البيانات المحلية</button>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- الواجهة 2: الدردشة والربط -->
         <section id="view-ai" class="view-content h-full flex flex-col gap-4">
             <div class="grid grid-cols-4 gap-4 h-full">
-                <!-- Sidebar AI -->
                 <div class="col-span-1 glass-panel p-4 flex flex-col gap-4">
-                    <h3 class="text-sm font-bold text-cyan-400 mb-2">تكوين النماذج</h3>
-                    <div class="space-y-3 flex-grow">
+                    <h3 class="text-xs font-bold text-cyan-400 mb-2 border-b border-cyan-900 pb-1 uppercase">Models_Config</h3>
+                    <div class="space-y-4 flex-grow">
                         <div>
-                            <label class="text-[10px] text-gray-500">مفتاح API الخاص بك:</label>
-                            <input type="password" id="apiKey" class="w-full bg-black border border-gray-700 p-2 rounded text-xs text-yellow-500 outline-none" value="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">
-                        </div>
-                        <div>
-                            <label class="text-[10px] text-gray-500">النموذج النشط:</label>
-                            <select id="modelSelect" class="w-full bg-black border border-gray-700 p-2 rounded text-xs outline-none">
+                            <label class="text-[10px] text-gray-500 block mb-1">النموذج النشط:</label>
+                            <select id="modelSelect" class="w-full bg-black border border-gray-700 p-2 rounded text-xs outline-none text-cyan-400">
                                 <option value="google/gemini-2.0-flash-001">Gemini 2.0 Flash</option>
-                                <option value="anthropic/claude-3-haiku">Claude 3 Haiku</option>
-                                <option value="meta-llama/llama-3-70b">Llama 3 70B</option>
                                 <option value="openai/gpt-4o-mini">GPT-4o Mini</option>
+                                <option value="anthropic/claude-3-haiku">Claude 3 Haiku</option>
                             </select>
                         </div>
+                        <div class="p-3 bg-cyan-950/20 rounded border border-cyan-900/50">
+                            <p class="text-[10px] text-cyan-600 mb-1">معلومات المفتاح:</p>
+                            <p class="text-[9px] mono truncate text-gray-400">sk-or-v1...77b2c5</p>
+                        </div>
                     </div>
-                    <button onclick="saveAIConfig()" id="saveAiBtn" class="btn-glow bg-cyan-600 text-black font-bold py-2 rounded text-sm">حفظ التكوين</button>
+                    <button onclick="switchTab('settings')" class="w-full py-2 text-xs border border-gray-700 rounded hover:bg-gray-800 transition">تغيير المفتاح</button>
                 </div>
-                <!-- Chat Window -->
-                <div class="col-span-3 glass-panel flex flex-col p-2 relative">
+                <div class="col-span-3 glass-panel flex flex-col p-2">
                     <div id="chatBox" class="flex-grow overflow-y-auto p-4 space-y-4 font-light text-sm">
-                        <div class="bg-cyan-900/20 p-3 rounded-lg border-r-2 border-cyan-500">مرحباً بك يا معاذ. النظام جاهز للعمل. اسألني أي شيء أو اطلب تعديل الكود.</div>
+                        <div class="chat-msg bg-cyan-900/10 p-3 rounded-lg border-r-2 border-cyan-500">أهلاً بك يا معاذ. أنا متصل الآن بـ OpenRouter وجاهز للرد على استفساراتك وتنفيذ أوامرك البرمجية.</div>
                     </div>
                     <div class="p-2 flex gap-2">
-                        <input type="text" id="chatInput" placeholder="أدخل استفسارك هنا..." class="flex-grow bg-black border border-gray-800 p-3 rounded-xl outline-none focus:border-cyan-500 transition">
-                        <button onclick="sendChatMessage()" class="w-12 h-12 bg-cyan-500 text-black rounded-xl flex items-center justify-center hover:scale-105 transition"><i class="fas fa-paper-plane"></i></button>
+                        <input type="text" id="chatInput" onkeypress="if(event.key==='Enter') sendChatMessage()" placeholder="اكتب سؤالك هنا..." class="flex-grow bg-black border border-gray-800 p-3 rounded-xl outline-none focus:border-cyan-500 transition text-sm">
+                        <button onclick="sendChatMessage()" id="sendBtn" class="w-12 h-12 bg-cyan-500 text-black rounded-xl flex items-center justify-center hover:scale-105 transition shadow-lg shadow-cyan-500/20"><i class="fas fa-paper-plane"></i></button>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- الواجهة 3: المحرر الجذري -->
         <section id="view-editor" class="view-content hidden h-full flex flex-col gap-4">
             <div class="flex gap-2">
                 <div class="relative flex-grow">
-                    <i class="fas fa-terminal absolute right-3 top-3.5 text-cyan-700"></i>
-                    <input type="text" id="aiCodeCmd" placeholder="أمر الذكاء الاصطناعي (مثال: اجعل الخلفية داكنة أكثر أو أضف زر خروج)..." 
-                           class="w-full bg-black border border-cyan-900 p-3 pr-10 rounded-lg mono text-sm outline-none focus:border-cyan-400 shadow-[inset_0_0_10px_rgba(0,242,255,0.1)]">
+                    <input type="text" id="aiCodeCmd" placeholder="اطلب من الذكاء الاصطناعي تعديل كود الصفحة (مثال: اجعل الأزرار ذهبية)..." 
+                           class="w-full bg-black border border-cyan-900 p-3 pr-4 rounded-lg mono text-sm outline-none focus:border-cyan-400 shadow-[inset_0_0_10px_rgba(0,242,255,0.05)]">
                 </div>
-                <button onclick="processCodeAI()" id="applyAiCode" class="btn-glow bg-yellow-500 text-black px-6 font-bold rounded-lg text-sm">تطبيق بالتوجيه</button>
+                <button onclick="processCodeAI()" id="applyAiBtn" class="btn-glow bg-yellow-500 text-black px-6 font-bold rounded-lg text-xs uppercase">Inject_AI_Code</button>
             </div>
-            
             <div class="grid grid-cols-4 gap-4 flex-grow overflow-hidden">
                 <div class="col-span-1 glass-panel p-3 overflow-y-auto">
-                    <h3 class="text-xs font-bold text-gray-500 mb-3 uppercase tracking-tighter">نقاط الاستعادة (Backups)</h3>
-                    <div id="backupList" class="space-y-2">
-                        <!-- نسخ احتياطية -->
+                    <h3 class="text-[10px] font-bold text-gray-500 mb-3 uppercase tracking-widest border-b border-gray-800 pb-1">System_Backups</h3>
+                    <div id="backupList" class="space-y-2"></div>
+                </div>
+                <div class="col-span-3 glass-panel relative overflow-hidden flex flex-col">
+                    <textarea id="codeTextarea" spellcheck="false" class="w-full flex-grow bg-black/40 p-4 font-mono text-[13px] text-green-400 outline-none leading-relaxed"></textarea>
+                    <div class="p-2 bg-black/60 border-t border-gray-800 flex justify-between">
+                        <div class="flex gap-2">
+                            <button onclick="applyManualCode()" class="bg-green-600/20 border border-green-500 text-green-400 px-4 py-1 rounded text-[10px] hover:bg-green-500 hover:text-black transition uppercase font-bold">Deploy_Changes</button>
+                            <button onclick="rollbackToStable()" class="bg-red-900/20 border border-red-500 text-red-400 px-4 py-1 rounded text-[10px] hover:bg-red-500 hover:text-black transition uppercase font-bold">Rollback</button>
+                        </div>
+                        <span class="text-[10px] text-gray-600 mono">ROOT_ACCESS: ENABLED</span>
                     </div>
                 </div>
-                <div class="col-span-3 glass-panel relative overflow-hidden group">
-                    <div class="absolute top-2 left-4 text-[10px] text-gray-700 mono z-10">ROOT_EDITOR_ACTIVE</div>
-                    <textarea id="codeTextarea" spellcheck="false" class="w-full h-full bg-black/40 p-6 pt-10 font-mono text-sm text-green-400 outline-none leading-relaxed"></textarea>
-                    
-                    <div class="absolute bottom-4 left-4 flex gap-2">
-                        <button onclick="applyManualCode()" class="bg-green-600/20 border border-green-500 text-green-400 px-4 py-1 rounded text-xs hover:bg-green-500 hover:text-black transition">تثبيت يدوي</button>
-                        <button onclick="rollbackToStable()" class="bg-red-900/20 border border-red-500 text-red-400 px-4 py-1 rounded text-xs hover:bg-red-500 hover:text-black transition">استعادة المستقرة</button>
+            </div>
+        </section>
+
+        <section id="view-settings" class="view-content hidden h-full overflow-y-auto">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 p-4">
+                <div class="glass-panel p-6 space-y-6">
+                    <h3 class="text-xl font-bold border-b border-cyan-900 pb-2 text-cyan-400"><i class="fas fa-key ml-2"></i>إعدادات المفتاح</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="text-xs text-gray-500 block mb-1">OpenRouter API Key:</label>
+                            <input type="password" id="settingsApiKey" value="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" class="w-full bg-black border border-gray-700 p-3 rounded text-sm text-yellow-500 outline-none focus:border-yellow-500">
+                        </div>
+                        <button onclick="updateApiKey()" class="w-full bg-cyan-600 text-black font-bold py-2 rounded hover:bg-cyan-500 transition">تحديث وحفظ المفتاح</button>
+                    </div>
+                </div>
+                <div class="glass-panel p-6 space-y-6">
+                    <h3 class="text-xl font-bold border-b border-red-900 pb-2 text-red-500"><i class="fas fa-danger ml-2"></i>إدارة النظام</h3>
+                    <div class="space-y-4">
+                        <button onclick="clearHistory()" class="w-full py-2 bg-red-900/10 border border-red-900 text-red-500 rounded hover:bg-red-900 transition text-sm">مسح سجل الدردشة</button>
+                        <button onclick="location.reload()" class="w-full py-2 border border-gray-700 text-gray-400 rounded hover:bg-gray-800 transition text-sm">إعادة تشغيل النظام</button>
                     </div>
                 </div>
             </div>
@@ -190,58 +149,34 @@
 
     </main>
 
-    <!-- Footer Stats -->
     <footer class="p-2 px-6 flex justify-between items-center text-[10px] mono text-gray-600 border-t border-gray-900">
-        <div class="flex gap-4">
-            <span><i class="fas fa-database ml-1"></i>STORAGE: LOCAL_DB</span>
-            <span><i class="fas fa-link ml-1"></i>API: OPENROUTER_V1</span>
-        </div>
-        <div id="save-indicator" class="hidden text-yellow-500 animate-pulse"><i class="fas fa-save ml-1"></i>جاري المزامنة...</div>
-        <div>&copy; 2026 MUAAD_SYSTEMS. ALL RIGHTS RESERVED.</div>
+        <div>CORE_V4_STABLE | RAM_USAGE: OPTIMAL</div>
+        <div id="statusIndicator" class="text-green-500"><i class="fas fa-circle ml-1 animate-pulse"></i>SYSTEM_READY</div>
     </footer>
 
     <script>
-        // المتغيرات العالمية
-        const API_KEY_VAL = "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";
+        // التكوين الأساسي
         let backups = JSON.parse(localStorage.getItem('muaad_backups')) || [];
-        let currentTab = 'ai';
-
-        // تهيئة النظام
-        window.onload = () => {
-            const savedKey = localStorage.getItem('openrouter_key');
-            if (savedKey) document.getElementById('apiKey').value = savedKey;
-            
-            document.getElementById('codeTextarea').value = document.documentElement.outerHTML;
-            renderBackups();
-            updateIndicator("System Online");
-        };
-
-        // تبديل الواجهات
+        
+        // تبديل التبويبات
         function switchTab(tabId) {
             document.querySelectorAll('.view-content').forEach(v => v.classList.add('hidden'));
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active-tab'));
-            
             document.getElementById(`view-${tabId}`).classList.remove('hidden');
             document.getElementById(`btn-${tabId}`).classList.add('active-tab');
-            currentTab = tabId;
+            if(tabId === 'editor') {
+                document.getElementById('codeTextarea').value = document.documentElement.outerHTML;
+            }
         }
 
-        // وظيفة حفظ الإعدادات
-        function saveAIConfig() {
-            const key = document.getElementById('apiKey').value;
+        // تحديث المفتاح
+        function updateApiKey() {
+            const key = document.getElementById('settingsApiKey').value;
             localStorage.setItem('openrouter_key', key);
-            
-            const btn = document.getElementById('saveAiBtn');
-            btn.innerText = "تم الحفظ بنجاح!";
-            btn.classList.add('saving');
-            
-            setTimeout(() => {
-                btn.innerText = "حفظ التكوين";
-                btn.classList.remove('saving');
-            }, 2000);
+            alert("تم تحديث مفتاح الـ API بنجاح.");
         }
 
-        // إرسال رسالة دردشة
+        // الدردشة الحقيقية مع OpenRouter
         async function sendChatMessage() {
             const input = document.getElementById('chatInput');
             const msg = input.value.trim();
@@ -249,31 +184,38 @@
 
             appendMsg('user', msg);
             input.value = '';
+            
+            const btn = document.getElementById('sendBtn');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            btn.disabled = true;
 
-            const response = await callOpenRouter(msg);
+            const response = await callAI(msg, false);
             appendMsg('ai', response);
+            
+            btn.innerHTML = '<i class="fas fa-paper-plane"></i>';
+            btn.disabled = false;
         }
 
         function appendMsg(role, text) {
             const box = document.getElementById('chatBox');
             const div = document.createElement('div');
-            div.className = role === 'user' ? 'bg-gray-800/50 p-3 rounded-lg text-left' : 'bg-cyan-900/20 p-3 rounded-lg border-r-2 border-cyan-500';
+            div.className = role === 'user' ? 'chat-msg bg-gray-800/40 p-3 rounded-lg text-left text-xs border-l-2 border-gray-600' : 'chat-msg bg-cyan-900/10 p-3 rounded-lg border-r-2 border-cyan-500 text-sm';
             div.innerText = text;
             box.appendChild(div);
             box.scrollTop = box.scrollHeight;
         }
 
-        // استدعاء OpenRouter
-        async function callOpenRouter(prompt, isCodeRequest = false) {
-            const key = document.getElementById('apiKey').value || API_KEY_VAL;
+        // استدعاء محرك الذكاء الاصطناعي
+        async function callAI(prompt, isCode) {
+            const key = localStorage.getItem('openrouter_key') || document.getElementById('settingsApiKey').value;
             const model = document.getElementById('modelSelect').value;
             
-            const systemPrompt = isCodeRequest 
-                ? "أنت مبرمج خبير. قم بتعديل الكود المصدري التالي بناءً على طلب المستخدم. أرجع الكود الكامل فقط داخل وسم ```html."
-                : "أنت مساعد ذكي للمستخدم معاذ. أجب باختصار واحترافية.";
+            const sys = isCode 
+                ? "أنت خبير برمجة. قم بتعديل الكود المصدري التالي بناءً على طلب المستخدم. أرجع الكود المحدث بالكامل داخل وسوم ```html. لا تتكلم، فقط أعطِ الكود."
+                : "أنت مساعد تقني ذكي للمستخدم 'معاذ'. أجب باللغة العربية باحترافية واختصار.";
 
             try {
-                const response = await fetch("[https://openrouter.ai/api/v1/chat/completions](https://openrouter.ai/api/v1/chat/completions)", {
+                const res = await fetch("[https://openrouter.ai/api/v1/chat/completions](https://openrouter.ai/api/v1/chat/completions)", {
                     method: "POST",
                     headers: {
                         "Authorization": `Bearer ${key}`,
@@ -282,64 +224,44 @@
                     body: JSON.stringify({
                         "model": model,
                         "messages": [
-                            {"role": "system", "content": systemPrompt},
-                            {"role": "user", "content": isCodeRequest ? `Current Code: ${document.getElementById('codeTextarea').value}\n\nRequest: ${prompt}` : prompt}
+                            {"role": "system", "content": sys},
+                            {"role": "user", "content": isCode ? `CODE:\n${document.getElementById('codeTextarea').value}\n\nREQUEST: ${prompt}` : prompt}
                         ]
                     })
                 });
-
-                const data = await response.json();
+                const data = await res.json();
                 return data.choices[0].message.content;
-            } catch (err) {
-                return "خطأ في الاتصال: تأكد من مفتاح الـ API والإنترنت.";
+            } catch (e) {
+                return "فشل الاتصال بمحرك الذكاء الاصطناعي. تأكد من المفتاح.";
             }
         }
 
-        // معالجة الكود بالذكاء الاصطناعي
+        // تعديل الكود بالذكاء الاصطناعي
         async function processCodeAI() {
-            const prompt = document.getElementById('aiCodeCmd').value;
-            if(!prompt) return;
+            const cmd = document.getElementById('aiCodeCmd').value;
+            if(!cmd) return;
 
-            const btn = document.getElementById('applyAiCode');
-            btn.innerText = "جاري المعالجة...";
+            const btn = document.getElementById('applyAiBtn');
+            btn.innerText = "PROCESSING...";
             btn.disabled = true;
 
-            const aiResult = await callOpenRouter(prompt, true);
-            
-            // استخراج الكود من الوسوم
+            const aiResult = await callAI(cmd, true);
             const codeMatch = aiResult.match(/```html?([\s\S]*?)```/);
-            const finalCode = codeMatch ? codeMatch[1].trim() : null;
-
-            if(finalCode) {
-                saveToBackup(document.getElementById('codeTextarea').value);
-                document.getElementById('codeTextarea').value = finalCode;
-                alert("تم تحديث الكود بنجاح. يمكنك المراجعة قبل التثبيت اليدوي.");
+            
+            if(codeMatch) {
+                saveBackup(document.getElementById('codeTextarea').value);
+                document.getElementById('codeTextarea').value = codeMatch[1].trim();
+                alert("تم توليد الكود الجديد وتحديث المحرر.");
             } else {
-                alert("لم يتم العثور على كود صالح في رد الذكاء الاصطناعي.");
+                alert("تعذر استخراج الكود. الرد: " + aiResult);
             }
 
-            btn.innerText = "تطبيق بالتوجيه";
+            btn.innerText = "INJECT_AI_CODE";
             btn.disabled = false;
         }
 
-        // التثبيت اليدوي
-        function applyManualCode() {
-            const newCode = document.getElementById('codeTextarea').value;
-            if(confirm("هل تريد تثبيت الكود الجديد؟ سيتم إعادة تحميل الصفحة للتطبيق.")) {
-                saveToBackup(document.documentElement.outerHTML);
-                // ملاحظة: في بيئة حقيقية يتم التحديث عبر DOM أو رفع لـ GitHub
-                // هنا سنقوم بمحاكاة النجاح
-                alert("تم التثبيت بنجاح (محاكاة).");
-            }
-        }
-
-        // إدارة النسخ الاحتياطية
-        function saveToBackup(code) {
-            backups.unshift({ 
-                id: Date.now(), 
-                time: new Date().toLocaleTimeString(), 
-                content: code 
-            });
+        function saveBackup(code) {
+            backups.unshift({ id: Date.now(), time: new Date().toLocaleTimeString(), content: code });
             if(backups.length > 10) backups.pop();
             localStorage.setItem('muaad_backups', JSON.stringify(backups));
             renderBackups();
@@ -349,41 +271,30 @@
             const list = document.getElementById('backupList');
             list.innerHTML = backups.map((b, i) => `
                 <div class="p-2 border border-gray-800 bg-black/20 rounded flex justify-between items-center group">
-                    <div class="text-[10px]">
-                        <p class="text-cyan-500 font-bold">نسخة #${i+1}</p>
-                        <p class="text-gray-600">${b.time}</p>
-                    </div>
-                    <button onclick="restoreBackup(${i})" class="hidden group-hover:block text-xs text-yellow-500 underline">استعادة</button>
+                    <span class="text-[9px] text-cyan-700">#${i+1} - ${b.time}</span>
+                    <button onclick="restoreBackup(${i})" class="hidden group-hover:block text-[9px] text-yellow-500 uppercase">Restore</button>
                 </div>
             `).join('');
         }
 
-        function restoreBackup(index) {
-            if(confirm("استعادة هذه النسخة؟")) {
-                document.getElementById('codeTextarea').value = backups[index].content;
-                switchTab('editor');
+        function restoreBackup(i) {
+            document.getElementById('codeTextarea').value = backups[i].content;
+        }
+
+        function applyManualCode() {
+            const code = document.getElementById('codeTextarea').value;
+            if(confirm("سيتم تطبيق الكود الجديد وتحديث الصفحة. هل أنت متأكد؟")) {
+                document.open();
+                document.write(code);
+                document.close();
             }
         }
 
-        function rollbackToStable() {
-            if(backups.length > 0) restoreBackup(0);
+        function clearHistory() {
+            document.getElementById('chatBox').innerHTML = '<div class="chat-msg bg-cyan-900/10 p-3 rounded-lg border-r-2 border-cyan-500 text-sm">تم مسح السجل.</div>';
         }
 
-        function clearAllData() {
-            if(confirm("سيتم مسح كافة الإعدادات والنسخ الاحتياطية. هل أنت متأكد؟")) {
-                localStorage.clear();
-                location.reload();
-            }
-        }
-
-        function updateIndicator(msg) {
-            const ind = document.getElementById('save-indicator');
-            ind.innerText = msg;
-            ind.classList.remove('hidden');
-            setTimeout(() => ind.classList.add('hidden'), 3000);
-        }
+        window.onload = () => { renderBackups(); };
     </script>
 </body>
 </html>
-
-```

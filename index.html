@@ -3,289 +3,250 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MUAAD SMART HUB</title>
+    <title>MUAAD CORE</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap');
-        
-        :root {
-            --primary-blue: #1e3a8a;
-            --accent-gold: #fbbf24;
-            --dark-bg: #050505;
-        }
-
-        body {
-            font-family: 'Cairo', sans-serif;
-            background-color: var(--dark-bg);
-            color: white;
-            margin: 0;
-            height: 100dvh;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        .glass-panel {
-            background: rgba(15, 15, 15, 0.95);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-        }
-
-        .active-tab {
-            color: var(--accent-gold);
-            border-top: 3px solid var(--accent-gold);
-            background: linear-gradient(to bottom, rgba(251, 191, 36, 0.1), transparent);
-        }
-
-        .chat-bubble {
-            max-width: 85%;
-            padding: 12px 16px;
-            border-radius: 15px;
-            font-size: 14px;
-            line-height: 1.5;
-            margin-bottom: 10px;
-        }
-
-        .user-bubble {
-            background: var(--primary-blue);
-            align-self: flex-start;
-            border-bottom-right-radius: 2px;
-        }
-
-        .ai-bubble {
-            background: #1a1a1a;
-            border: 1px solid #333;
-            align-self: flex-end;
-            border-bottom-left-radius: 2px;
-        }
-
-        .code-area {
-            background: #000;
-            color: #10b981;
-            font-family: 'Courier New', monospace;
-            scrollbar-width: thin;
-        }
-
-        .loader {
-            width: 12px;
-            height: 12px;
-            border: 2px solid #fff;
-            border-bottom-color: transparent;
-            border-radius: 50%;
-            display: inline-block;
-            animation: rotation 1s linear infinite;
-        }
-
-        @keyframes rotation {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-thumb { background: var(--accent-gold); }
+        body { font-family: 'Cairo', sans-serif; background: #050505; color: white; height: 100dvh; overflow: hidden; margin: 0; }
+        .glass { background: rgba(15, 15, 15, 0.98); border: 1px solid rgba(251, 191, 36, 0.1); }
+        .active-nav { color: #fbbf24; border-top: 2px solid #fbbf24; background: linear-gradient(to bottom, rgba(251, 191, 36, 0.1), transparent); }
+        .tab-content { display: none; height: 100%; position: absolute; inset: 0; padding: 15px; flex-direction: column; }
+        .tab-content.active { display: flex; }
+        .msg { max-width: 85%; padding: 10px 15px; border-radius: 12px; font-size: 13px; margin-bottom: 8px; }
+        .msg-user { background: #1e3a8a; align-self: flex-start; }
+        .msg-ai { background: #1a1a1a; border: 1px solid #333; align-self: flex-end; }
+        #auth-overlay { position: fixed; inset: 0; z-index: 100; background: #000; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .loader { border: 2px solid #333; border-top: 2px solid #fbbf24; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: none; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
-<body>
+<body class="flex flex-col">
+
+    <!-- Auth Overlay (اول رسالة تطلع لك) -->
+    <div id="auth-overlay">
+        <div class="glass w-full max-w-md p-8 rounded-3xl text-center space-y-6 border-yellow-600/30">
+            <i class="fas fa-user-shield text-5xl text-yellow-500"></i>
+            <h2 class="text-xl font-bold">نظام الوصول المباشر</h2>
+            <div class="space-y-4">
+                <input type="password" id="init-api-key" placeholder="أدخل مفتاح OpenRouter API..." 
+                       class="w-full bg-black border border-gray-800 p-4 rounded-xl text-center text-yellow-500 outline-none focus:border-yellow-500">
+                <select id="init-model" class="w-full bg-black border border-gray-800 p-4 rounded-xl text-center text-xs outline-none">
+                    <option value="google/gemini-2.0-flash-001">Gemini 2.0 Flash</option>
+                    <option value="anthropic/claude-3-haiku">Claude 3 Haiku</option>
+                    <option value="openai/gpt-4o-mini">GPT-4o Mini</option>
+                </select>
+                <button onclick="System.authenticate()" id="auth-btn" class="w-full bg-yellow-600 text-black font-bold py-4 rounded-xl hover:bg-yellow-500 transition-all flex items-center justify-center gap-2">
+                    <span id="auth-text">بدء الاتصال</span>
+                    <div id="auth-loader" class="loader"></div>
+                </button>
+            </div>
+            <p class="text-[10px] text-gray-500">مرحبا بك يا معاذ. أدخل مفتاحك للبدء.</p>
+        </div>
+    </div>
 
     <!-- Header -->
-    <header class="p-4 glass-panel border-b border-white/10 flex justify-between items-center shrink-0">
-        <div class="flex items-center gap-3">
-            <div class="w-8 h-8 bg-amber-500 rounded flex items-center justify-center text-black shadow-lg">
-                <i class="fas fa-shield-alt"></i>
-            </div>
-            <h1 class="font-bold text-sm tracking-widest text-amber-500 uppercase">Muaad_System_v5</h1>
+    <header class="p-4 border-b border-white/5 flex justify-between items-center bg-black/50 shrink-0">
+        <div class="flex items-center gap-2">
+            <span class="bg-yellow-500 text-black px-2 py-0.5 rounded text-[10px] font-bold">MUAAD</span>
+            <span class="text-xs font-bold tracking-widest opacity-80 uppercase">Core System</span>
         </div>
-        <div id="status-indicator" class="flex items-center gap-2 text-[10px] text-green-500 font-bold">
-            <span class="flex h-2 w-2 rounded-full bg-green-500 animate-pulse"></span>
-            CONNECTED
+        <div id="conn-status" class="text-[9px] text-green-500 flex items-center gap-1 font-bold">
+            <span class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span> ONLINE
         </div>
     </header>
 
-    <!-- Content -->
-    <main class="flex-1 relative overflow-hidden bg-[#080808]">
-        
-        <!-- View: Chat (AI) -->
-        <section id="view-chat" class="absolute inset-0 flex flex-col p-4 space-y-4">
-            <div id="chat-logs" class="flex-1 overflow-y-auto flex flex-col space-y-2 p-2">
-                <div class="ai-bubble chat-bubble">
-                    مرحباً يا معاذ. الواجهة الزرقاء والذهبية عادت، والنظام مرتبط الآن بـ OpenRouter. كيف يمكنني مساعدتك؟
-                </div>
+    <!-- Main Views -->
+    <main class="flex-1 relative">
+        <!-- 1. الدردشة -->
+        <section id="tab-chat" class="tab-content active">
+            <div id="chat-box" class="flex-1 overflow-y-auto flex flex-col p-2">
+                <div class="msg msg-ai">تم الاتصال بنجاح. أنا جاهز لتنفيذ أوامرك يا معاذ.</div>
             </div>
-            <div class="flex gap-2 shrink-0 bg-black/50 p-2 rounded-2xl border border-white/5">
-                <input type="text" id="user-input" placeholder="اطلب أي شيء من الذكاء الاصطناعي..." class="flex-1 bg-transparent px-4 py-3 outline-none text-sm">
-                <button onclick="System.sendChat()" id="send-btn" class="bg-amber-500 text-black w-12 h-12 rounded-xl flex items-center justify-center hover:scale-105 transition-transform shadow-lg shadow-amber-500/20">
-                    <i class="fas fa-paper-plane"></i>
-                </button>
+            <div class="flex gap-2 p-2 bg-white/5 rounded-2xl border border-white/5 mt-2">
+                <input type="text" id="chat-in" placeholder="اسألني أي شيء..." class="flex-1 bg-transparent px-3 py-2 outline-none text-sm">
+                <button onclick="System.sendChat()" id="chat-btn" class="bg-yellow-600 text-black w-10 h-10 rounded-xl flex items-center justify-center"><i class="fas fa-paper-plane"></i></button>
             </div>
         </section>
 
-        <!-- View: Editor -->
-        <section id="view-editor" class="absolute inset-0 hidden flex flex-col p-4 space-y-3">
-            <div class="flex gap-2 shrink-0">
-                <input type="text" id="ai-code-prompt" placeholder="أمر تعديل الكود (مثلاً: غير لون الخلفية)..." class="flex-1 bg-black border border-blue-900/50 p-3 rounded-lg text-xs outline-none focus:border-amber-500 transition-all">
-                <button onclick="System.modifyCode()" id="modify-btn" class="bg-blue-600 px-5 rounded-lg text-[11px] font-bold">تعديل</button>
+        <!-- 2. المحرر -->
+        <section id="tab-editor" class="tab-content">
+            <div class="flex gap-2 mb-2">
+                <input type="text" id="ai-code-in" placeholder="أمر التعديل الذكي..." class="flex-1 bg-black border border-blue-900 p-2 rounded text-xs outline-none">
+                <button onclick="System.aiModify()" id="edit-btn" class="bg-blue-600 text-white px-4 rounded text-xs">تعديل</button>
             </div>
-            <textarea id="main-editor" class="flex-1 code-area p-4 text-xs rounded-lg border border-white/5 outline-none resize-none" spellcheck="false"></textarea>
-            <div class="flex gap-2 shrink-0">
-                <button onclick="System.deploy()" class="flex-1 bg-amber-600 text-black py-3 rounded-xl font-bold text-xs uppercase tracking-widest shadow-lg">تحديث وتثبيت النظام</button>
-                <button onclick="System.copy()" class="bg-zinc-800 px-5 rounded-xl text-amber-500"><i class="fas fa-copy"></i></button>
+            <textarea id="editor-area" class="flex-1 w-full bg-black text-green-500 font-mono text-[10px] p-3 rounded-lg border border-white/5 outline-none resize-none" spellcheck="false"></textarea>
+            <div class="flex gap-2 mt-2">
+                <button onclick="System.deploy()" class="flex-1 bg-yellow-600 text-black py-3 rounded-xl font-bold text-xs uppercase">تثبيت الكود الجديد</button>
+                <button onclick="System.copy()" class="bg-gray-800 px-4 rounded-xl"><i class="fas fa-copy"></i></button>
             </div>
         </section>
 
-        <!-- View: Settings -->
-        <section id="view-settings" class="absolute inset-0 hidden p-6 overflow-y-auto">
-            <div class="max-w-md mx-auto space-y-6">
-                <div class="glass-panel p-6 rounded-3xl space-y-5">
-                    <h3 class="text-amber-500 font-bold flex items-center gap-2 border-b border-white/5 pb-3">
-                        <i class="fas fa-key"></i> إعدادات المفتاح
-                    </h3>
-                    <div class="space-y-2">
-                        <label class="text-[10px] text-zinc-500 uppercase font-bold px-1">OpenRouter API Key</label>
-                        <input type="text" id="api-key-input" value="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" class="w-full bg-black border border-white/10 p-3 rounded-xl text-xs text-amber-400 outline-none focus:border-amber-500">
+        <!-- 3. الإعدادات -->
+        <section id="tab-settings" class="tab-content overflow-y-auto">
+            <div class="space-y-4 max-w-md mx-auto">
+                <div class="glass p-5 rounded-2xl space-y-4">
+                    <h3 class="text-yellow-500 font-bold text-sm">إعدادات المحرك</h3>
+                    <div class="space-y-1">
+                        <label class="text-[10px] text-gray-500">مفتاح الـ API</label>
+                        <input type="password" id="set-api-key" class="w-full bg-black border border-white/10 p-3 rounded-xl text-xs text-yellow-500 outline-none">
                     </div>
-                    <button onclick="System.saveSettings()" class="w-full bg-amber-500 text-black font-bold py-3 rounded-xl text-xs shadow-lg">حفظ الإعدادات</button>
+                    <div class="space-y-1">
+                        <label class="text-[10px] text-gray-500">النموذج النشط</label>
+                        <select id="set-model" class="w-full bg-black border border-white/10 p-3 rounded-xl text-xs outline-none">
+                            <option value="google/gemini-2.0-flash-001">Gemini 2.0 Flash</option>
+                            <option value="anthropic/claude-3-haiku">Claude 3 Haiku</option>
+                        </select>
+                    </div>
+                    <button onclick="System.saveConfig()" class="w-full bg-yellow-600 text-black font-bold py-3 rounded-xl text-xs">حفظ التغييرات</button>
                 </div>
-
-                <div class="glass-panel p-6 rounded-3xl space-y-3">
-                    <h3 class="text-red-500 font-bold flex items-center gap-2 text-sm"><i class="fas fa-exclamation-triangle"></i> التحكم بالنظام</h3>
-                    <button onclick="localStorage.clear(); location.reload();" class="w-full border border-red-900/30 text-red-500 py-3 rounded-xl text-[10px] font-bold hover:bg-red-900/10">إعادة ضبط المصنع (حذف الكاش)</button>
-                </div>
+                <button onclick="localStorage.clear(); location.reload();" class="w-full border border-red-900 text-red-500 py-3 rounded-xl text-[10px]">إعادة ضبط المصنع</button>
             </div>
         </section>
-
     </main>
 
-    <!-- Navigation -->
-    <nav class="glass-panel border-t border-white/5 flex justify-around items-center shrink-0 h-20 px-2 pb-2">
-        <button onclick="System.switch('chat')" id="nav-chat" class="active-tab flex-1 flex flex-col items-center justify-center gap-1 transition-all h-full">
-            <i class="fas fa-robot text-xl"></i><span class="text-[10px] font-bold">الذكاء</span>
+    <!-- Bottom Navigation -->
+    <nav class="bg-black border-t border-white/5 flex justify-around h-16 shrink-0">
+        <button onclick="System.switchTab('chat', this)" class="active-nav flex-1 flex flex-col items-center justify-center gap-1">
+            <i class="fas fa-comment-dots text-lg"></i><span class="text-[9px]">الدردشة</span>
         </button>
-        <button onclick="System.switch('editor')" id="nav-editor" class="flex-1 flex flex-col items-center justify-center gap-1 transition-all h-full">
-            <i class="fas fa-code-branch text-xl"></i><span class="text-[10px] font-bold">المحرر</span>
+        <button onclick="System.switchTab('editor', this)" class="flex-1 flex flex-col items-center justify-center gap-1">
+            <i class="fas fa-terminal text-lg"></i><span class="text-[9px]">المحرر</span>
         </button>
-        <button onclick="System.switch('settings')" id="nav-settings" class="flex-1 flex flex-col items-center justify-center gap-1 transition-all h-full">
-            <i class="fas fa-user-cog text-xl"></i><span class="text-[10px] font-bold">الإعدادات</span>
+        <button onclick="System.switchTab('settings', this)" class="flex-1 flex flex-col items-center justify-center gap-1">
+            <i class="fas fa-sliders-h text-lg"></i><span class="text-[9px]">الإعدادات</span>
         </button>
     </nav>
 
     <script>
         const System = {
-            // مفتاحك الافتراضي
-            DEFAULT_KEY: "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",
+            config: { key: '', model: '' },
 
-            init() {
-                const savedKey = localStorage.getItem('muaad_api_key');
-                if(savedKey) document.getElementById('api-key-input').value = savedKey;
-                document.getElementById('main-editor').value = document.documentElement.outerHTML;
-                
-                // تفعيل Enter للإرسال
-                document.getElementById('user-input').onkeydown = (e) => { if(e.key === 'Enter') this.sendChat(); };
-            },
+            async authenticate() {
+                const key = document.getElementById('init-api-key').value.trim();
+                const model = document.getElementById('init-model').value;
+                if(!key) return alert("يرجى إدخال المفتاح");
 
-            switch(tab) {
-                document.querySelectorAll('main section').forEach(s => s.classList.add('hidden'));
-                document.querySelectorAll('nav button').forEach(b => b.classList.remove('active-tab'));
-                document.getElementById('view-' + tab).classList.remove('hidden');
-                document.getElementById('nav-' + tab).classList.add('active-tab');
-            },
+                const btnText = document.getElementById('auth-text');
+                const loader = document.getElementById('auth-loader');
+                btnText.style.display = 'none';
+                loader.style.display = 'block';
 
-            async callOpenRouter(prompt, systemMsg) {
-                const apiKey = document.getElementById('api-key-input').value || this.DEFAULT_KEY;
+                // اختبار اتصال حقيقي
                 try {
-                    const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+                    const res = await this.callAI("ping", "أجب فقط بكلمة 'pong'", key, model);
+                    if(res.includes("pong") || res.length > 0) {
+                        this.config.key = key;
+                        this.config.model = model;
+                        localStorage.setItem('muaad_key', key);
+                        localStorage.setItem('muaad_model', model);
+                        
+                        document.getElementById('set-api-key').value = key;
+                        document.getElementById('set-model').value = model;
+                        document.getElementById('auth-overlay').style.display = 'none';
+                        document.getElementById('editor-area').value = document.documentElement.outerHTML;
+                    } else {
+                        throw new Error();
+                    }
+                } catch (e) {
+                    alert("فشل الاتصال: تأكد من صحة المفتاح.");
+                    btnText.style.display = 'block';
+                    loader.style.display = 'none';
+                }
+            },
+
+            async callAI(prompt, system, keyOverride, modelOverride) {
+                const key = keyOverride || this.config.key;
+                const model = modelOverride || this.config.model;
+                
+                try {
+                    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
                         method: "POST",
                         headers: {
-                            "Authorization": `Bearer ${apiKey}`,
+                            "Authorization": `Bearer ${key}`,
                             "Content-Type": "application/json"
                         },
                         body: JSON.stringify({
-                            model: "google/gemini-2.0-flash-001",
+                            model: model,
                             messages: [
-                                { role: "system", content: systemMsg },
+                                { role: "system", content: system },
                                 { role: "user", content: prompt }
                             ]
                         })
                     });
-                    const data = await res.json();
-                    if(data.error) throw new Error(data.error.message);
+                    const data = await response.json();
                     return data.choices[0].message.content;
-                } catch (err) {
-                    console.error(err);
-                    return "ERROR: " + err.message;
+                } catch (error) {
+                    return "ERROR: خطأ في المفتاح أو الشبكة.";
                 }
+            },
+
+            switchTab(tab, btn) {
+                document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('nav button').forEach(b => b.classList.remove('active-nav'));
+                document.getElementById('tab-' + tab).classList.add('active');
+                btn.classList.add('active-nav');
             },
 
             async sendChat() {
-                const input = document.getElementById('user-input');
-                const log = document.getElementById('chat-logs');
-                const text = input.value.trim();
-                if(!text) return;
+                const input = document.getElementById('chat-in');
+                const box = document.getElementById('chat-box');
+                if(!input.value.trim()) return;
 
-                log.innerHTML += `<div class="user-bubble chat-bubble">${text}</div>`;
+                const msg = input.value;
+                box.innerHTML += `<div class="msg msg-user">${msg}</div>`;
                 input.value = '';
-                log.scrollTop = log.scrollHeight;
+                box.scrollTop = box.scrollHeight;
 
-                const btn = document.getElementById('send-btn');
-                btn.innerHTML = '<span class="loader"></span>';
-                btn.disabled = true;
-
-                const reply = await this.callOpenRouter(text, "أنت مساعد ذكي للمستخدم معاذ. أجب باللغة العربية باختصار.");
-                
-                log.innerHTML += `<div class="ai-bubble chat-bubble">${reply}</div>`;
-                log.scrollTop = log.scrollHeight;
-                btn.innerHTML = '<i class="fas fa-paper-plane"></i>';
-                btn.disabled = false;
+                const reply = await this.callAI(msg, "أنت مساعد ذكي لمعاذ. أجب باختصار.");
+                box.innerHTML += `<div class="msg msg-ai">${reply}</div>`;
+                box.scrollTop = box.scrollHeight;
             },
 
-            async modifyCode() {
-                const prompt = document.getElementById('ai-code-prompt').value.trim();
-                const editor = document.getElementById('main-editor');
+            async aiModify() {
+                const prompt = document.getElementById('ai-code-in').value;
+                const editor = document.getElementById('editor-area');
                 if(!prompt) return;
 
-                const btn = document.getElementById('modify-btn');
-                btn.innerText = "...";
-                btn.disabled = true;
-
-                const sysPrompt = "أنت خبير تطوير ويب. عدل الكود التالي بناءً على طلب المستخدم وأرجع الكود الكامل فقط داخل ```html.";
-                const result = await this.callOpenRouter(`الكود:\n${editor.value}\n\nالمطلوب: ${prompt}`, sysPrompt);
+                document.getElementById('edit-btn').innerText = "...";
+                const result = await this.callAI(`الكود:\n${editor.value}\n\nالمطلوب: ${prompt}`, "أرجع الكود الكامل فقط داخل ```html.");
+                const code = result.match(/```html?([\s\S]*?)```/);
                 
-                const match = result.match(/```html?([\s\S]*?)```/);
-                if(match) {
-                    editor.value = match[1].trim();
-                    alert("تم تحديث الكود في المحرر. اضغط على زر التثبيت لتفعيل التغييرات.");
-                } else {
-                    alert("تعذر استخراج كود. جرب وصفاً أدق.");
+                if(code) {
+                    editor.value = code[1].trim();
+                    alert("تم التعديل في المحرر.");
                 }
-
-                btn.innerText = "تعديل";
-                btn.disabled = false;
+                document.getElementById('edit-btn').innerText = "تعديل";
             },
 
             deploy() {
-                if(confirm("هل تريد تثبيت التعديلات الجديدة وإعادة تشغيل النظام؟")) {
-                    const newCode = document.getElementById('main-editor').value;
+                if(confirm("تثبيت الكود وإعادة التشغيل؟")) {
                     document.open();
-                    document.write(newCode);
+                    document.write(document.getElementById('editor-area').value);
                     document.close();
                 }
             },
 
+            saveConfig() {
+                this.config.key = document.getElementById('set-api-key').value;
+                this.config.model = document.getElementById('set-model').value;
+                localStorage.setItem('muaad_key', this.config.key);
+                alert("تم الحفظ.");
+            },
+
             copy() {
-                const area = document.getElementById('main-editor');
+                const area = document.getElementById('editor-area');
                 area.select();
                 document.execCommand('copy');
                 alert("تم النسخ!");
-            },
-
-            saveSettings() {
-                const key = document.getElementById('api-key-input').value;
-                localStorage.setItem('muaad_api_key', key);
-                alert("تم حفظ مفتاح API في ذاكرة المتصفح.");
             }
         };
 
-        System.init();
+        // فحص الذاكرة عند التحميل
+        window.onload = () => {
+            const k = localStorage.getItem('muaad_key');
+            if(k) document.getElementById('init-api-key').value = k;
+        };
     </script>
 </body>
 </html>

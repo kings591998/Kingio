@@ -2,169 +2,134 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MUAAD | نظام التحكم الذكي</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MUAAD CORE | نظام التحكم</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap');
-        
-        body {
-            font-family: 'Cairo', sans-serif;
-            background-color: #0f1115;
-            color: #f3f4f6;
-            /* منع التمرير في الجسم الرئيسي ليعمل كتطبيق */
-            height: 100dvh; 
-            overflow: hidden; 
-        }
-
-        .glass {
-            background: rgba(30, 41, 59, 0.7);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        /* تخصيص شريط التمرير */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #374151; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #14b8a6; }
-
-        .tab-btn.active {
-            color: #14b8a6;
-            border-bottom: 2px solid #14b8a6;
-            background: rgba(20, 184, 166, 0.1);
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap');
+        body { font-family: 'Cairo', sans-serif; background: #050505; color: #fff; overflow: hidden; height: 100vh; }
+        .glass { background: rgba(15, 15, 15, 0.9); border: 1px solid #1a1a1a; }
+        .active-tab { color: #fbbf24; border-bottom: 2px solid #fbbf24; }
+        .nav-item { transition: 0.3s; cursor: pointer; }
+        .nav-item:hover { color: #fbbf24; }
+        .code-editor { background: #000; color: #00ff00; font-family: 'Courier New', monospace; }
+        .msg-box { border-radius: 12px; padding: 10px 15px; margin-bottom: 10px; max-width: 80%; }
+        .user-msg { background: #1e3a8a; align-self: flex-start; }
+        .ai-msg { background: #1a1a1a; border: 1px solid #333; align-self: flex-end; }
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-thumb { background: #fbbf24; border-radius: 10px; }
     </style>
 </head>
 <body class="flex flex-col">
 
-    <header class="glass flex justify-between items-center px-4 py-3 shrink-0">
-        <div class="flex items-center gap-3">
-            <div class="w-8 h-8 bg-teal-500 rounded-lg flex items-center justify-center shadow-lg shadow-teal-500/30">
-                <i class="fas fa-layer-group text-gray-900 text-sm"></i>
-            </div>
-            <div>
-                <h1 class="text-sm font-bold tracking-wide text-white">MUAAD<span class="text-teal-400">_CORE</span></h1>
-                <p class="text-[9px] text-teal-500 font-mono">SYSTEM ONLINE - V5</p>
-            </div>
+    <!-- Header -->
+    <header class="p-4 border-b border-yellow-900/30 flex justify-between items-center bg-[#0a0a0a]">
+        <div class="flex items-center gap-2">
+            <i class="fas fa-microchip text-yellow-500"></i>
+            <span class="font-bold tracking-widest text-sm">MUAAD_SYSTEM v5.0</span>
         </div>
-        <div id="loadingIndicator" class="hidden text-teal-400 text-xs animate-pulse">
-            <i class="fas fa-circle-notch fa-spin ml-1"></i> جاري المعالجة...
-        </div>
+        <div id="connection-status" class="text-[10px] text-green-500"><i class="fas fa-circle mr-1 text-[8px]"></i> متصل بالخادم</div>
     </header>
 
-    <nav class="flex border-b border-gray-800 bg-[#0f1115] shrink-0">
-        <button onclick="switchTab('chat')" id="tab-chat" class="tab-btn active flex-1 py-3 text-xs font-semibold text-gray-400 transition-colors"><i class="fas fa-comment-dots ml-2"></i>الدردشة</button>
-        <button onclick="switchTab('editor')" id="tab-editor" class="tab-btn flex-1 py-3 text-xs font-semibold text-gray-400 transition-colors"><i class="fas fa-code ml-2"></i>المحرر</button>
-        <button onclick="switchTab('settings')" id="tab-settings" class="tab-btn flex-1 py-3 text-xs font-semibold text-gray-400 transition-colors"><i class="fas fa-sliders-h ml-2"></i>الإعدادات</button>
-    </nav>
-
+    <!-- Main Views -->
     <main class="flex-1 overflow-hidden relative">
-
-        <section id="view-chat" class="absolute inset-0 flex flex-col p-2 gap-2 h-full">
-            <div id="chatBox" class="flex-1 glass rounded-xl p-4 overflow-y-auto flex flex-col gap-3">
-                <div class="bg-gray-800/50 p-3 rounded-xl rounded-tr-none self-start max-w-[85%] border border-gray-700 text-sm">
-                    مرحباً بك يا معاذ. النظام مرتبط الآن بـ OpenRouter. كيف يمكنني مساعدتك؟
+        
+        <!-- View 1: Chat & AI -->
+        <section id="view-ai" class="absolute inset-0 flex flex-col p-4 space-y-4">
+            <div class="flex-1 glass rounded-xl flex flex-col p-3 overflow-hidden">
+                <div id="chat-container" class="flex-1 overflow-y-auto flex flex-col p-2 text-sm space-y-2">
+                    <div class="ai-msg msg-box text-xs">نظام MUAAD جاهز. مفتاح API مفعل والربط حقيقي. كيف يمكنني مساعدتك برمجياً اليوم؟</div>
                 </div>
             </div>
-            <div class="flex gap-2 shrink-0">
-                <input type="text" id="chatInput" placeholder="اكتب رسالتك..." class="flex-1 bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 outline-none focus:border-teal-500 text-sm transition-colors">
-                <button onclick="handleChat()" class="bg-teal-600 hover:bg-teal-500 text-white px-5 rounded-xl transition-colors shadow-lg"><i class="fas fa-paper-plane"></i></button>
+            <div class="flex gap-2">
+                <input type="text" id="chat-input" placeholder="اطلب أي شيء من الذكاء الاصطناعي..." class="flex-1 bg-black border border-gray-800 p-3 rounded-lg outline-none text-sm focus:border-yellow-500">
+                <button onclick="sendChatRequest()" id="send-btn" class="bg-yellow-600 text-black px-5 rounded-lg hover:bg-yellow-500 transition"><i class="fas fa-paper-plane"></i></button>
             </div>
         </section>
 
-        <section id="view-editor" class="absolute inset-0 hidden flex-col p-2 gap-2 h-full">
-            <div class="flex gap-2 shrink-0">
-                <input type="text" id="aiCmd" placeholder="أمر الذكاء الاصطناعي (مثال: أضف زراً أزرق)..." class="flex-1 bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 outline-none focus:border-teal-500 text-xs">
-                <button onclick="handleCodeAI()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg text-xs font-bold transition-colors">نفذ التعديل</button>
+        <!-- View 2: Code Editor -->
+        <section id="view-editor" class="absolute inset-0 hidden flex flex-col p-4 space-y-3">
+            <div class="flex gap-2">
+                <input type="text" id="ai-code-prompt" placeholder="أخبر الذكاء الاصطناعي بالتغيير المطلوب في الكود..." class="flex-1 bg-black border border-blue-900 p-2 rounded text-xs outline-none focus:border-blue-500">
+                <button onclick="editCodeWithAI()" id="ai-edit-btn" class="bg-blue-600 text-white px-4 rounded text-[10px] font-bold">تعديل ذكي</button>
             </div>
-            
-            <textarea id="codeBox" spellcheck="false" class="flex-1 w-full bg-gray-950 border border-gray-800 rounded-xl p-3 font-mono text-[11px] text-teal-300 outline-none resize-none"></textarea>
-            
-            <div class="flex justify-between items-center shrink-0 p-1">
-                <div class="flex gap-2">
-                    <button onclick="applyCode()" class="bg-teal-600/20 border border-teal-500 text-teal-400 px-4 py-2 rounded-lg text-xs hover:bg-teal-600 hover:text-white transition-colors">تثبيت التعديلات</button>
-                    <button onclick="restoreLast()" class="bg-gray-800 border border-gray-600 text-gray-300 px-4 py-2 rounded-lg text-xs hover:bg-gray-700 transition-colors">استعادة</button>
-                </div>
-                <span class="text-[10px] text-gray-500">ROOT ACCESS</span>
+            <textarea id="main-editor" class="flex-1 code-editor p-4 text-xs rounded border border-gray-800 outline-none resize-none" spellcheck="false"></textarea>
+            <div class="flex gap-2">
+                <button onclick="applyNewCode()" class="flex-1 bg-green-700 py-2 rounded text-[10px] font-bold">تثبيت الكود وتحديث الصفحة</button>
+                <button onclick="copyCode()" class="bg-gray-800 px-4 py-2 rounded text-[10px]">نسخ</button>
             </div>
         </section>
 
-        <section id="view-settings" class="absolute inset-0 hidden p-4 overflow-y-auto h-full">
-            <div class="max-w-md mx-auto space-y-4">
-                <div class="glass p-5 rounded-xl border border-gray-800">
-                    <h3 class="text-sm font-bold text-teal-400 mb-4 border-b border-gray-700 pb-2">تكوين الذكاء الاصطناعي</h3>
-                    <div class="space-y-3">
-                        <div>
-                            <label class="text-xs text-gray-400 block mb-1">مفتاح API (OpenRouter)</label>
-                            <input type="text" id="apiKey" value="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" class="w-full bg-black border border-gray-700 rounded p-2 text-xs text-yellow-500 outline-none focus:border-teal-500">
-                        </div>
-                        <div>
-                            <label class="text-xs text-gray-400 block mb-1">النموذج المفضل</label>
-                            <select id="modelSelect" class="w-full bg-black border border-gray-700 rounded p-2 text-xs outline-none">
-                                <option value="google/gemini-2.0-flash-001">Gemini 2.0 Flash (سريع وذكي)</option>
-                                <option value="anthropic/claude-3-haiku">Claude 3 Haiku</option>
-                                <option value="meta-llama/llama-3-70b-instruct">Llama 3 70B</option>
-                            </select>
-                        </div>
-                        <button onclick="saveSettings()" class="w-full bg-teal-600 text-white py-2 rounded text-xs font-bold mt-2">حفظ الإعدادات</button>
+        <!-- View 3: Settings -->
+        <section id="view-settings" class="absolute inset-0 hidden p-6 overflow-y-auto">
+            <div class="max-w-md mx-auto space-y-6">
+                <div class="glass p-5 rounded-xl space-y-4">
+                    <h3 class="text-yellow-500 font-bold border-b border-yellow-900/20 pb-2 text-sm">إعدادات الربط</h3>
+                    <div>
+                        <label class="text-[10px] text-gray-500 mb-1 block">مفتاح API Key</label>
+                        <input type="password" id="api-key-input" value="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" class="w-full bg-black border border-gray-800 p-2 rounded text-xs text-yellow-500 outline-none">
                     </div>
+                    <div>
+                        <label class="text-[10px] text-gray-500 mb-1 block">النموذج (Model)</label>
+                        <select id="model-select" class="w-full bg-black border border-gray-800 p-2 rounded text-xs outline-none">
+                            <option value="google/gemini-2.0-flash-001">Gemini 2.0 Flash (سريع)</option>
+                            <option value="anthropic/claude-3-haiku">Claude 3 Haiku</option>
+                            <option value="openai/gpt-4o-mini">GPT-4o Mini</option>
+                        </select>
+                    </div>
+                    <button onclick="saveSettings()" class="w-full bg-yellow-600 text-black py-2 rounded text-xs font-bold">حفظ الإعدادات</button>
                 </div>
-
-                <div class="glass p-5 rounded-xl border border-gray-800">
-                    <h3 class="text-sm font-bold text-red-400 mb-4 border-b border-gray-700 pb-2">أوامر النظام</h3>
-                    <div class="space-y-2">
-                        <button onclick="clearHistory()" class="w-full border border-gray-700 text-gray-300 py-2 rounded text-xs hover:bg-gray-800">مسح سجل المحادثة</button>
-                        <button onclick="location.reload()" class="w-full border border-red-900/50 text-red-400 bg-red-900/10 py-2 rounded text-xs hover:bg-red-900/30">إعادة تشغيل النظام</button>
-                    </div>
+                <div class="glass p-5 rounded-xl">
+                    <h3 class="text-red-500 font-bold border-b border-red-900/20 pb-2 text-sm">إدارة البيانات</h3>
+                    <p class="text-[10px] text-gray-400 my-2">مسح الكاش والبيانات المحلية يعيد النظام لحالته الأصلية.</p>
+                    <button onclick="localStorage.clear(); location.reload();" class="w-full border border-red-900/50 text-red-500 py-2 rounded text-xs hover:bg-red-900/10">إعادة ضبط المصنع</button>
                 </div>
             </div>
         </section>
 
     </main>
 
+    <!-- Navigation Bar -->
+    <nav class="bg-[#0a0a0a] border-t border-yellow-900/20 flex justify-around py-3 shrink-0">
+        <div onclick="switchTab('ai')" id="nav-ai" class="nav-item active-tab flex flex-col items-center gap-1">
+            <i class="fas fa-robot text-lg"></i>
+            <span class="text-[10px]">الذكاء الاصطناعي</span>
+        </div>
+        <div onclick="switchTab('editor')" id="nav-editor" class="nav-item flex flex-col items-center gap-1">
+            <i class="fas fa-code text-lg"></i>
+            <span class="text-[10px]">المحرر</span>
+        </div>
+        <div onclick="switchTab('settings')" id="nav-settings" class="nav-item flex flex-col items-center gap-1">
+            <i class="fas fa-cog text-lg"></i>
+            <span class="text-[10px]">الإعدادات</span>
+        </div>
+    </nav>
+
     <script>
-        // إدارة الحالة والنسخ الاحتياطية
-        let backups = JSON.parse(localStorage.getItem('sys_backups')) || [];
-
+        const API_KEY = "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";
+        
         window.onload = () => {
-            const savedKey = localStorage.getItem('api_key');
-            if(savedKey) document.getElementById('apiKey').value = savedKey;
+            const savedKey = localStorage.getItem('user_api_key');
+            if(savedKey) document.getElementById('api-key-input').value = savedKey;
             
-            // تهيئة المحرر بالكود الحالي
-            document.getElementById('codeBox').value = document.documentElement.outerHTML;
-            
-            // تفعيل الإرسال بزر Enter
-            document.getElementById('chatInput').addEventListener('keypress', function (e) {
-                if (e.key === 'Enter') handleChat();
-            });
-        };
+            // تهيئة المحرر بكود الصفحة الحالي
+            document.getElementById('main-editor').value = document.documentElement.outerHTML;
 
-        // تبديل الواجهات
+            // تفعيل Enter للإرسال
+            document.getElementById('chat-input').onkeydown = (e) => { if(e.key === 'Enter') sendChatRequest(); };
+        }
+
         function switchTab(tabId) {
-            document.querySelectorAll('section').forEach(el => el.classList.add('hidden'));
-            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-            
-            document.getElementById(`view-${tabId}`).classList.remove('hidden');
-            document.getElementById(`view-${tabId}`).classList.add('flex');
-            document.getElementById(`tab-${tabId}`).classList.add('active');
+            document.querySelectorAll('main section').forEach(s => s.classList.add('hidden'));
+            document.querySelectorAll('nav .nav-item').forEach(n => n.classList.remove('active-tab'));
+            document.getElementById('view-' + tabId).classList.remove('hidden');
+            document.getElementById('nav-' + tabId).classList.add('active-tab');
         }
 
-        // حفظ الإعدادات
-        function saveSettings() {
-            localStorage.setItem('api_key', document.getElementById('apiKey').value);
-            alert("تم حفظ الإعدادات بنجاح.");
-        }
-
-        function toggleLoading(show) {
-            document.getElementById('loadingIndicator').style.display = show ? 'block' : 'none';
-        }
-
-        // دالة الاتصال بـ OpenRouter (الأساسية)
-        async function fetchAI(prompt, systemRole) {
-            const key = document.getElementById('apiKey').value;
-            const model = document.getElementById('modelSelect').value;
+        async function apiCall(prompt, systemPrompt) {
+            const key = document.getElementById('api-key-input').value || API_KEY;
+            const model = document.getElementById('model-select').value;
             
             try {
                 const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
@@ -174,75 +139,95 @@
                         "Content-Type": "application/json"
                     },
                     body: JSON.stringify({
-                        "model": model,
-                        "messages": [
-                            {"role": "system", "content": systemRole},
-                            {"role": "user", "content": prompt}
+                        model: model,
+                        messages: [
+                            { role: "system", content: systemPrompt },
+                            { role: "user", content: prompt }
                         ]
                     })
                 });
-                
                 const data = await response.json();
-                if(data.error) throw new Error(data.error.message);
                 return data.choices[0].message.content;
-            } catch (err) {
-                return `[خطأ في النظام]: ${err.message || "تأكد من صحة المفتاح والاتصال بالإنترنت"}`;
+            } catch (error) {
+                console.error(error);
+                return "خطأ: تعذر الاتصال بالذكاء الاصطناعي. تأكد من مفتاح الـ API.";
             }
         }
 
-        // معالجة الدردشة
-        async function handleChat() {
-            const inputEl = document.getElementById('chatInput');
-            const msg = inputEl.value.trim();
+        async function sendChatRequest() {
+            const input = document.getElementById('chat-input');
+            const container = document.getElementById('chat-container');
+            const msg = input.value.trim();
             if(!msg) return;
 
-            addChatMsg(msg, 'user');
-            inputEl.value = '';
-            toggleLoading(true);
+            // Add user message
+            container.innerHTML += `<div class="user-msg msg-box text-xs">${msg}</div>`;
+            input.value = '';
+            container.scrollTop = container.scrollHeight;
 
-            const sysRole = "أنت مساعد ذكي للمستخدم 'معاذ'. أجب باختصار، دقة، واحترافية عالية باللغة العربية.";
-            const reply = await fetchAI(msg, sysRole);
-            
-            addChatMsg(reply, 'ai');
-            toggleLoading(false);
+            const btn = document.getElementById('send-btn');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            btn.disabled = true;
+
+            const systemPrompt = "أنت مساعد ذكي للمستخدم معاذ. أجب باختصار واحترافية.";
+            const reply = await apiCall(msg, systemPrompt);
+
+            // Add AI response
+            container.innerHTML += `<div class="ai-msg msg-box text-xs">${reply}</div>`;
+            container.scrollTop = container.scrollHeight;
+            btn.innerHTML = '<i class="fas fa-paper-plane"></i>';
+            btn.disabled = false;
         }
 
-        function addChatMsg(text, type) {
-            const box = document.getElementById('chatBox');
-            const div = document.createElement('div');
-            
-            if(type === 'user') {
-                div.className = "bg-teal-900/30 p-3 rounded-xl rounded-tl-none self-end max-w-[85%] border border-teal-800/50 text-sm text-teal-50";
-            } else {
-                div.className = "bg-gray-800/50 p-3 rounded-xl rounded-tr-none self-start max-w-[85%] border border-gray-700 text-sm";
-            }
-            
-            // تحويل علامات الكود إلى تنسيق بسيط إن وجدت
-            const formattedText = text.replace(/```([\s\S]*?)```/g, '<pre class="bg-black text-xs text-green-400 p-2 rounded mt-2 overflow-x-auto">$1</pre>');
-            div.innerHTML = formattedText;
-            
-            box.appendChild(div);
-            box.scrollTop = box.scrollHeight;
-        }
-
-        // معالجة تعديل الكود عبر الذكاء الاصطناعي
-        async function handleCodeAI() {
-            const cmd = document.getElementById('aiCmd').value;
+        async function editCodeWithAI() {
+            const promptInput = document.getElementById('ai-code-prompt');
+            const editor = document.getElementById('main-editor');
+            const cmd = promptInput.value.trim();
             if(!cmd) return;
 
-            toggleLoading(true);
-            const currentCode = document.getElementById('codeBox').value;
+            const btn = document.getElementById('ai-edit-btn');
+            btn.innerText = "جاري التعديل...";
+            btn.disabled = true;
+
+            const systemPrompt = "أنت خبير تطوير ويب. قم بتعديل الكود المصدري التالي بناءً على طلب المستخدم. أرجع الكود المحدث بالكامل فقط داخل وسم ```html.";
+            const fullPrompt = `الكود الحالي:\n${editor.value}\n\nالتعديل المطلوب: ${cmd}`;
+
+            const result = await apiCall(fullPrompt, systemPrompt);
+            const codeMatch = result.match(/```html?([\s\S]*?)```/);
             
-            const sysRole = "أنت محرك برمجي (Code Generator). قم بتعديل الكود المُرسل بناءً على طلب المستخدم. أرجع الكود الكامل والمعدل فقط داخل وسم ```html. لا تقم بإضافة أي نصوص أخرى أو شروحات.";
-            const prompt = `الكود الحالي:\n${currentCode}\n\nالتعديل المطلوب: ${cmd}`;
+            if(codeMatch) {
+                editor.value = codeMatch[1].trim();
+                promptInput.value = '';
+                alert("تم تعديل الكود في المحرر بنجاح.");
+            } else {
+                alert("تعذر استخراج كود صالح من الرد.");
+            }
 
-            const result = await fetchAI(prompt, sysRole);
-            toggleLoading(false);
+            btn.innerText = "تعديل ذكي";
+            btn.disabled = false;
+        }
 
-            const codeMatch = result.match(/
-http://googleusercontent.com/immersive_entry_chip/0
+        function applyNewCode() {
+            const newCode = document.getElementById('main-editor').value;
+            if(confirm("سيتم تطبيق الكود الجديد وتحديث الصفحة كلياً. استمر؟")) {
+                document.open();
+                document.write(newCode);
+                document.close();
+            }
+        }
 
-### طريقة الاستخدام الفعّالة:
-1. انسخ هذا الكود بالكامل واستبدله في ملف `index.html` الخاص بك على GitHub.
-2. النظام الآن مصمم بأسلوب **(Flexbox & 100dvh)** مما يعني أنه سيتكيف تلقائياً مع حجم شاشة جوالك دون أن تضغط العناصر بعضها فوق بعض.
-3. يعمل المفتاح الخاص بك (`sk-or-v1...`) بشكل افتراضي ومباشر، بمجرد أن تكتب أي رسالة في خانة "الدردشة"، سيتم إرسالها لنموذج الذكاء الاصطناعي وسيصلك الرد الحقيقي فوراً.
+        function copyCode() {
+            const editor = document.getElementById('main-editor');
+            editor.select();
+            document.execCommand('copy');
+            alert("تم نسخ الكود للمحفظة.");
+        }
+
+        function saveSettings() {
+            const key = document.getElementById('api-key-input').value;
+            localStorage.setItem('user_api_key', key);
+            alert("تم حفظ الإعدادات في المتصفح.");
+        }
+    </script>
+</body>
+</html>

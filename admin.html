@@ -2,215 +2,584 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>لوحة تحكم أوج | AWJ Admin</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>مركز قيادة أوج | AWJ Admin</title>
+    <!-- إضافة خطوط متناسقة مع الموقع الرئيسي -->
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@300;600&family=Cinzel:wght@700&family=Lalezar&family=Tajawal&family=Almarai&family=Scheherazade+New:wght@400;700&display=swap" rel="stylesheet">
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         :root {
             --gold: #D4AF37;
+            --gold-dim: rgba(212, 175, 55, 0.15);
             --dark: #060606;
+            --card-dark: #0c0c0c;
             --border: #1a1a1a;
             --input-bg: #0f0f0f;
+            --danger: #ff4444;
+            --success: #2ecc71;
+            --text-muted: #888;
+            --transition: 0.3s ease;
         }
 
         body {
             background-color: var(--dark);
             color: #eee;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Cairo', sans-serif;
             margin: 0;
             display: flex;
+            flex-wrap: wrap;
         }
 
-        /* --- القائمة الجانبية --- */
+        /* ========== القائمة الجانبية ========== */
         .sidebar {
-            width: 250px;
+            width: 280px;
             height: 100vh;
-            background: #000;
+            background: #000000;
             border-left: 1px solid var(--border);
+            position: sticky;
+            top: 0;
             padding: 30px 20px;
-            position: fixed;
+            overflow-y: auto;
         }
 
-        .sidebar h2 { color: var(--gold); font-size: 1.5rem; margin-bottom: 40px; }
-        .nav-item { padding: 15px; cursor: pointer; border-bottom: 1px solid var(--border); transition: 0.3s; }
-        .nav-item:hover { color: var(--gold); background: #0a0a0a; }
+        .sidebar h2 {
+            color: var(--gold);
+            font-family: 'Cinzel', serif;
+            font-size: 1.8rem;
+            margin-bottom: 40px;
+            border-bottom: 2px solid var(--gold);
+            padding-bottom: 10px;
+            display: inline-block;
+        }
 
-        /* --- محتوى الإدارة --- */
+        .nav-item {
+            padding: 14px 18px;
+            margin: 5px 0;
+            cursor: pointer;
+            border-bottom: 1px solid var(--border);
+            transition: var(--transition);
+            color: var(--text-muted);
+            font-weight: 500;
+            border-radius: 8px;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            color: var(--gold);
+            background: var(--gold-dim);
+            border-right: 3px solid var(--gold);
+            padding-right: 15px;
+        }
+
+        /* ========== المحتوى الرئيسي ========== */
         .main-content {
-            margin-right: 250px;
-            padding: 40px;
-            width: 100%;
+            flex: 1;
+            padding: 30px 40px;
+            max-width: calc(100% - 280px);
         }
 
         .section-card {
-            background: #090909;
+            background: var(--card-dark);
             border: 1px solid var(--border);
-            padding: 30px;
-            border-radius: 8px;
+            border-radius: 16px;
+            padding: 28px;
             margin-bottom: 30px;
+            transition: 0.2s;
         }
 
-        h3 { color: var(--gold); border-bottom: 1px solid var(--gold); padding-bottom: 10px; margin-bottom: 25px; }
+        .section-card:hover {
+            border-color: var(--gold-dim);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
 
-        .form-group { margin-bottom: 20px; }
-        label { display: block; margin-bottom: 8px; color: #888; font-size: 0.9rem; }
-        
+        h3 {
+            color: var(--gold);
+            font-family: 'Amiri', serif;
+            font-size: 1.6rem;
+            border-bottom: 1px solid var(--gold);
+            padding-bottom: 8px;
+            margin-bottom: 24px;
+            display: inline-block;
+        }
+
+        .form-group {
+            margin-bottom: 22px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
         input, select, textarea {
             width: 100%;
-            padding: 12px;
+            padding: 12px 14px;
             background: var(--input-bg);
             border: 1px solid var(--border);
-            color: white;
-            border-radius: 4px;
+            color: #f0f0f0;
+            border-radius: 12px;
+            font-family: inherit;
+            transition: 0.2s;
             outline: none;
         }
 
-        input:focus { border-color: var(--gold); }
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--gold);
+            box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.2);
+        }
 
         .btn-gold {
             background: var(--gold);
-            color: black;
+            color: #000;
             border: none;
-            padding: 12px 30px;
+            padding: 12px 32px;
             font-weight: bold;
+            border-radius: 40px;
             cursor: pointer;
-            transition: 0.3s;
+            transition: var(--transition);
+            font-family: 'Cairo', sans-serif;
         }
 
-        .btn-gold:hover { opacity: 0.8; transform: translateY(-2px); }
+        .btn-gold:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(212, 175, 55, 0.3);
+        }
 
-        .plus-btn {
-            background: #111;
-            color: var(--gold);
+        .btn-outline {
+            background: transparent;
             border: 1px solid var(--gold);
-            padding: 5px 10px;
+            color: var(--gold);
+            padding: 8px 20px;
+            border-radius: 40px;
             cursor: pointer;
-            margin-top: 10px;
+            transition: 0.2s;
         }
 
-        /* تنسيق معاينة الأرواح الضالة */
-        .log-mini { font-family: monospace; font-size: 12px; color: #ff4444; background: #000; padding: 10px; margin-top: 5px; }
+        .btn-outline:hover {
+            background: var(--gold);
+            color: #000;
+        }
+
+        .flex-row {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            align-items: flex-end;
+        }
+
+        .flex-row > div {
+            flex: 1;
+        }
+
+        .cat-badge {
+            background: var(--gold-dim);
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            margin: 4px;
+            font-size: 0.8rem;
+        }
+
+        .log-mini {
+            font-family: monospace;
+            font-size: 12px;
+            color: var(--gold);
+            background: #0a0a0a;
+            padding: 8px 12px;
+            border-right: 3px solid var(--gold);
+            margin-bottom: 8px;
+            border-radius: 6px;
+        }
+
+        #mini-logs {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        hr {
+            border-color: var(--border);
+            margin: 20px 0;
+        }
+
+        /* قائمة المقالات المنشورة */
+        .post-item {
+            background: #111;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .post-item span {
+            color: var(--gold);
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                border-left: none;
+                border-bottom: 1px solid var(--border);
+            }
+            .main-content {
+                max-width: 100%;
+                padding: 20px;
+            }
+            .flex-row {
+                flex-direction: column;
+            }
+        }
     </style>
 </head>
 <body>
 
-    <div class="sidebar">
-        <h2>أوج ADM</h2>
-        <div class="nav-item">نشر مقال جديد</div>
-        <div class="nav-item">إدارة التبويبات</div>
-        <div class="nav-item">سجل الأرواح الضالة</div>
-        <div class="nav-item">الإعدادات السيادية</div>
+<div class="sidebar">
+    <h2>أوج ADM</h2>
+    <div class="nav-item active" data-section="publish">نشر وثيقة</div>
+    <div class="nav-item" data-section="categories">هندسة التصنيفات</div>
+    <div class="nav-item" data-section="logs">سجل الأرواح</div>
+    <div class="nav-item" data-section="posts">المقالات المنشورة</div>
+</div>
+
+<div class="main-content">
+    <!-- قسم النشر -->
+    <div id="publish-section" class="section-card">
+        <h3>📜 نشر وثيقة جديدة</h3>
+        
+        <div class="form-group">
+            <label>عنوان المقال الملكي</label>
+            <input type="text" id="post-title" placeholder="اكتب العنوان هنا...">
+        </div>
+
+        <div class="form-group">
+            <label>اسم الكاتب / المحلل</label>
+            <select id="author-select"></select>
+        </div>
+
+        <div class="flex-row">
+            <div class="form-group">
+                <label>التبويبة الرئيسية</label>
+                <select id="select-tab" onchange="updateFieldsDropdown()"></select>
+            </div>
+            <div class="form-group">
+                <label>المجال الفرعي</label>
+                <select id="select-field"></select>
+            </div>
+        </div>
+
+        <div class="flex-row">
+            <div class="form-group">
+                <label>خط العنوان</label>
+                <select id="title-font">
+                    <option value="Amiri">Amiri (رصين)</option>
+                    <option value="Cairo">Cairo (حديث)</option>
+                    <option value="Cinzel">Cinzel (ملكي)</option>
+                    <option value="Lalezar">Lalezar (بارز)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>خط المحتوى</label>
+                <select id="body-font">
+                    <option value="Tajawal">Tajawal (ناعم)</option>
+                    <option value="Almarai">Almarai (رسمي)</option>
+                    <option value="Scheherazade New">Scheherazade (أدبي)</option>
+                    <option value="Amiri">Amiri (كلاسيكي)</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>رفع الصور (اختياري - سيتم حفظ المسارات)</label>
+            <input type="file" id="post-images" multiple accept="image/*">
+            <small style="color:#666;">ملاحظة: سيتم تخزين أسماء الملفات فقط، لرفع حقيقي يحتاج خادم</small>
+        </div>
+
+        <div class="form-group">
+            <label>المحتوى السيادي (HTML مسموح)</label>
+            <textarea id="post-content" rows="10" placeholder="صِغ المعنى هنا..."></textarea>
+        </div>
+
+        <button class="btn-gold" onclick="publishArticle()">نشر في أوج</button>
     </div>
 
-    <div class="main-content">
-        
-        <!-- القسم الأول: إدارة التبويبات والمجالات -->
-        <div class="section-card">
-            <h3>هندسة التصنيفات</h3>
-            <div style="display: flex; gap: 20px;">
-                <div style="flex: 1;">
-                    <label>إضافة تبويبة رئيسية جديدة</label>
-                    <input type="text" id="new-tab" placeholder="مثل: فلسفة، تقنية...">
-                    <button class="plus-btn" onclick="addTab()">+ إضافة التبويبة</button>
-                </div>
-                <div style="flex: 1;">
-                    <label>إضافة مجال فرعي للتبويبة المختارة</label>
-                    <input type="text" id="new-field" placeholder="مثل: وجودية، أمن سيبراني...">
-                    <button class="plus-btn" onclick="addField()">+ إضافة مجال</button>
-                </div>
+    <!-- قسم التصنيفات -->
+    <div id="categories-section" class="section-card" style="display: none;">
+        <h3>🏛️ هندسة التصنيفات</h3>
+        <div class="flex-row">
+            <div class="form-group">
+                <label>التبويبة الرئيسية</label>
+                <input type="text" id="tab-input" placeholder="مثل: فلسفة">
             </div>
-            <div id="hierarchy-preview" style="margin-top: 20px; font-size: 0.8rem; color: #555;">
-                * التبويبات والمجالات ستظهر تلقائياً في الشريط الدوار العلوي.
+            <div class="form-group">
+                <label>المجال الفرعي</label>
+                <input type="text" id="field-input" placeholder="مثل: وجودية">
+            </div>
+            <div>
+                <button class="btn-gold" onclick="addNewCategory()">ربط وإضافة</button>
             </div>
         </div>
-
-        <!-- القسم الثاني: محرك النشر -->
-        <div class="section-card">
-            <h3>نشر وثيقة جديدة</h3>
-            
-            <div class="form-group">
-                <label>عنوان المقال</label>
-                <input type="text" id="post-title" placeholder="اكتب العنوان الملكي هنا...">
-            </div>
-
-            <div style="display: flex; gap: 20px;" class="form-group">
-                <div style="flex: 1;">
-                    <label>اختر القسم (التبويبة)</label>
-                    <select id="select-tab" onchange="updateFieldsDropdown()">
-                        <option>اختر القسم...</option>
-                        <!-- مبرمج ليعمل مع نظام التبويبات الخاص بك -->
-                    </select>
-                </div>
-                <div style="flex: 1;">
-                    <label>اختر المجال (يظهر تلقائياً)</label>
-                    <select id="select-field">
-                        <option>بانتظار القسم...</option>
-                    </select>
-                </div>
-            </div>
-
-            <div style="display: flex; gap: 20px;" class="form-group">
-                <div style="flex: 1;">
-                    <label>خط العنوان (10 خطوط احترافية)</label>
-                    <select id="title-font">
-                        <option value="1">Amiri (كلاسيكي)</option>
-                        <option value="2">Cairo (عصري)</option>
-                        <option value="7">Lalezar (عريض)</option>
-                        <!-- بقية الخطوط الـ 10 مدمجة هنا -->
-                    </select>
-                </div>
-                <div style="flex: 1;">
-                    <label>خط المقال</label>
-                    <select id="body-font">
-                        <option value="3">Tajawal (ناعم)</option>
-                        <option value="4">Almarai (رسمي)</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label>تحميل الصور (يمكن اختيار صور متعددة)</label>
-                <input type="file" id="post-images" multiple accept="image/*">
-            </div>
-
-            <div class="form-group">
-                <label>محتوى المقال (يدعم HTML)</label>
-                <textarea id="post-content" rows="10" placeholder="ابدأ بصياغة المعنى..."></textarea>
-            </div>
-
-            <button class="btn-gold" onclick="sendToMain()">نشر الوثيقة فوراً</button>
+        <div id="categories-preview" style="margin-top: 20px;">
+            <p>التصنيفات الحالية:</p>
+            <div id="current-cats-list"></div>
         </div>
-
-        <!-- القسم الثالث: نبذة عن سجل الأرواح -->
-        <div class="section-card" style="border-color: #300;">
-            <h3 style="color: #ff4444; border-color: #ff4444;">سجل الأرواح الضالة (موجز)</h3>
-            <div id="mini-logs">
-                <div class="log-mini">[!] محاولة دخول من IP: 192.168.1.1 | تم تفعيل الفخ بنجاح.</div>
-            </div>
-        </div>
-
     </div>
 
-    <script>
-        // مصفوفة الكتاب الطبيعية (الـ 50 اسماً) يمكن ربطها هنا أيضاً
+    <!-- قسم السجل -->
+    <div id="logs-section" class="section-card" style="display: none;">
+        <h3 style="color: var(--danger);">⚠️ سجل الأرواح الضالة</h3>
+        <div id="mini-logs">
+            <div class="log-mini">النظام يعمل.. بانتظار المتسللين.</div>
+        </div>
+        <button class="btn-outline" onclick="clearLogs()" style="margin-top: 15px;">مسح السجل</button>
+    </div>
+
+    <!-- قسم المقالات المنشورة -->
+    <div id="posts-section" class="section-card" style="display: none;">
+        <h3>📚 المقالات المنشورة في أوج</h3>
+        <div id="posts-list"></div>
+    </div>
+</div>
+
+<script>
+    // ----------------------------- قاعدة البيانات -----------------------------
+    let awjData = JSON.parse(localStorage.getItem('awj_logic')) || {};
+    let articles = JSON.parse(localStorage.getItem('awj_articles')) || [];
+    let logs = JSON.parse(localStorage.getItem('awj_logs')) || [];
+
+    const naturalAuthors = [
+        "أحمد منصور", "سارة القحطاني", "محمد الشمري", "فاطمة الزهراني", "عبدالله العتيبي",
+        "نورة السبيعي", "حمد الفهد", "ريم عبدالله", "سلطان بن خالد", "العنود الدوسري",
+        "ياسر التميمي", "لينا السلطان", "فيصل الحربي", "هيا الراشد", "عمر العمودي",
+        "منى الغامدي", "بندر الحازمي", "دلال المشعل", "تركي السديري", "شوق البدر",
+        "صالح البارقي", "أريج الفوزان", "مشاري العيد", "نواف بن صقر", "عبير المقرن",
+        "ماجد النفيعي", "لجين العيسى", "خالد الجبر", "وسن التويجري", "فهد الروقي",
+        "هيفاء الماجد", "طلال الرشيد", "جواهر السيف", "باسم الهلال", "مها الخالدي",
+        "راكان الصالح", "نجود المطيري", "سامي الملحم", "ديمة اليحيى", "منصور المنيف",
+        "سلوى الشريف", "إبراهيم السعد", "خلود الفراج", "سيف اليافعي", "أماني الشهري",
+        "سعد السبيعي", "روان كمال", "علي الناصر", "بسمة الصالح", "جمال السويدي"
+    ];
+
+    // إضافة سجل
+    function addLog(msg, type = "info") {
+        const logEntry = { time: new Date().toLocaleString(), text: msg, type };
+        logs.unshift(logEntry);
+        if (logs.length > 50) logs.pop();
+        localStorage.setItem('awj_logs', JSON.stringify(logs));
+        renderLogs();
+    }
+
+    function renderLogs() {
+        const container = document.getElementById('mini-logs');
+        if (!container) return;
+        if (logs.length === 0) {
+            container.innerHTML = '<div class="log-mini">لا توجد أحداث بعد.</div>';
+            return;
+        }
+        container.innerHTML = logs.map(log => `<div class="log-mini" style="${log.type === 'error' ? 'border-right-color: var(--danger); color: #ff8888;' : ''}">[${log.time}] ${log.text}</div>`).join('');
+    }
+
+    function clearLogs() {
+        logs = [];
+        localStorage.setItem('awj_logs', JSON.stringify(logs));
+        renderLogs();
+        addLog("تم مسح سجل الأرواح من قبل المدير");
+    }
+
+    // عرض التصنيفات
+    function refreshCategoriesUI() {
+        const container = document.getElementById('current-cats-list');
+        const tabSelect = document.getElementById('select-tab');
+        if (!container) return;
+        container.innerHTML = '';
+        const keys = Object.keys(awjData);
+        if (keys.length === 0) {
+            container.innerHTML = '<span style="color:#888;">لا توجد تصنيفات مضافة بعد.</span>';
+        } else {
+            keys.forEach(tab => {
+                const fields = awjData[tab];
+                const chip = document.createElement('div');
+                chip.className = 'cat-badge';
+                chip.innerHTML = `<strong style="color:var(--gold);">${tab}</strong> : ${fields.join(' · ')}`;
+                container.appendChild(chip);
+            });
+        }
+
+        // تحديث قائمة التبويبات في النشر
+        if (tabSelect) {
+            tabSelect.innerHTML = '<option value="">اختر القسم...</option>';
+            keys.forEach(k => {
+                tabSelect.innerHTML += `<option value="${k}">${k}</option>`;
+            });
+        }
+        updateFieldsDropdown();
+    }
+
+    function updateFieldsDropdown() {
+        const selectedTab = document.getElementById('select-tab')?.value;
+        const fieldSelect = document.getElementById('select-field');
+        if (!fieldSelect) return;
+        fieldSelect.innerHTML = '<option value="">اختر المجال...</option>';
+        if (selectedTab && awjData[selectedTab]) {
+            awjData[selectedTab].forEach(f => {
+                fieldSelect.innerHTML += `<option value="${f}">${f}</option>`;
+            });
+        }
+    }
+
+    function addNewCategory() {
+        const tab = document.getElementById('tab-input').value.trim();
+        const field = document.getElementById('field-input').value.trim();
+        if (!tab || !field) {
+            alert("يرجى إدخال التبويبة والمجال معاً.");
+            return;
+        }
+        if (!awjData[tab]) awjData[tab] = [];
+        if (!awjData[tab].includes(field)) {
+            awjData[tab].push(field);
+            localStorage.setItem('awj_logic', JSON.stringify(awjData));
+            addLog(`تم إضافة مجال جديد: "${field}" ضمن تبويبة "${tab}"`);
+            alert(`تم ربط [${field}] بقسم [${tab}]`);
+        } else {
+            alert("هذا المجال موجود مسبقاً.");
+        }
+        document.getElementById('field-input').value = "";
+        refreshCategoriesUI();
+    }
+
+    // دالة النشر
+    function publishArticle() {
+        const title = document.getElementById('post-title').value.trim();
+        const author = document.getElementById('author-select').value;
+        const category = document.getElementById('select-tab').value;
+        const subfield = document.getElementById('select-field').value;
+        const titleFont = document.getElementById('title-font').value;
+        const bodyFont = document.getElementById('body-font').value;
+        const content = document.getElementById('post-content').value.trim();
+        const images = document.getElementById('post-images').files;
+        const imageNames = Array.from(images).map(f => f.name);
+
+        if (!title || !author || !category || !subfield || !content) {
+            alert("الرجاء ملء جميع الحقول الأساسية (العنوان، الكاتب، التصنيف، المجال، المحتوى).");
+            return;
+        }
+        const newArticle = {
+            id: Date.now(),
+            title,
+            author,
+            category,
+            subfield,
+            titleFont,
+            bodyFont,
+            content,
+            images: imageNames,
+            date: new Date().toLocaleString('ar-EG'),
+            views: 0
+        };
+        articles.unshift(newArticle);
+        localStorage.setItem('awj_articles', JSON.stringify(articles));
+        addLog(`تم نشر مقال جديد: "${title}" للكاتب ${author}`);
+        alert("تم نشر المقال بنجاح في منصة أوج.");
         
-        function addTab() {
-            let val = document.getElementById('new-tab').value;
-            if(val) {
-                alert("تم إضافة التبويبة: " + val);
-                // منطق الحفظ في قاعدة البيانات
-            }
-        }
+        // تفريغ الحقول
+        document.getElementById('post-title').value = '';
+        document.getElementById('post-content').value = '';
+        document.getElementById('post-images').value = '';
+        document.getElementById('select-tab').value = '';
+        document.getElementById('select-field').innerHTML = '<option value="">اختر المجال...</option>';
+        renderPostsList();
+    }
 
-        function updateFieldsDropdown() {
-            // منطق الربط الذي طلبته: عند اختيار التبويب تظهر المجالات التابعة له
-            let select = document.getElementById('select-field');
-            select.innerHTML = '<option>مجال 1</option><option>مجال 2</option>';
+    function renderPostsList() {
+        const container = document.getElementById('posts-list');
+        if (!container) return;
+        if (articles.length === 0) {
+            container.innerHTML = '<p style="color:#888;">لا توجد مقالات منشورة بعد.</p>';
+            return;
         }
+        container.innerHTML = articles.map(art => `
+            <div class="post-item">
+                <div>
+                    <strong style="color:var(--gold);">${art.title}</strong><br>
+                    <small>${art.author} | ${art.category} / ${art.subfield} | ${art.date}</small>
+                </div>
+                <div>
+                    <button class="btn-outline" onclick="deleteArticle(${art.id})" style="margin-left: 5px;">🗑️ حذف</button>
+                    <button class="btn-outline" onclick="viewArticle(${art.id})">📖 عرض</button>
+                </div>
+            </div>
+        `).join('');
+    }
 
-        function sendToMain() {
-            alert("جاري تشفير الوثيقة وإرسالها للمحرك الرئيسي...");
-            // هنا يتم الربط البرمجي الفعلي مع ملف index.html
+    function deleteArticle(id) {
+        if (confirm("هل أنت متأكد من حذف هذا المقال نهائياً؟")) {
+            articles = articles.filter(a => a.id !== id);
+            localStorage.setItem('awj_articles', JSON.stringify(articles));
+            addLog(`تم حذف مقال برقم ${id}`);
+            renderPostsList();
+            alert("تم حذف المقال.");
         }
-    </script>
+    }
+
+    function viewArticle(id) {
+        const article = articles.find(a => a.id === id);
+        if (article) {
+            alert(`معاينة: ${article.title}\n\nالمحتوى: ${article.content.substring(0, 200)}...`);
+            // يمكن لاحقاً فتح نافذة منبثقة أو توجيه للموقع الرئيسي
+        }
+    }
+
+    // populate Authors
+    function populateAuthors() {
+        const sel = document.getElementById('author-select');
+        if (!sel) return;
+        naturalAuthors.forEach(a => {
+            sel.innerHTML += `<option value="${a}">${a}</option>`;
+        });
+    }
+
+    // تبديل الأقسام (Sidebar)
+    function initSidebar() {
+        const navItems = document.querySelectorAll('.nav-item');
+        const sections = {
+            publish: document.getElementById('publish-section'),
+            categories: document.getElementById('categories-section'),
+            logs: document.getElementById('logs-section'),
+            posts: document.getElementById('posts-section')
+        };
+        navItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const sectionKey = item.getAttribute('data-section');
+                if (!sectionKey) return;
+                navItems.forEach(i => i.classList.remove('active'));
+                item.classList.add('active');
+                Object.values(sections).forEach(sec => { if (sec) sec.style.display = 'none'; });
+                if (sections[sectionKey]) sections[sectionKey].style.display = 'block';
+            });
+        });
+        // إظهار القسم الافتراضي
+        if (sections.publish) sections.publish.style.display = 'block';
+    }
+
+    // تحميل البيانات الأولية
+    window.onload = () => {
+        populateAuthors();
+        refreshCategoriesUI();
+        renderLogs();
+        renderPostsList();
+        initSidebar();
+        addLog("تم فتح لوحة تحكم أوج - جلسة إدارية جديدة");
+    };
+</script>
 </body>
 </html>
-

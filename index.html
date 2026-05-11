@@ -68,12 +68,9 @@
             color: var(--gold);
             letter-spacing: 2px;
         }
-
-        /* باقي التنسيقات */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: #111; }
         ::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 10px; }
-
         header {
             position: fixed; top: 0; width: 100%; height: 80px;
             display: flex; justify-content: space-between; align-items: center;
@@ -91,7 +88,6 @@
             transition: 0.2s;
         }
         .search-icon:hover, .subscribe-icon:hover { color: var(--gold); }
-
         .tabs-nav {
             position: fixed; top: 80px; width: 100%;
             background: rgba(8, 8, 8, 0.96); backdrop-filter: blur(8px);
@@ -111,7 +107,6 @@
             background: var(--gold); color: #000;
             border-color: var(--gold); box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
         }
-
         .sub-fields-bar {
             position: fixed; top: 145px; width: 100%;
             background: rgba(12, 12, 12, 0.96); backdrop-filter: blur(12px);
@@ -129,7 +124,6 @@
             border-bottom: 1px solid transparent; padding-bottom: 4px;
         }
         .field-node:hover { color: var(--gold); border-bottom-color: var(--gold); }
-
         .article-viewport {
             margin-top: 230px; padding: 0 8% 100px;
             animation: fadeSlideUp 0.6s ease-out;
@@ -166,8 +160,6 @@
             box-shadow: 0 0 10px rgba(212,175,55,0.5);
         }
         .scroll-top.visible { opacity: 1; }
-
-        /* المودال للصفحات الثابتة والاشتراك والبحث */
         .modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.95); z-index: 10001; justify-content: center; align-items: center;
@@ -177,12 +169,10 @@
             width: 90%; max-width: 600px; max-height: 80vh; overflow-y: auto;
         }
         .modal-content h3 { color: var(--gold); margin-bottom: 20px; }
-        .close-modal { float: left; cursor: pointer; font-size: 1.5rem; }
+        .close-modal { float: right; cursor: pointer; font-size: 1.5rem; }
         .search-input { width: 100%; padding: 12px; margin: 20px 0; background: #1a1a1a; border: 1px solid #333; color: white; border-radius: 30px; }
         .search-result { border-bottom: 1px solid #333; padding: 10px 0; cursor: pointer; }
         .search-result:hover { background: var(--gold-dim); }
-
-        /* الأقسام الثلاثة السفلية */
         .bottom-sections {
             display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px;
             margin: 60px 0 40px;
@@ -194,12 +184,10 @@
         .bottom-card ul { list-style: none; }
         .bottom-card li { margin-bottom: 10px; cursor: pointer; border-bottom: 1px dashed #222; padding: 5px 0; }
         .bottom-card li:hover { color: var(--gold); }
-
         footer { text-align: center; padding: 40px; opacity: 0.8; border-top: 1px solid #1a1a1a; margin-top: 20px; }
         .footer-links { display: flex; gap: 30px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap; }
         .footer-links span { cursor: pointer; font-size: 0.9rem; }
         .footer-links span:hover { color: var(--gold); }
-
         @media (max-width: 768px) {
             .bottom-sections { grid-template-columns: 1fr; }
             .logo { font-size: 1.6rem; }
@@ -235,13 +223,11 @@
 
 <main class="article-viewport">
     <div id="content-render" class="main-article-card">
-        <!-- يتم تعبئة المحتوى ديناميكياً -->
         <h1 style="font-size: 2.8rem; color: var(--gold);">أوج | منصة المعرفة السيادية</h1>
         <p style="font-size: 1.2rem; line-height: 1.8; margin-top: 20px;">اختر قسماً من الأعلى لاستعراض المقالات أو العلوم المصنفة.</p>
     </div>
 </main>
 
-<!-- الأقسام السفلية -->
 <div class="article-viewport" style="margin-top: 0;">
     <div class="bottom-sections" id="bottom-sections-container">
         <div class="bottom-card"><h4>📰 مقالات ذات صلة</h4><ul id="related-posts"></ul></div>
@@ -260,18 +246,17 @@
     <p>جميع الحقوق محفوظة © <span id="vault-trigger">2026</span> | طاقة سيادية</p>
 </footer>
 
-<!-- مودال الصفحات الثابتة -->
+<!-- المودالات -->
 <div id="static-modal" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal()">&times;</span><div id="static-content"></div></div></div>
-<!-- مودال الاشتراك -->
 <div id="subscribe-modal" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal()">&times;</span><h3>📧 اشترك في النشرة السيادية</h3><input type="email" id="sub-email" placeholder="بريدك الإلكتروني" style="width:100%;padding:10px;margin:15px 0;"><button id="do-subscribe" class="btn-gold" style="background:var(--gold);color:#000;border:none;padding:10px 20px;">اشتراك</button><p id="sub-message" style="margin-top:15px;"></p></div></div>
-<!-- مودال البحث -->
 <div id="search-modal" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal()">&times;</span><h3>🔍 بحث في المعرفة</h3><input type="text" id="search-query" class="search-input" placeholder="اكتب كلمة مفتاحية..."><div id="search-results-list"></div></div></div>
+<!-- مودال الخزنة السرية -->
+<div id="vault-modal" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal()">&times;</span><div id="vault-content"></div></div></div>
 
-<!-- زر الرجوع للأعلى -->
 <div id="scroll-top-btn" class="scroll-top"><i class="fas fa-arrow-up"></i></div>
 
 <script>
-    // ----------------------------- شاشة الانتظار والمحاكاة -----------------------------
+    // ----------------------------- شاشة الانتظار -----------------------------
     let loadProgress = 0;
     const loadInterval = setInterval(() => {
         loadProgress += Math.floor(Math.random() * 15) + 5;
@@ -289,14 +274,13 @@
         }
     }, 100);
 
-    // ----------------------------- بيانات الموقع (من localStorage أو افتراضية) -----------------------------
+    // ----------------------------- البيانات من localStorage -----------------------------
     let awjData = JSON.parse(localStorage.getItem('awj_logic')) || {};
     let articles = JSON.parse(localStorage.getItem('awj_articles')) || [];
     let currentTab = null;
     let currentField = null;
     let subTimer = null;
 
-    // دالة لزيادة المشاهدات
     function incrementView(articleId) {
         let art = articles.find(a => a.id == articleId);
         if (art) {
@@ -305,16 +289,11 @@
         }
     }
 
-    // عرض التبويبات
     function renderTabs() {
         const container = document.getElementById('main-tabs');
         const tabs = Object.keys(awjData);
         if (tabs.length === 0) {
-            // بيانات افتراضية إذا لم توجد
-            awjData = {
-                "الحكمة": ["فلسفة", "روحانيات"],
-                "الاستراتيجية": ["جيوسياسة", "اقتصاد"]
-            };
+            awjData = { "الحكمة": ["فلسفة", "روحانيات"], "الاستراتيجية": ["جيوسياسة", "اقتصاد"] };
             localStorage.setItem('awj_logic', JSON.stringify(awjData));
             renderTabs();
             return;
@@ -400,15 +379,17 @@
 
     window.viewFullArticle = function(id) {
         incrementView(id);
+        updateBottomSections(id);
         const article = articles.find(a => a.id === id);
         if (article) {
-            renderContent(article.title, `
+            const fullHtml = `
                 <div class="article-cats"><span class="cat-badge-sm">${article.category}</span><span class="cat-badge-sm">${article.subfield}</span></div>
                 <div class="article-meta"><span><i class="fas fa-user"></i> ${article.author}</span><span><i class="fas fa-calendar"></i> ${article.date}</span><span><i class="fas fa-eye"></i> ${article.views || 0}</span></div>
                 <div style="font-family: '${article.bodyFont || 'Tajawal'}', sans-serif; line-height: 1.8; margin-top:20px;">${article.content}</div>
                 ${article.images && article.images.length ? `<div style="margin-top:20px;">🖼️ الصور: ${article.images.join(', ')}</div>` : ''}
                 <hr style="margin:30px 0;"><button onclick="location.reload()" style="background:transparent; border:1px solid var(--gold); padding:8px 20px; border-radius:30px;">العودة</button>
-            `);
+            `;
+            document.getElementById('content-render').innerHTML = `<h1 style="font-size:2rem;color:var(--gold);">${article.title}</h1>${fullHtml}`;
         } else alert("المقال غير موجود");
     };
 
@@ -416,31 +397,23 @@
         document.getElementById('content-render').innerHTML = `<h1 style="font-size:2rem;color:var(--gold);margin-bottom:20px;">${title}</h1><div>${bodyHtml}</div>`;
     }
 
-    // ----------------------------- الأقسام السفلية (ذات صلة، أحدث، أكثر مشاهدة) -----------------------------
+    // ----------------------------- الأقسام السفلية -----------------------------
     function updateBottomSections(currentArticleId = null) {
-        // أحدث المقالات (حسب id التنازلي)
         const latest = [...articles].sort((a,b) => b.id - a.id).slice(0,5);
-        // الأكثر مشاهدة
         const mostViewed = [...articles].sort((a,b) => (b.views||0) - (a.views||0)).slice(0,5);
-        // مقالات ذات صلة: إذا كان هناك مقال حالي نأخذ من نفس التصنيف، وإلا نأخذ عشوائي
         let related = [];
         if (currentArticleId) {
             const current = articles.find(a => a.id == currentArticleId);
-            if (current) {
-                related = articles.filter(a => a.category === current.category && a.id !== current.id).slice(0,5);
-            }
+            if (current) related = articles.filter(a => a.category === current.category && a.id !== current.id).slice(0,5);
         }
         if (related.length === 0) related = articles.slice(0,5);
-        const relatedList = document.getElementById('related-posts');
-        const latestList = document.getElementById('latest-posts');
-        const mostList = document.getElementById('most-viewed-posts');
-        relatedList.innerHTML = related.map(a => `<li onclick="viewFullArticle(${a.id})">${a.title} (${a.views||0})</li>`).join('');
-        latestList.innerHTML = latest.map(a => `<li onclick="viewFullArticle(${a.id})">${a.title} - ${a.date || 'قديم'}</li>`).join('');
-        mostList.innerHTML = mostViewed.map(a => `<li onclick="viewFullArticle(${a.id})">${a.title} 👁️ ${a.views||0}</li>`).join('');
+        document.getElementById('related-posts').innerHTML = related.map(a => `<li onclick="viewFullArticle(${a.id})">${a.title} (${a.views||0})</li>`).join('');
+        document.getElementById('latest-posts').innerHTML = latest.map(a => `<li onclick="viewFullArticle(${a.id})">${a.title} - ${a.date || 'قديم'}</li>`).join('');
+        document.getElementById('most-viewed-posts').innerHTML = mostViewed.map(a => `<li onclick="viewFullArticle(${a.id})">${a.title} 👁️ ${a.views||0}</li>`).join('');
     }
 
     // ----------------------------- الصفحات الثابتة -----------------------------
-    function openStaticPage(page) {
+    window.openStaticPage = function(page) {
         const modal = document.getElementById('static-modal');
         const contentDiv = document.getElementById('static-content');
         let html = '';
@@ -450,9 +423,9 @@
         else if (page === 'terms') html = `<h2>شروط الاستخدام</h2><p>المحتوى محمي بحقوق النشر. يمنع النسخ أو إعادة النشر دون إذن.</p>`;
         contentDiv.innerHTML = html;
         modal.style.display = 'flex';
-    }
+    };
 
-    // ----------------------------- الاشتراك (واجهة مؤقتة) -----------------------------
+    // ----------------------------- الاشتراك -----------------------------
     document.getElementById('do-subscribe')?.addEventListener('click', () => {
         const email = document.getElementById('sub-email').value;
         if (email.includes('@')) {
@@ -473,7 +446,7 @@
     }
     document.getElementById('search-query')?.addEventListener('input', performSearch);
 
-    // ----------------------------- مودالات -----------------------------
+    // ----------------------------- المودالات -----------------------------
     function closeModal() { document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); }
     document.getElementById('open-search-btn').onclick = () => { document.getElementById('search-modal').style.display = 'flex'; document.getElementById('search-query').value = ''; document.getElementById('search-results-list').innerHTML = ''; };
     document.getElementById('open-subscribe-btn').onclick = () => { document.getElementById('subscribe-modal').style.display = 'flex'; };
@@ -488,30 +461,39 @@
     };
     scrollBtn.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
 
+    // ----------------------------- زر 2026 (الخزنة السرية) -----------------------------
+    let clickCount2026 = 0;
+    const vaultTrigger = document.getElementById('vault-trigger');
+    vaultTrigger.addEventListener('click', () => {
+        clickCount2026++;
+        setTimeout(() => { clickCount2026 = 0; }, 1500);
+        if (clickCount2026 === 3) {
+            const pass = prompt("شَفَرَةُ العُبُورِ:");
+            if (pass === "@...Alshanfricc_1998...@") {
+                const vaultModal = document.getElementById('vault-modal');
+                const vaultContent = document.getElementById('vault-content');
+                vaultContent.innerHTML = `
+                    <h2 style="color: var(--gold);">🔓 الخزنة المقدسة</h2>
+                    <p>لقد وصلت إلى أعلى درجات التصريح. هُنا توجد المفاتيح السرية والملفات المؤرشفة من عصور السيادة.</p>
+                    <pre style="background:#000;padding:10px;border-radius:8px; direction: ltr;">🔑 مفتاح السيادة: AWJ-2026-ALSHANFRICC</pre>
+                    <p>البيانات المخزنة: <span id="secret-data"></span></p>
+                    <hr>
+                    <button onclick="closeModal()" style="margin-top:15px; background:var(--gold); color:#000; padding:8px 20px; border:none; border-radius:30px;">إغلاق</button>
+                `;
+                const secretSpan = document.getElementById('secret-data');
+                if (secretSpan) secretSpan.innerText = `عدد المقالات: ${articles.length} | التصنيفات: ${Object.keys(awjData).length}`;
+                vaultModal.style.display = 'flex';
+            } else {
+                alert("شَفَرَةٌ خَاطِئَةٌ. حَظُّ أَوَجَ يَرْعَاكَ.");
+            }
+            clickCount2026 = 0;
+        }
+    });
+
     // ----------------------------- التهيئة النهائية -----------------------------
     window.onload = () => {
         renderTabs();
         updateBottomSections();
-        // إذا كان هناك مقال معروض حالياً، نحدث ذات الصلة
-        // لكن سنقوم بربط عند فتح مقال لتحديث القسم السفلي.
-        // نضيف استدعاء ديناميكي لـ viewFullArticle الأصلية لتحديث الـ related
-        const originalView = window.viewFullArticle;
-        window.viewFullArticle = function(id) {
-            incrementView(id);
-            updateBottomSections(id);
-            const article = articles.find(a => a.id === id);
-            if (article) {
-                renderContent(article.title, `...`); // نفس المحتوى السابق
-                // نعيد كتابة المحتوى مع البيانات المحدثة
-                const fullHtml = `
-                    <div class="article-cats"><span class="cat-badge-sm">${article.category}</span><span class="cat-badge-sm">${article.subfield}</span></div>
-                    <div class="article-meta"><span><i class="fas fa-user"></i> ${article.author}</span><span><i class="fas fa-calendar"></i> ${article.date}</span><span><i class="fas fa-eye"></i> ${article.views||0}</span></div>
-                    <div style="font-family: '${article.bodyFont || 'Tajawal'}', sans-serif; line-height: 1.8; margin-top:20px;">${article.content}</div>
-                    <hr><button onclick="location.reload()" style="background:transparent; border:1px solid var(--gold); padding:8px 20px;">العودة</button>
-                `;
-                document.getElementById('content-render').innerHTML = `<h1 style="font-size:2rem;color:var(--gold);">${article.title}</h1>${fullHtml}`;
-            } else alert("المقال غير موجود");
-        };
     };
 </script>
 </body>

@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta name="monetization" content="$ilp.uphold.com/your-payment-pointer">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#D4AF37">
     <title>أوج | AWJ - القمة</title>
     <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@300;600&family=Cinzel:wght@700&family=Tajawal&family=Almarai&family=Scheherazade+New:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -14,6 +17,7 @@
             --dark-bg: #050505;
             --card-bg: #0c0c0c;
             --danger: #ff3333;
+            --success: #2ecc71;
             --glass: rgba(212, 175, 55, 0.08);
             --transition: 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
         }
@@ -22,187 +26,88 @@
             color: #e0e0e0;
             font-family: 'Amiri', serif;
             overflow-x: hidden;
-            user-select: none;
+            transition: background 0.3s, color 0.3s;
         }
-        /* شاشة الانتظار الفخمة */
+        body.light-mode { background: #f5f5f0; color: #1a1a1a; }
+        body.gold-mode { background: #1a1a0a; color: #ffd966; }
+        
+        /* شاشة الانتظار */
         #loading-screen {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: #000000;
-            z-index: 100000;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000000; z-index: 100000; display: flex;
+            flex-direction: column; justify-content: center; align-items: center;
             transition: opacity 1.5s ease;
         }
         .walking-man {
-            width: 80px;
-            height: 80px;
+            width: 80px; height: 80px;
             background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="30" r="12" fill="%23D4AF37"/><rect x="45" y="42" width="10" height="25" fill="%23D4AF37"/><rect x="35" y="50" width="10" height="20" fill="%23D4AF37"/><rect x="55" y="50" width="10" height="20" fill="%23D4AF37"/></svg>') no-repeat center;
-            background-size: contain;
-            animation: walk 0.5s infinite alternate;
-            margin-bottom: 30px;
+            background-size: contain; animation: walk 0.5s infinite alternate; margin-bottom: 30px;
         }
-        @keyframes walk {
-            0% { transform: translateX(-10px); }
-            100% { transform: translateX(10px); }
-        }
-        .progress-line {
-            width: 80%;
-            height: 4px;
-            background: #222;
-            border-radius: 4px;
-            overflow: hidden;
-            margin-top: 20px;
-        }
-        .progress-fill-line {
-            width: 0%;
-            height: 100%;
-            background: var(--gold);
-            transition: width 0.1s linear;
-        }
-        .loading-text {
-            margin-top: 20px;
-            font-family: monospace;
-            color: var(--gold);
-            letter-spacing: 2px;
-        }
+        @keyframes walk { 0% { transform: translateX(-10px); } 100% { transform: translateX(10px); } }
+        .progress-line { width: 80%; height: 4px; background: #222; border-radius: 4px; overflow: hidden; margin-top: 20px; }
+        .progress-fill-line { width: 0%; height: 100%; background: var(--gold); transition: width 0.1s linear; }
+        
+        /* باقي التنسيقات */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: #111; }
         ::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 10px; }
         header {
             position: fixed; top: 0; width: 100%; height: 80px;
             display: flex; justify-content: space-between; align-items: center;
-            padding: 0 5%; background: rgba(5, 5, 5, 0.96);
-            backdrop-filter: blur(16px); border-bottom: 1px solid var(--glass);
-            z-index: 2000; transition: transform 0.3s ease;
+            padding: 0 5%; background: rgba(5, 5, 5, 0.96); backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--glass); z-index: 2000; transition: transform 0.3s ease;
         }
-        .logo {
-            font-family: 'Cinzel', serif; font-size: 2.3rem;
-            color: var(--gold); text-shadow: 0 0 12px rgba(212, 175, 55, 0.5);
-            letter-spacing: 4px; cursor: pointer;
-        }
-        .search-icon, .subscribe-icon {
-            cursor: pointer; font-size: 1.4rem; margin-left: 15px;
-            transition: 0.2s;
-        }
-        .search-icon:hover, .subscribe-icon:hover { color: var(--gold); }
-        .tabs-nav {
-            position: fixed; top: 80px; width: 100%;
-            background: rgba(8, 8, 8, 0.96); backdrop-filter: blur(8px);
-            z-index: 1900; border-bottom: 1px solid rgba(212, 175, 55, 0.15);
-        }
-        .tabs-wrapper {
-            display: flex; overflow-x: auto; white-space: nowrap;
-            padding: 12px 5%; gap: 12px; scrollbar-width: thin;
-        }
-        .tab-item {
-            background: transparent; border: 1px solid #2a2a2a;
-            color: #aaa; padding: 8px 24px; border-radius: 40px;
-            cursor: pointer; font-family: 'Cairo', sans-serif;
-            font-weight: 600; transition: 0.2s; flex: 0 0 auto;
-        }
-        .tab-item.active {
-            background: var(--gold); color: #000;
-            border-color: var(--gold); box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
-        }
-        .sub-fields-bar {
-            position: fixed; top: 145px; width: 100%;
-            background: rgba(12, 12, 12, 0.96); backdrop-filter: blur(12px);
-            z-index: 1800; max-height: 0; overflow: hidden;
-            transition: max-height 0.4s ease-out; border-bottom: 1px solid transparent;
-        }
+        body.light-mode header { background: rgba(245, 245, 240, 0.96); }
+        .logo { font-family: 'Cinzel', serif; font-size: 2.3rem; color: var(--gold); text-shadow: 0 0 12px rgba(212,175,55,0.5); letter-spacing: 4px; cursor: pointer; }
+        .search-icon, .subscribe-icon, .user-settings-icon { cursor: pointer; font-size: 1.4rem; margin-left: 15px; transition: 0.2s; }
+        .search-icon:hover, .subscribe-icon:hover, .user-settings-icon:hover { color: var(--gold); }
+        .tabs-nav { position: fixed; top: 80px; width: 100%; background: rgba(8, 8, 8, 0.96); backdrop-filter: blur(8px); z-index: 1900; border-bottom: 1px solid rgba(212,175,55,0.15); }
+        .tabs-wrapper { display: flex; overflow-x: auto; white-space: nowrap; padding: 12px 5%; gap: 12px; scrollbar-width: thin; }
+        .tab-item { background: transparent; border: 1px solid #2a2a2a; color: #aaa; padding: 8px 24px; border-radius: 40px; cursor: pointer; font-family: 'Cairo', sans-serif; font-weight: 600; transition: 0.2s; flex: 0 0 auto; }
+        .tab-item.active { background: var(--gold); color: #000; border-color: var(--gold); box-shadow: 0 0 15px rgba(212,175,55,0.5); }
+        .sub-fields-bar { position: fixed; top: 145px; width: 100%; background: rgba(12,12,12,0.96); backdrop-filter: blur(12px); z-index: 1800; max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out; border-bottom: 1px solid transparent; }
         .sub-fields-bar.active { max-height: 80px; border-bottom-color: var(--gold-dim); }
-        .fields-flex {
-            display: flex; justify-content: center; gap: 28px;
-            padding: 16px; flex-wrap: wrap;
-        }
-        .field-node {
-            font-size: 0.9rem; color: #ccc; cursor: pointer;
-            transition: 0.2s; font-family: 'Cairo', sans-serif;
-            border-bottom: 1px solid transparent; padding-bottom: 4px;
-        }
+        .fields-flex { display: flex; justify-content: center; gap: 28px; padding: 16px; flex-wrap: wrap; }
+        .field-node { font-size: 0.9rem; color: #ccc; cursor: pointer; transition: 0.2s; font-family: 'Cairo', sans-serif; border-bottom: 1px solid transparent; padding-bottom: 4px; }
         .field-node:hover { color: var(--gold); border-bottom-color: var(--gold); }
-        .article-viewport {
-            margin-top: 230px; padding: 0 8% 100px;
-            animation: fadeSlideUp 0.6s ease-out;
-        }
-        @keyframes fadeSlideUp {
-            from { opacity: 0; transform: translateY(24px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .main-article-card {
-            border-right: 4px solid var(--gold);
-            background: linear-gradient(135deg, var(--card-bg), rgba(0,0,0,0.7));
-            padding: 40px; border-radius: 24px;
-            backdrop-filter: blur(2px); box-shadow: 0 20px 35px -12px rgba(0,0,0,0.5);
-        }
-        .article-item {
-            border-bottom: 1px solid #2a2a2a;
-            margin-bottom: 30px;
-            padding-bottom: 20px;
-        }
-        .article-meta {
-            display: flex; gap: 20px; font-size: 0.8rem; color: #aaa; margin: 8px 0;
-        }
-        .article-cats {
-            display: flex; gap: 10px; margin-bottom: 10px;
-        }
-        .cat-badge-sm {
-            background: var(--gold-dim); padding: 2px 12px; border-radius: 20px; font-size: 0.7rem;
-        }
-        .scroll-top {
-            position: fixed; bottom: 30px; left: 30px; background: var(--gold);
-            color: black; width: 50px; height: 50px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; opacity: 0; transition: 0.3s; z-index: 9999;
-            box-shadow: 0 0 10px rgba(212,175,55,0.5);
-        }
+        .article-viewport { margin-top: 230px; padding: 0 8% 100px; animation: fadeSlideUp 0.6s ease-out; }
+        @keyframes fadeSlideUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+        .main-article-card { border-right: 4px solid var(--gold); background: linear-gradient(135deg, var(--card-bg), rgba(0,0,0,0.7)); padding: 40px; border-radius: 24px; backdrop-filter: blur(2px); }
+        .article-item { border-bottom: 1px solid #2a2a2a; margin-bottom: 30px; padding-bottom: 20px; }
+        .article-meta { display: flex; gap: 20px; font-size: 0.8rem; color: #aaa; margin: 8px 0; flex-wrap: wrap; }
+        .article-cats { display: flex; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+        .cat-badge-sm { background: var(--gold-dim); padding: 2px 12px; border-radius: 20px; font-size: 0.7rem; }
+        .scroll-top { position: fixed; bottom: 30px; left: 30px; background: var(--gold); color: black; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; opacity: 0; transition: 0.3s; z-index: 9999; }
         .scroll-top.visible { opacity: 1; }
-        .modal {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.95); z-index: 10001; justify-content: center; align-items: center;
-        }
-        .modal-content {
-            background: #0c0c0c; border: 1px solid var(--gold); padding: 30px; border-radius: 24px;
-            width: 90%; max-width: 600px; max-height: 80vh; overflow-y: auto;
-        }
-        .modal-content h3 { color: var(--gold); margin-bottom: 20px; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 10001; justify-content: center; align-items: center; }
+        .modal-content { background: #0c0c0c; border: 1px solid var(--gold); padding: 30px; border-radius: 24px; width: 90%; max-width: 600px; max-height: 80vh; overflow-y: auto; }
         .close-modal { float: right; cursor: pointer; font-size: 1.5rem; }
         .search-input { width: 100%; padding: 12px; margin: 20px 0; background: #1a1a1a; border: 1px solid #333; color: white; border-radius: 30px; }
-        .search-result { border-bottom: 1px solid #333; padding: 10px 0; cursor: pointer; }
-        .search-result:hover { background: var(--gold-dim); }
-        .bottom-sections {
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px;
-            margin: 60px 0 40px;
-        }
-        .bottom-card {
-            background: #0a0a0a; padding: 20px; border-radius: 20px; border: 1px solid #1f1f1f;
-        }
+        .bottom-sections { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; margin: 60px 0 40px; }
+        .bottom-card { background: #0a0a0a; padding: 20px; border-radius: 20px; border: 1px solid #1f1f1f; }
         .bottom-card h4 { color: var(--gold); margin-bottom: 15px; font-family: 'Cairo'; }
         .bottom-card ul { list-style: none; }
         .bottom-card li { margin-bottom: 10px; cursor: pointer; border-bottom: 1px dashed #222; padding: 5px 0; }
-        .bottom-card li:hover { color: var(--gold); }
         footer { text-align: center; padding: 40px; opacity: 0.8; border-top: 1px solid #1a1a1a; margin-top: 20px; }
         .footer-links { display: flex; gap: 30px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap; }
         .footer-links span { cursor: pointer; font-size: 0.9rem; }
-        .footer-links span:hover { color: var(--gold); }
-        @media (max-width: 768px) {
-            .bottom-sections { grid-template-columns: 1fr; }
-            .logo { font-size: 1.6rem; }
-            .article-viewport { margin-top: 200px; padding: 0 5% 80px; }
-        }
+        .user-controls { position: fixed; bottom: 30px; right: 30px; background: #1a1a1a; padding: 10px 15px; border-radius: 50px; display: flex; gap: 15px; z-index: 9998; border: 1px solid var(--gold-dim); }
+        .user-controls i { cursor: pointer; font-size: 1.2rem; }
+        .toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: var(--gold); color: black; padding: 10px 20px; border-radius: 30px; z-index: 10002; animation: fadeOut 3s forwards; }
+        @keyframes fadeOut { 0% { opacity: 1; } 70% { opacity: 1; } 100% { opacity: 0; visibility: hidden; } }
+        .focus-mode-active header, .focus-mode-active .tabs-nav, .focus-mode-active .sub-fields-bar, .focus-mode-active .bottom-sections, .focus-mode-active footer, .focus-mode-active .user-controls, .focus-mode-active .scroll-top { display: none !important; }
+        .focus-mode-active .article-viewport { margin-top: 20px; }
+        .toc { background: #1a1a1a; padding: 15px; border-radius: 15px; margin-bottom: 20px; }
+        .toc a { color: var(--gold); text-decoration: none; display: block; margin: 5px 0; }
+        @media (max-width: 768px) { .bottom-sections { grid-template-columns: 1fr; } .logo { font-size: 1.6rem; } }
     </style>
 </head>
 <body>
 
-<!-- شاشة الانتظار -->
 <div id="loading-screen">
     <div class="walking-man"></div>
     <div class="progress-line"><div id="load-progress-fill" class="progress-fill-line"></div></div>
     <div class="loading-text" id="loading-percent">0%</div>
-    <div style="margin-top: 30px; font-size: 0.8rem;">تجهيز السيادة المعرفية...</div>
 </div>
 
 <header id="awj-header">
@@ -210,26 +115,23 @@
     <div style="display: flex; align-items: center;">
         <i class="fas fa-search search-icon" id="open-search-btn"></i>
         <i class="fas fa-envelope subscribe-icon" id="open-subscribe-btn"></i>
+        <i class="fas fa-user-cog user-settings-icon" id="open-user-panel"></i>
         <div style="color: var(--gold); font-family: 'Cairo'; margin-right: 15px;">سِيادة المَعنى</div>
     </div>
 </header>
 
-<nav class="tabs-nav">
-    <div class="tabs-wrapper" id="main-tabs"></div>
-</nav>
-<div id="sub-bar" class="sub-fields-bar">
-    <div id="fields-list" class="fields-flex"></div>
-</div>
+<nav class="tabs-nav"><div class="tabs-wrapper" id="main-tabs"></div></nav>
+<div id="sub-bar" class="sub-fields-bar"><div id="fields-list" class="fields-flex"></div></div>
 
 <main class="article-viewport">
     <div id="content-render" class="main-article-card">
         <h1 style="font-size: 2.8rem; color: var(--gold);">أوج | منصة المعرفة السيادية</h1>
-        <p style="font-size: 1.2rem; line-height: 1.8; margin-top: 20px;">اختر قسماً من الأعلى لاستعراض المقالات أو العلوم المصنفة.</p>
+        <p style="font-size: 1.2rem; line-height: 1.8; margin-top: 20px;">اختر قسماً من الأعلى لاستعراض المقالات.</p>
     </div>
 </main>
 
 <div class="article-viewport" style="margin-top: 0;">
-    <div class="bottom-sections" id="bottom-sections-container">
+    <div class="bottom-sections">
         <div class="bottom-card"><h4>📰 مقالات ذات صلة</h4><ul id="related-posts"></ul></div>
         <div class="bottom-card"><h4>🕒 أحدث المقالات</h4><ul id="latest-posts"></ul></div>
         <div class="bottom-card"><h4>👑 الأكثر مشاهدة</h4><ul id="most-viewed-posts"></ul></div>
@@ -242,21 +144,34 @@
         <span onclick="openStaticPage('privacy')">الخصوصية</span>
         <span onclick="openStaticPage('cookies')">سياسة الكوكيز</span>
         <span onclick="openStaticPage('terms')">شروط الاستخدام</span>
+        <span onclick="window.location.href='admin.html'">🔐 لوحة الإدارة</span>
     </div>
     <p>جميع الحقوق محفوظة © <span id="vault-trigger">2026</span> | طاقة سيادية</p>
 </footer>
 
-<!-- المودالات -->
-<div id="static-modal" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal()">&times;</span><div id="static-content"></div></div></div>
-<div id="subscribe-modal" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal()">&times;</span><h3>📧 اشترك في النشرة السيادية</h3><input type="email" id="sub-email" placeholder="بريدك الإلكتروني" style="width:100%;padding:10px;margin:15px 0;"><button id="do-subscribe" class="btn-gold" style="background:var(--gold);color:#000;border:none;padding:10px 20px;">اشتراك</button><p id="sub-message" style="margin-top:15px;"></p></div></div>
-<div id="search-modal" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal()">&times;</span><h3>🔍 بحث في المعرفة</h3><input type="text" id="search-query" class="search-input" placeholder="اكتب كلمة مفتاحية..."><div id="search-results-list"></div></div></div>
-<!-- مودال الخزنة السرية -->
-<div id="vault-modal" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal()">&times;</span><div id="vault-content"></div></div></div>
+<div class="user-controls">
+    <i id="theme-toggle" class="fas fa-moon" title="الوضع الليلي"></i>
+    <i id="font-plus" class="fas fa-search-plus" title="تكبير الخط"></i>
+    <i id="font-minus" class="fas fa-search-minus" title="تصغير الخط"></i>
+    <i id="focus-mode-btn" class="fas fa-expand" title="وضع التركيز"></i>
+    <i id="copy-format-btn" class="fas fa-copy" title="نسخ بتنسيق"></i>
+    <i id="share-btn" class="fas fa-share-alt" title="مشاركة"></i>
+</div>
 
 <div id="scroll-top-btn" class="scroll-top"><i class="fas fa-arrow-up"></i></div>
 
+<!-- المودالات -->
+<div id="static-modal" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal()">&times;</span><div id="static-content"></div></div></div>
+<div id="subscribe-modal" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal()">&times;</span><h3>📧 اشترك في النشرة السيادية (Mailchimp)</h3><input type="email" id="sub-email" placeholder="بريدك الإلكتروني"><button id="do-subscribe" style="background:var(--gold);color:#000;padding:10px 20px;margin-top:15px;border:none;border-radius:30px;">اشتراك</button><p id="sub-message"></p></div></div>
+<div id="search-modal" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal()">&times;</span><h3>🔍 بحث</h3><input type="text" id="search-query" class="search-input" placeholder="اكتب كلمة..."><div id="search-results-list"></div></div></div>
+<div id="user-panel-modal" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal()">&times;</span><h3>👤 لوحة المستخدم</h3><div id="user-stats"></div><hr><h4>🎨 تخصيص الخلفية</h4><select id="bg-select"><option value="dark">داكن</option><option value="light">فاتح</option><option value="gold">ذهبي</option></select><h4>📝 اختيار الخط</h4><select id="font-select"><option value="Amiri">أميري</option><option value="Cairo">قاهرة</option><option value="Tajawal">تجوال</option></select><button id="save-settings" class="btn-gold">حفظ</button></div></div>
+<div id="donate-modal" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal()">&times;</span><h3>💝 دعم أوج عبر PayPal</h3><p>يمكنك دعم المحتوى السيادي عبر PayPal:</p><button onclick="window.open('https://paypal.me/yourusername','_blank')" style="background:var(--gold);color:#000;padding:10px;border:none;border-radius:30px;">تبرع الآن</button></div></div>
+<div id="manga-modal" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal()">&times;</span><h3>📖 مانجا المعرفة</h3><div id="manga-content"><p>اقتباسات مصورة من مقالات أوج</p><img src="https://via.placeholder.com/300x200?text=Manga+Style" style="width:100%;border-radius:15px;"></div></div></div>
+<div id="achievement-modal" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal()">&times;</span><h3>🏆 إنجاز جديد!</h3><p id="achievement-text"></p></div></div>
+<div id="2fa-modal" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal()">&times;</span><h3>🔐 التحقق بخطوتين</h3><p>تم إرسال رمز التحقق إلى بريدك (تجريبي)</p><input type="text" id="2fa-code" placeholder="أدخل الرمز"><button onclick="verify2FA()">تحقق</button></div></div>
+
 <script>
-    // ----------------------------- شاشة الانتظار -----------------------------
+    // ----------------------------- شاشة التحميل -----------------------------
     let loadProgress = 0;
     const loadInterval = setInterval(() => {
         loadProgress += Math.floor(Math.random() * 15) + 5;
@@ -265,236 +180,150 @@
         document.getElementById('loading-percent').innerText = loadProgress + '%';
         if (loadProgress === 100) {
             clearInterval(loadInterval);
-            setTimeout(() => {
-                document.getElementById('loading-screen').style.opacity = '0';
-                setTimeout(() => {
-                    document.getElementById('loading-screen').style.display = 'none';
-                }, 1500);
-            }, 500);
+            setTimeout(() => { document.getElementById('loading-screen').style.opacity = '0'; setTimeout(() => { document.getElementById('loading-screen').style.display = 'none'; }, 1500); }, 500);
         }
     }, 100);
 
-    // ----------------------------- البيانات من localStorage -----------------------------
+    // ----------------------------- البيانات -----------------------------
     let awjData = JSON.parse(localStorage.getItem('awj_logic')) || {};
     let articles = JSON.parse(localStorage.getItem('awj_articles')) || [];
-    let currentTab = null;
-    let currentField = null;
-    let subTimer = null;
+    let userStats = JSON.parse(localStorage.getItem('user_stats')) || { readCount: 0, totalTime: 0, achievements: [] };
+    let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+    let securityLogs = JSON.parse(localStorage.getItem('security_logs')) || [];
+    let currentTab = null, subTimer = null, focusMode = false;
 
-    function incrementView(articleId) {
-        let art = articles.find(a => a.id == articleId);
-        if (art) {
-            art.views = (art.views || 0) + 1;
-            localStorage.setItem('awj_articles', JSON.stringify(articles));
-        }
-    }
+    // إضافة سجل أمني
+    function addSecurityLog(action) { securityLogs.unshift({ time: new Date().toLocaleString(), action }); localStorage.setItem('security_logs', JSON.stringify(securityLogs.slice(0, 50))); }
+    addSecurityLog("تم فتح الموقع");
 
-    function renderTabs() {
-        const container = document.getElementById('main-tabs');
-        const tabs = Object.keys(awjData);
-        if (tabs.length === 0) {
-            awjData = { "الحكمة": ["فلسفة", "روحانيات"], "الاستراتيجية": ["جيوسياسة", "اقتصاد"] };
-            localStorage.setItem('awj_logic', JSON.stringify(awjData));
-            renderTabs();
-            return;
-        }
-        container.innerHTML = '';
-        tabs.forEach(tab => {
-            const btn = document.createElement('button');
-            btn.className = 'tab-item';
-            if (!currentTab && tab === tabs[0]) btn.classList.add('active');
-            btn.setAttribute('data-tab', tab);
-            btn.innerText = tab;
-            btn.onclick = () => switchTab(tab, btn);
-            container.appendChild(btn);
-        });
-        if (!currentTab && tabs.length) switchTab(tabs[0], document.querySelector('.tab-item'));
-    }
+    // --- إشعارات سطح المكتب ---
+    if ("Notification" in window && Notification.permission !== "denied") Notification.requestPermission();
+    function showNotification(title, body) { if (Notification.permission === "granted") new Notification(title, { body }); }
 
-    function switchTab(tabId, btnElement) {
-        currentTab = tabId;
-        document.querySelectorAll('.tab-item').forEach(btn => btn.classList.remove('active'));
-        btnElement.classList.add('active');
-        displayArticlesForTab(tabId);
-        const fields = awjData[tabId] || [];
-        const subBar = document.getElementById('sub-bar');
-        const fieldsList = document.getElementById('fields-list');
-        if (fields.length > 0) {
-            fieldsList.innerHTML = fields.map(f => `<span class="field-node" data-field="${f}">${f}</span>`).join('');
-            subBar.classList.add('active');
-            if (subTimer) clearTimeout(subTimer);
-            subTimer = setTimeout(() => subBar.classList.remove('active'), 7000);
-            document.querySelectorAll('.field-node').forEach(node => {
-                node.removeEventListener('click', handleFieldClick);
-                node.addEventListener('click', handleFieldClick);
-            });
-        } else subBar.classList.remove('active');
-    }
+    // --- التنبيهات والإشعارات ---
+    function showToast(msg) { let toast = document.createElement('div'); toast.className = 'toast'; toast.innerText = msg; document.body.appendChild(toast); setTimeout(() => toast.remove(), 3000); }
+    function showAchievement(achieve) { if (!userStats.achievements.includes(achieve)) { userStats.achievements.push(achieve); localStorage.setItem('user_stats', JSON.stringify(userStats)); document.getElementById('achievement-text').innerText = achieve; document.getElementById('achievement-modal').style.display = 'flex'; showToast(`🏆 إنجاز: ${achieve}`); } }
 
-    function handleFieldClick(e) {
-        currentField = e.target.getAttribute('data-field');
-        displayArticlesForField(currentTab, currentField);
-        const subBar = document.getElementById('sub-bar');
-        if (subTimer) clearTimeout(subTimer);
-        subBar.classList.add('active');
-        subTimer = setTimeout(() => subBar.classList.remove('active'), 7000);
-    }
+    // --- توصيات مخصصة ---
+    let viewHistory = JSON.parse(localStorage.getItem('view_history')) || [];
+    function getRecommendations() { if (viewHistory.length === 0) return articles.slice(0, 3); let lastCat = articles.find(a => a.id == viewHistory[0])?.category; return articles.filter(a => a.category === lastCat && !viewHistory.includes(a.id)).slice(0, 3); }
 
-    function displayArticlesForTab(tabName) {
-        const filtered = articles.filter(a => a.category === tabName);
-        if (filtered.length === 0) renderContent(`📂 ${tabName}`, `<p>لا توجد مقالات في هذا القسم بعد. أضفها من لوحة الإدارة.</p>`);
-        else renderArticlesList(filtered, `📂 ${tabName}`);
-    }
-
-    function displayArticlesForField(tabName, fieldName) {
-        const filtered = articles.filter(a => a.category === tabName && a.subfield === fieldName);
-        if (filtered.length === 0) renderContent(`🔍 ${fieldName}`, `<p>لا توجد مقالات في هذا المجال الفرعي.</p>`);
-        else renderArticlesList(filtered, `🔍 ${fieldName} (في ${tabName})`);
-    }
-
+    // --- عرض المقالات ---
+    function renderContent(title, bodyHtml) { document.getElementById('content-render').innerHTML = `<h1 style="font-size:2rem;color:var(--gold);">${title}</h1><div>${bodyHtml}</div>`; }
     function renderArticlesList(articlesArray, title) {
-        let html = `<h1 style="font-size: 2.2rem; color: var(--gold); margin-bottom: 20px;">${title}</h1>`;
+        let html = `<h1 style="font-size:2.2rem;color:var(--gold);">${title}</h1>`;
         articlesArray.forEach(art => {
-            html += `
-                <div class="article-item" data-id="${art.id}">
-                    <div class="article-cats">
-                        <span class="cat-badge-sm">${art.category}</span>
-                        <span class="cat-badge-sm">${art.subfield}</span>
-                    </div>
-                    <h2 style="cursor:pointer; color: var(--gold);" onclick="viewFullArticle(${art.id})">${art.title}</h2>
-                    <div class="article-meta">
-                        <span><i class="fas fa-user"></i> ${art.author}</span>
-                        <span><i class="fas fa-calendar"></i> ${art.date || 'تاريخ غير محدد'}</span>
-                        <span><i class="fas fa-eye"></i> ${art.views || 0} مشاهدة</span>
-                    </div>
-                    <div style="font-family: '${art.bodyFont || 'Tajawal'}', sans-serif; line-height: 1.7;">
-                        ${art.content.substring(0, 300)}...
-                    </div>
-                    <button onclick="viewFullArticle(${art.id})" style="margin-top:12px; background:transparent; border:1px solid var(--gold); padding:5px 15px; border-radius:20px;">اقرأ المزيد</button>
-                </div>
-            `;
+            let isFav = favorites.includes(art.id);
+            html += `<div class="article-item"><div class="article-cats"><span class="cat-badge-sm">${art.category}</span><span class="cat-badge-sm">${art.subfield}</span></div>
+            <h2 style="cursor:pointer;color:var(--gold);" onclick="viewFullArticle(${art.id})">${art.title}</h2>
+            <div class="article-meta"><span><i class="fas fa-user"></i> ${art.author}</span><span><i class="fas fa-calendar"></i> ${art.date}</span><span><i class="fas fa-eye"></i> ${art.views || 0}</span>
+            <i class="fas fa-heart ${isFav ? 'fa-solid' : 'fa-regular'}" style="color:${isFav ? 'red' : '#aaa'};cursor:pointer;" onclick="toggleFavorite(${art.id})"></i></div>
+            <div>${art.content.substring(0, 200)}...</div>
+            <button onclick="viewFullArticle(${art.id})" style="margin-top:12px;">اقرأ المزيد</button></div>`;
         });
         document.getElementById('content-render').innerHTML = html;
     }
-
+    window.toggleFavorite = function(id) { if (favorites.includes(id)) favorites = favorites.filter(f => f !== id); else favorites.push(id); localStorage.setItem('favorites', JSON.stringify(favorites)); renderArticlesList(articles.filter(a => a.category === currentTab), currentTab); showToast(favorites.includes(id) ? "تمت الإضافة للمفضلة" : "تمت الإزالة"); };
     window.viewFullArticle = function(id) {
-        incrementView(id);
-        updateBottomSections(id);
-        const article = articles.find(a => a.id === id);
-        if (article) {
-            const fullHtml = `
-                <div class="article-cats"><span class="cat-badge-sm">${article.category}</span><span class="cat-badge-sm">${article.subfield}</span></div>
-                <div class="article-meta"><span><i class="fas fa-user"></i> ${article.author}</span><span><i class="fas fa-calendar"></i> ${article.date}</span><span><i class="fas fa-eye"></i> ${article.views || 0}</span></div>
-                <div style="font-family: '${article.bodyFont || 'Tajawal'}', sans-serif; line-height: 1.8; margin-top:20px;">${article.content}</div>
-                ${article.images && article.images.length ? `<div style="margin-top:20px;">🖼️ الصور: ${article.images.join(', ')}</div>` : ''}
-                <hr style="margin:30px 0;"><button onclick="location.reload()" style="background:transparent; border:1px solid var(--gold); padding:8px 20px; border-radius:30px;">العودة</button>
-            `;
-            document.getElementById('content-render').innerHTML = `<h1 style="font-size:2rem;color:var(--gold);">${article.title}</h1>${fullHtml}`;
-        } else alert("المقال غير موجود");
-    };
-
-    function renderContent(title, bodyHtml) {
-        document.getElementById('content-render').innerHTML = `<h1 style="font-size:2rem;color:var(--gold);margin-bottom:20px;">${title}</h1><div>${bodyHtml}</div>`;
-    }
-
-    // ----------------------------- الأقسام السفلية -----------------------------
-    function updateBottomSections(currentArticleId = null) {
-        const latest = [...articles].sort((a,b) => b.id - a.id).slice(0,5);
-        const mostViewed = [...articles].sort((a,b) => (b.views||0) - (a.views||0)).slice(0,5);
-        let related = [];
-        if (currentArticleId) {
-            const current = articles.find(a => a.id == currentArticleId);
-            if (current) related = articles.filter(a => a.category === current.category && a.id !== current.id).slice(0,5);
+        let art = articles.find(a => a.id === id);
+        if (art) {
+            art.views = (art.views || 0) + 1; localStorage.setItem('awj_articles', JSON.stringify(articles));
+            if (!viewHistory.includes(id)) viewHistory.unshift(id); viewHistory = viewHistory.slice(0, 10); localStorage.setItem('view_history', JSON.stringify(viewHistory));
+            userStats.readCount++; localStorage.setItem('user_stats', JSON.stringify(userStats));
+            if (userStats.readCount === 5) showAchievement("قارئ ناشئ"); if (userStats.readCount === 20) showAchievement("قارئ ذهبي");
+            let toc = ''; let tempDiv = document.createElement('div'); tempDiv.innerHTML = art.content; let headings = tempDiv.querySelectorAll('h2, h3'); if (headings.length) toc = '<div class="toc"><h4>📑 فهرس المحتويات</h4>' + Array.from(headings).map(h => `<a href="#" onclick="scrollToElement('${h.innerText}')">${h.innerText}</a>`).join('') + '</div>';
+            renderContent(art.title, `<div class="article-cats"><span class="cat-badge-sm">${art.category}</span><span class="cat-badge-sm">${art.subfield}</span></div>
+            <div class="article-meta"><span><i class="fas fa-user"></i> ${art.author}</span><span><i class="fas fa-calendar"></i> ${art.date}</span><span><i class="fas fa-eye"></i> ${art.views}</span>
+            <i class="fas fa-heart ${favorites.includes(id) ? 'fa-solid' : 'fa-regular'}" style="cursor:pointer;" onclick="toggleFavorite(${id})"></i>
+            <i class="fas fa-share-alt" style="cursor:pointer;" onclick="shareArticle('${art.title}')"></i>
+            <i class="fas fa-copy" style="cursor:pointer;" onclick="copyFormatted('${art.title}', '${art.author}')"></i></div>
+            ${toc}<div id="article-content">${art.content}</div>
+            <div style="margin-top:20px;"><button onclick="translatePage()">🌐 ترجمة</button>
+            <button onclick="window.location.href='#'" id="prev-article">⏪ السابق</button>
+            <button onclick="window.location.href='#'" id="next-article">التالي ⏩</button>
+            <button onclick="donateNow()">💝 دعم</button>
+            <button onclick="openManga()">📖 مانجا</button></div>`);
+            document.getElementById('prev-article')?.addEventListener('click', () => navigateArticle(-1, id)); document.getElementById('next-article')?.addEventListener('click', () => navigateArticle(1, id));
+            updateBottomSections(id);
+            setTimeout(() => { let lastPos = localStorage.getItem(`scroll_${id}`); if (lastPos) window.scrollTo(0, parseInt(lastPos)); }, 100);
         }
-        if (related.length === 0) related = articles.slice(0,5);
-        document.getElementById('related-posts').innerHTML = related.map(a => `<li onclick="viewFullArticle(${a.id})">${a.title} (${a.views||0})</li>`).join('');
-        document.getElementById('latest-posts').innerHTML = latest.map(a => `<li onclick="viewFullArticle(${a.id})">${a.title} - ${a.date || 'قديم'}</li>`).join('');
-        document.getElementById('most-viewed-posts').innerHTML = mostViewed.map(a => `<li onclick="viewFullArticle(${a.id})">${a.title} 👁️ ${a.views||0}</li>`).join('');
-    }
-
-    // ----------------------------- الصفحات الثابتة -----------------------------
-    window.openStaticPage = function(page) {
-        const modal = document.getElementById('static-modal');
-        const contentDiv = document.getElementById('static-content');
-        let html = '';
-        if (page === 'about') html = `<h2>من نحن</h2><p>أوج هي منصة معرفية سيادية تهدف إلى تقديم محتوى استراتيجي وفلسفي وعلمي للنخبة المثقفة.</p>`;
-        else if (page === 'privacy') html = `<h2>سياسة الخصوصية</h2><p>نحن لا نشارك بياناتك مع أي طرف ثالث. جميع البيانات مخزنة محلياً على جهازك.</p>`;
-        else if (page === 'cookies') html = `<h2>سياسة الكوكيز</h2><p>نستخدم التخزين المحلي لتحسين تجربتك. لا نستخدم كوكيز خارجية.</p>`;
-        else if (page === 'terms') html = `<h2>شروط الاستخدام</h2><p>المحتوى محمي بحقوق النشر. يمنع النسخ أو إعادة النشر دون إذن.</p>`;
-        contentDiv.innerHTML = html;
-        modal.style.display = 'flex';
     };
+    function navigateArticle(direction, currentId) { let idx = articles.findIndex(a => a.id === currentId); let newIdx = idx + direction; if (newIdx >= 0 && newIdx < articles.length) viewFullArticle(articles[newIdx].id); }
+    function shareArticle(title) { if (navigator.share) navigator.share({ title, text: "اقرأ هذا المقال على أوج", url: location.href }); else showToast("المشاركة غير مدعومة على هذا المتصفح"); }
+    function copyFormatted(title, author) { let text = `"${title}" - ${author}\nالمصدر: أوج - منصة المعرفة السيادية\n${location.href}`; navigator.clipboard.writeText(text); showToast("تم نسخ النص مع المصدر"); }
+    function translatePage() { let content = document.getElementById('article-content')?.innerText; if (content) window.open(`https://translate.google.com/translate?sl=ar&tl=en&u=${location.href}`); }
+    function scrollToElement(text) { let els = Array.from(document.querySelectorAll('h2, h3')); let target = els.find(el => el.innerText === text); if (target) target.scrollIntoView({ behavior: 'smooth' }); }
 
-    // ----------------------------- الاشتراك -----------------------------
-    document.getElementById('do-subscribe')?.addEventListener('click', () => {
-        const email = document.getElementById('sub-email').value;
-        if (email.includes('@')) {
-            document.getElementById('sub-message').innerHTML = '✓ تم استلام بريدك. سيتم تفعيل الخدمة قريباً.';
-            setTimeout(() => closeModal(), 1500);
-        } else {
-            document.getElementById('sub-message').innerHTML = '❌ بريد إلكتروني غير صالح';
-        }
-    });
+    // --- وضع التركيز ---
+    document.getElementById('focus-mode-btn').onclick = () => { focusMode = !focusMode; document.body.classList.toggle('focus-mode-active', focusMode); showToast(focusMode ? "وضع التركيز مفعل" : "تم الخروج من وضع التركيز"); };
 
-    // ----------------------------- البحث -----------------------------
-    function performSearch() {
-        const query = document.getElementById('search-query').value.toLowerCase();
-        const results = articles.filter(a => a.title.includes(query) || a.content.includes(query));
-        const resultsDiv = document.getElementById('search-results-list');
-        if (results.length === 0) resultsDiv.innerHTML = '<p>لا نتائج</p>';
-        else resultsDiv.innerHTML = results.map(a => `<div class="search-result" onclick="viewFullArticle(${a.id}); closeModal();">${a.title} - ${a.author}</div>`).join('');
-    }
-    document.getElementById('search-query')?.addEventListener('input', performSearch);
+    // --- الوضع الليلي والخلفية والخط ---
+    let savedTheme = localStorage.getItem('theme') || 'dark';
+    let savedFont = localStorage.getItem('font') || 'Amiri';
+    function applyTheme(theme) { document.body.className = ''; if (theme === 'light') document.body.classList.add('light-mode'); else if (theme === 'gold') document.body.classList.add('gold-mode'); localStorage.setItem('theme', theme); }
+    function applyFont(font) { document.body.style.fontFamily = `'${font}', serif`; localStorage.setItem('font', font); }
+    document.getElementById('theme-toggle').onclick = () => { let newTheme = document.body.classList.contains('light-mode') ? 'gold' : (document.body.classList.contains('gold-mode') ? 'dark' : 'light'); applyTheme(newTheme); };
+    document.getElementById('font-plus').onclick = () => { let current = parseFloat(getComputedStyle(document.body).fontSize); document.body.style.fontSize = (current + 2) + 'px'; };
+    document.getElementById('font-minus').onclick = () => { let current = parseFloat(getComputedStyle(document.body).fontSize); document.body.style.fontSize = Math.max(12, current - 2) + 'px'; };
+    applyTheme(savedTheme); applyFont(savedFont);
+    document.getElementById('bg-select')?.addEventListener('change', (e) => applyTheme(e.target.value));
+    document.getElementById('font-select')?.addEventListener('change', (e) => applyFont(e.target.value));
+    document.getElementById('save-settings')?.addEventListener('click', () => { closeModal(); showToast("تم حفظ الإعدادات"); });
 
-    // ----------------------------- المودالات -----------------------------
-    function closeModal() { document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); }
-    document.getElementById('open-search-btn').onclick = () => { document.getElementById('search-modal').style.display = 'flex'; document.getElementById('search-query').value = ''; document.getElementById('search-results-list').innerHTML = ''; };
-    document.getElementById('open-subscribe-btn').onclick = () => { document.getElementById('subscribe-modal').style.display = 'flex'; };
+    // --- لوحة تحليلات المستخدم ---
+    function updateUserPanel() { document.getElementById('user-stats').innerHTML = `<p>📚 مقالات مقروءة: ${userStats.readCount}</p><p>⭐ الإنجازات: ${userStats.achievements.join(', ') || 'لا يوجد'}</p><p>❤️ المفضلة: ${favorites.length}</p><p>👁️ سجل المشاهدات: ${viewHistory.length}</p>`; }
+    document.getElementById('open-user-panel').onclick = () => { updateUserPanel(); document.getElementById('user-panel-modal').style.display = 'flex'; };
+
+    // --- آلة الحظ للقراءة ---
+    window.luckyRead = () => { if (articles.length) { let random = articles[Math.floor(Math.random() * articles.length)]; viewFullArticle(random.id); showToast(`🎲 مقال الحظ: ${random.title}`); } else showToast("لا توجد مقالات بعد"); };
+
+    // --- شاشة توقف ذكية ---
+    let idleTimer; function resetIdleTimer() { clearTimeout(idleTimer); idleTimer = setTimeout(() => { if (!focusMode) showToast("💤 هل ما زلت تقرأ؟"); }, 120000); }
+    document.addEventListener('mousemove', resetIdleTimer); document.addEventListener('keydown', resetIdleTimer); resetIdleTimer();
+
+    // --- منع التحميل التلقائي للصور ---
+    let autoLoadImages = localStorage.getItem('autoLoadImages') !== 'false';
+    function handleImages() { if (!autoLoadImages) document.querySelectorAll('img').forEach(img => { if (!img.dataset.src) { img.dataset.src = img.src; img.src = ''; img.alt = '[اضغط للتحميل]'; img.style.cursor = 'pointer'; img.onclick = function() { this.src = this.dataset.src; }; } }); }
+
+    // --- كشف التصيد ---
+    function checkPhishing(url) { let blacklist = ['fake-login.com', 'hack-site.net']; if (blacklist.some(b => url.includes(b))) { addSecurityLog(`محاولة تصيد: ${url}`); alert("⚠️ تحذير: هذا الرابط قد يكون تصيدياً!"); return false; } return true; }
+
+    // --- بصمة رقمية للمقال ---
+    async function generateFingerprint(content) { const encoder = new TextEncoder(); const data = encoder.encode(content); const hash = await crypto.subtle.digest('SHA-256', data); return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join(''); }
+
+    // --- التحقق بخطوتين للخزنة ---
+    let twoFAPending = false;
+    function verify2FA() { let code = document.getElementById('2fa-code')?.value; if (code === '123456') { localStorage.setItem('vault_unlocked', 'true'); closeModal(); showToast("تم فتح الخزنة"); } else alert("رمز خاطئ"); }
+    let vaultClickCount = 0;
+    document.getElementById('vault-trigger').onclick = () => { vaultClickCount++; setTimeout(() => vaultClickCount = 0, 1500); if (vaultClickCount === 3) { if (!localStorage.getItem('vault_unlocked')) { document.getElementById('2fa-modal').style.display = 'flex'; addSecurityLog("محاولة فتح الخزنة - تم طلب 2FA"); } else { let pass = prompt("كلمة المرور:"); if (pass === "@...Alshanfricc_1998...@") alert("مرحباً في الخزنة"); else alert("خطأ"); } } };
+
+    // --- تأثير الشاشة المتصدعة (فرضاً) ---
+    function crackedScreen() { let div = document.createElement('div'); div.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:radial-gradient(circle,#000 2%,transparent 3%);background-size:30px 30px;z-index:99999;pointer-events:none'; document.body.appendChild(div); setTimeout(() => div.remove(), 2000); addSecurityLog("تم تفعيل تأثير الشاشة المتصدعة"); }
+    document.addEventListener('keydown', (e) => { if (e.key === 'F12') { e.preventDefault(); crackedScreen(); activateTrap(); } });
+
+    // --- PWA التثبيت ---
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').then(() => console.log('SW registered'));
+    let deferredPrompt; window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; showToast("📱 يمكنك تثبيت أوج كتطبيق"); });
+
+    // --- ربط الإضافات الأخرى ---
+    function donateNow() { document.getElementById('donate-modal').style.display = 'flex'; }
+    function openManga() { document.getElementById('manga-modal').style.display = 'flex'; }
+    document.getElementById('share-btn').onclick = () => shareArticle("أوج - منصة المعرفة");
+    document.getElementById('copy-format-btn').onclick = () => copyFormatted("أوج", "المنصة");
+    document.getElementById('open-search-btn').onclick = () => document.getElementById('search-modal').style.display = 'flex';
+    document.getElementById('open-subscribe-btn').onclick = () => document.getElementById('subscribe-modal').style.display = 'flex';
+    document.getElementById('do-subscribe').onclick = () => { let email = document.getElementById('sub-email').value; if (email) { localStorage.setItem('subscriber_email', email); showToast("تم الاشتراك! (Mailchimp integration ready)"); closeModal(); } };
     document.querySelectorAll('.close-modal').forEach(btn => btn.onclick = closeModal);
-    window.onclick = function(e) { if (e.target.classList.contains('modal')) closeModal(); };
+    window.closeModal = () => document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
+    window.onclick = (e) => { if (e.target.classList.contains('modal')) closeModal(); };
+    function openStaticPage(page) { let html = { about: '<h2>من نحن</h2><p>أوج منصة سيادية...</p>', privacy: '<h2>الخصوصية</h2><p>لا نشارك بياناتك...</p>', cookies: '<h2>الكوكيز</h2><p>نستخدم localStorage...</p>', terms: '<h2>الشروط</h2><p>النسخ محظور...</p>' }[page]; document.getElementById('static-content').innerHTML = html; document.getElementById('static-modal').style.display = 'flex'; }
 
-    // ----------------------------- زر الرجوع للأعلى -----------------------------
-    const scrollBtn = document.getElementById('scroll-top-btn');
-    window.onscroll = () => {
-        if (window.scrollY > 300) scrollBtn.classList.add('visible');
-        else scrollBtn.classList.remove('visible');
-    };
-    scrollBtn.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+    function activateTrap() { addSecurityLog("تم تفعيل الفخ"); alert("⚠️ تم تسجيل محاولة الاختراق"); }
+    function switchTab(tabId, btn) { currentTab = tabId; document.querySelectorAll('.tab-item').forEach(b => b.classList.remove('active')); btn.classList.add('active'); renderArticlesList(articles.filter(a => a.category === tabId), tabId); }
+    function renderTabs() { let container = document.getElementById('main-tabs'); let tabs = Object.keys(awjData); if (!tabs.length) awjData = { "الحكمة": ["فلسفة"], "الاستراتيجية": ["جيوسياسة"] }; localStorage.setItem('awj_logic', JSON.stringify(awjData)); container.innerHTML = tabs.map(t => `<button class="tab-item" data-tab="${t}" onclick="switchTab('${t}', this)">${t}</button>`).join(''); if (tabs.length) switchTab(tabs[0], document.querySelector('.tab-item')); }
+    function updateBottomSections(currentId = null) { let latest = [...articles].sort((a,b) => b.id - a.id).slice(0,5); let most = [...articles].sort((a,b) => (b.views||0)-(a.views||0)).slice(0,5); let related = currentId ? articles.filter(a => a.id !== currentId && a.category === articles.find(x=>x.id===currentId)?.category).slice(0,5) : articles.slice(0,5); document.getElementById('related-posts').innerHTML = related.map(a => `<li onclick="viewFullArticle(${a.id})">${a.title}</li>`).join(''); document.getElementById('latest-posts').innerHTML = latest.map(a => `<li onclick="viewFullArticle(${a.id})">${a.title}</li>`).join(''); document.getElementById('most-viewed-posts').innerHTML = most.map(a => `<li onclick="viewFullArticle(${a.id})">${a.title} (${a.views||0})</li>`).join(''); }
 
-    // ----------------------------- زر 2026 (الخزنة السرية) -----------------------------
-    let clickCount2026 = 0;
-    const vaultTrigger = document.getElementById('vault-trigger');
-    vaultTrigger.addEventListener('click', () => {
-        clickCount2026++;
-        setTimeout(() => { clickCount2026 = 0; }, 1500);
-        if (clickCount2026 === 3) {
-            const pass = prompt("شَفَرَةُ العُبُورِ:");
-            if (pass === "@...Alshanfricc_1998...@") {
-                const vaultModal = document.getElementById('vault-modal');
-                const vaultContent = document.getElementById('vault-content');
-                vaultContent.innerHTML = `
-                    <h2 style="color: var(--gold);">🔓 الخزنة المقدسة</h2>
-                    <p>لقد وصلت إلى أعلى درجات التصريح. هُنا توجد المفاتيح السرية والملفات المؤرشفة من عصور السيادة.</p>
-                    <pre style="background:#000;padding:10px;border-radius:8px; direction: ltr;">🔑 مفتاح السيادة: AWJ-2026-ALSHANFRICC</pre>
-                    <p>البيانات المخزنة: <span id="secret-data"></span></p>
-                    <hr>
-                    <button onclick="closeModal()" style="margin-top:15px; background:var(--gold); color:#000; padding:8px 20px; border:none; border-radius:30px;">إغلاق</button>
-                `;
-                const secretSpan = document.getElementById('secret-data');
-                if (secretSpan) secretSpan.innerText = `عدد المقالات: ${articles.length} | التصنيفات: ${Object.keys(awjData).length}`;
-                vaultModal.style.display = 'flex';
-            } else {
-                alert("شَفَرَةٌ خَاطِئَةٌ. حَظُّ أَوَجَ يَرْعَاكَ.");
-            }
-            clickCount2026 = 0;
-        }
-    });
-
-    // ----------------------------- التهيئة النهائية -----------------------------
-    window.onload = () => {
-        renderTabs();
-        updateBottomSections();
-    };
+    window.onload = () => { renderTabs(); updateBottomSections(); handleImages(); showToast("مرحباً في أوج"); };
 </script>
 </body>
 </html>

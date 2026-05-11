@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>أوج | لوحة الإدارة السيادية</title>
+    <title>أوج | لوحة الإدارة المتكاملة</title>
     <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@400;600&family=Cinzel:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
@@ -21,17 +21,12 @@
             background: var(--dark-bg);
             color: #e0e0e0;
             font-family: 'Cairo', sans-serif;
-            padding: 40px 20px;
+            padding: 30px 20px;
             direction: rtl;
         }
         .admin-container {
-            max-width: 800px;
+            max-width: 1200px;
             margin: 0 auto;
-            background: var(--card-bg);
-            border: 1px solid var(--gold);
-            border-radius: 24px;
-            padding: 30px;
-            box-shadow: 0 0 40px rgba(212,175,55,0.2);
         }
         h1 {
             color: var(--gold);
@@ -40,13 +35,20 @@
             margin-bottom: 30px;
             font-size: 2rem;
         }
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
         .section {
-            background: #0a0a0a;
-            border-radius: 20px;
-            padding: 20px;
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 25px;
             margin-bottom: 25px;
             border-right: 3px solid var(--gold);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
         }
+        .full-width { grid-column: span 2; }
         h3 {
             color: var(--gold);
             margin-bottom: 20px;
@@ -54,6 +56,8 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            border-bottom: 1px solid var(--gold-dim);
+            padding-bottom: 8px;
         }
         .flex-row {
             display: flex;
@@ -61,10 +65,8 @@
             flex-wrap: wrap;
             margin-bottom: 15px;
         }
-        .flex-row > div {
-            flex: 1;
-        }
-        input, select, button {
+        .flex-row > div { flex: 1; }
+        input, select, textarea {
             width: 100%;
             padding: 12px;
             background: #1a1a1a;
@@ -74,132 +76,171 @@
             font-family: inherit;
             transition: 0.2s;
         }
-        input:focus, select:focus {
+        textarea { min-height: 150px; resize: vertical; }
+        input:focus, select:focus, textarea:focus {
             border-color: var(--gold);
             outline: none;
         }
         button {
             background: #2a2a2a;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 12px;
+            color: white;
             cursor: pointer;
             font-weight: bold;
+            transition: 0.2s;
+            margin: 5px 0;
         }
         button:hover {
             background: var(--gold);
             color: black;
-            border-color: var(--gold);
         }
         .btn-danger {
+            background: #330000;
             border-color: var(--danger);
             color: #ff8888;
         }
-        .btn-danger:hover {
-            background: var(--danger);
-            color: white;
-        }
-        hr {
-            margin: 20px 0;
-            border-color: var(--border);
-        }
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-top: 15px;
-        }
-        .stat-card {
-            background: #111;
-            padding: 15px;
-            border-radius: 16px;
-            text-align: center;
-        }
-        .stat-card i {
-            color: var(--gold);
-            font-size: 1.5rem;
-            margin-bottom: 8px;
-            display: block;
-        }
-        .back-link {
-            display: inline-block;
-            margin-top: 20px;
-            color: var(--gold);
-            text-decoration: none;
-            text-align: center;
-            width: 100%;
-        }
-        .back-link:hover {
-            text-decoration: underline;
-        }
-        .note {
-            font-size: 12px;
-            color: #888;
+        .btn-danger:hover { background: var(--danger); color: white; }
+        .btn-success { background: #004d1a; border-color: var(--success); }
+        .btn-success:hover { background: var(--success); color: black; }
+        .image-preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
             margin-top: 10px;
         }
-        @media (max-width: 600px) {
-            .admin-container { padding: 20px; }
-            .flex-row { flex-direction: column; }
+        .image-preview img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid var(--gold);
         }
+        .article-list {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        .article-item {
+            background: #111;
+            border-radius: 16px;
+            padding: 15px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .article-info { flex: 1; }
+        .article-info h4 { color: var(--gold); margin-bottom: 5px; }
+        .article-actions button { margin: 0 5px; padding: 6px 12px; font-size: 0.8rem; }
+        hr { margin: 15px 0; border-color: var(--border); }
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 30px;
+            color: var(--gold);
+            text-decoration: none;
+        }
+        @media (max-width: 800px) { .grid-2 { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
 <div class="admin-container">
-    <h1><i class="fas fa-crown"></i> لوحة تحكم أوج السيادية</h1>
+    <h1><i class="fas fa-crown"></i> لوحة تحكم أوج المتكاملة</h1>
+    
+    <div class="grid-2">
+        <!-- القسم الأيمن: إدارة التصنيفات -->
+        <div class="section">
+            <h3><i class="fas fa-tags"></i> إدارة التصنيفات</h3>
+            <div class="flex-row">
+                <div><input type="text" id="new-tab" placeholder="التبويبة الرئيسية (مثال: تقنية)"></div>
+                <div><input type="text" id="new-field" placeholder="المجال الفرعي (مثال: أمن سيبراني)"></div>
+                <div><button id="add-category-btn">➕ إضافة</button></div>
+            </div>
+            <hr>
+            <h4>حذف تبويبة كاملة</h4>
+            <select id="delete-tab-select"></select>
+            <button id="delete-tab-btn" class="btn-danger">🗑️ حذف التبويبة وجميع مقالاتها</button>
+            <hr>
+            <h4>إحصائيات</h4>
+            <div id="stats-preview" style="display: flex; gap: 15px; justify-content: space-between;"></div>
+        </div>
 
-    <!-- قسم إضافة تبويبة ومجال -->
-    <div class="section">
-        <h3><i class="fas fa-plus-circle"></i> إضافة تصنيف جديد</h3>
-        <div class="flex-row">
-            <div>
-                <label>التبويبة الرئيسية (القسم)</label>
-                <input type="text" id="new-tab" placeholder="مثال: استخبارات">
+        <!-- القسم الأيسر: إضافة/تعديل مقال -->
+        <div class="section">
+            <h3><i class="fas fa-edit"></i> نشر أو تعديل مقال</h3>
+            <input type="hidden" id="edit-id" value="">
+            <div class="flex-row">
+                <div><input type="text" id="article-title" placeholder="عنوان المقال"></div>
+                <div><input type="text" id="article-author" placeholder="اسم الكاتب"></div>
+            </div>
+            <div class="flex-row">
+                <div>
+                    <select id="article-category" onchange="updateSubfields()">
+                        <option value="">اختر التبويبة</option>
+                    </select>
+                </div>
+                <div>
+                    <select id="article-subfield">
+                        <option value="">اختر المجال الفرعي</option>
+                    </select>
+                </div>
+            </div>
+            <div class="flex-row">
+                <div>
+                    <label>خط العنوان</label>
+                    <select id="title-font">
+                        <option value="Amiri">Amiri</option>
+                        <option value="Cairo">Cairo</option>
+                        <option value="Cinzel">Cinzel</option>
+                    </select>
+                </div>
+                <div>
+                    <label>خط المحتوى</label>
+                    <select id="body-font">
+                        <option value="Tajawal">Tajawal</option>
+                        <option value="Almarai">Almarai</option>
+                        <option value="Amiri">Amiri</option>
+                    </select>
+                </div>
             </div>
             <div>
-                <label>المجال الفرعي</label>
-                <input type="text" id="new-field" placeholder="مثال: تحليل جيوسياسي">
+                <label>رفع صور (يدعم متعدد)</label>
+                <input type="file" id="article-images" multiple accept="image/*">
+                <div id="image-previews" class="image-preview"></div>
             </div>
-            <div style="flex: 0.5;">
-                <label>&nbsp;</label>
-                <button id="add-category-btn">➕ إضافة</button>
+            <textarea id="article-content" placeholder="محتوى المقال (يدعم HTML بسيط)"></textarea>
+            <div class="flex-row">
+                <button id="publish-btn" class="btn-success"><i class="fas fa-save"></i> نشر / تحديث</button>
+                <button id="new-article-btn"><i class="fas fa-plus"></i> مقال جديد</button>
             </div>
         </div>
-        <div class="note">يمكنك إضافة تبويبة جديدة أو إضافة مجال فرعي لتبويبة موجودة (اكتب اسم التبويبة الموجودة).</div>
-    </div>
 
-    <!-- قسم حذف تبويبة -->
-    <div class="section">
-        <h3><i class="fas fa-trash-alt"></i> حذف تبويبة كاملة</h3>
-        <select id="delete-tab-select"></select>
-        <button id="delete-tab-btn" class="btn-danger">🗑️ حذف التبويبة وجميع مقالاتها</button>
-        <div class="note">⚠️ سيتم حذف كل المقالات التابعة لهذه التبويبة نهائياً.</div>
-    </div>
-
-    <!-- قسم حذف مقال -->
-    <div class="section">
-        <h3><i class="fas fa-file-alt"></i> حذف مقال محدد</h3>
-        <select id="delete-article-select"></select>
-        <button id="delete-article-btn" class="btn-danger">🗑️ حذف المقال المختار</button>
-    </div>
-
-    <!-- قسم قاعدة البيانات -->
-    <div class="section">
-        <h3><i class="fas fa-database"></i> قاعدة البيانات (جاهز للربط)</h3>
-        <div class="flex-row">
-            <button id="sync-database-btn">💾 حفظ النسخة الاحتياطية</button>
-            <button id="load-from-db-btn">📥 استعادة من الخادم</button>
+        <!-- القسم السفلي: قائمة المقالات -->
+        <div class="section full-width">
+            <h3><i class="fas fa-list"></i> جميع المقالات المنشورة</h3>
+            <div id="articles-list" class="article-list"></div>
         </div>
-        <div class="note">⚠️ حالياً هذه الأزرار تجريبية – يمكنك ربطها لاحقاً بـ API حقيقي (Node.js / PHP / Firebase).</div>
-    </div>
 
-    <!-- قسم الإحصائيات -->
-    <div class="section">
-        <h3><i class="fas fa-chart-line"></i> إحصائيات سريعة</h3>
-        <div id="stats-container" class="stats-grid"></div>
+        <!-- قسم قاعدة البيانات والخيارات -->
+        <div class="section full-width">
+            <h3><i class="fas fa-database"></i> قاعدة البيانات والنسخ الاحتياطي</h3>
+            <div class="flex-row">
+                <button id="sync-database-btn">💾 حفظ نسخة للخادم (جاهز)</button>
+                <button id="load-from-db-btn">📥 استعادة من الخادم</button>
+                <button id="export-data-btn">📁 تصدير جميع البيانات (JSON)</button>
+                <button id="import-data-btn">📂 استيراد بيانات من ملف</button>
+                <input type="file" id="import-file" accept=".json" style="display:none;">
+            </div>
+            <div class="note">⚠️ أزرار الخادم جاهزة للتعديل – يمكنك ربطها بـ API حقيقي لاحقاً.</div>
+        </div>
     </div>
-
     <a href="index.html" class="back-link">← العودة إلى الموقع الرئيسي</a>
 </div>
 
 <script>
-    // ----------------------------- دوال التحديث العامة -----------------------------
+    // ----------------------------- دوال مساعدة -----------------------------
     function loadData() {
         return {
             awjData: JSON.parse(localStorage.getItem('awj_logic')) || {},
@@ -213,127 +254,284 @@
     function addSecurityLog(action) {
         let logs = JSON.parse(localStorage.getItem('security_logs')) || [];
         logs.unshift({ time: new Date().toLocaleString(), action });
-        localStorage.setItem('security_logs', JSON.stringify(logs.slice(0, 50)));
+        localStorage.setItem('security_logs', JSON.stringify(logs.slice(0,50)));
     }
 
-    // تحديث جميع القوائم والإحصائيات
-    function refreshAll() {
-        let { awjData, articles } = loadData();
-        // تحديث قائمة التبويبات للحذف
-        const tabSelect = document.getElementById('delete-tab-select');
-        if (tabSelect) {
-            let tabs = Object.keys(awjData);
-            tabSelect.innerHTML = '<option value="">-- اختر تبويبة --</option>' + 
-                tabs.map(t => `<option value="${t}">${t} (${articles.filter(a=>a.category===t).length} مقال)</option>`).join('');
+    // تحديث قائمة المجالات الفرعية حسب التبويبة المختارة
+    window.updateSubfields = function() {
+        let { awjData } = loadData();
+        let tab = document.getElementById('article-category').value;
+        let subSelect = document.getElementById('article-subfield');
+        subSelect.innerHTML = '<option value="">اختر المجال الفرعي</option>';
+        if (tab && awjData[tab]) {
+            awjData[tab].forEach(f => {
+                subSelect.innerHTML += `<option value="${f}">${f}</option>`;
+            });
         }
-        // تحديث قائمة المقالات للحذف
-        const artSelect = document.getElementById('delete-article-select');
-        if (artSelect) {
-            artSelect.innerHTML = '<option value="">-- اختر مقال --</option>' + 
-                articles.map(a => `<option value="${a.id}">${a.title} (${a.category})</option>`).join('');
-        }
-        // تحديث الإحصائيات
-        const statsDiv = document.getElementById('stats-container');
-        if (statsDiv) {
-            const totalViews = articles.reduce((sum, a) => sum + (a.views || 0), 0);
-            const totalFields = Object.values(awjData).reduce((sum, arr) => sum + arr.length, 0);
-            statsDiv.innerHTML = `
-                <div class="stat-card"><i class="fas fa-folder"></i><h4>${Object.keys(awjData).length}</h4><p>التبويبات</p></div>
-                <div class="stat-card"><i class="fas fa-tags"></i><h4>${totalFields}</h4><p>المجالات الفرعية</p></div>
-                <div class="stat-card"><i class="fas fa-newspaper"></i><h4>${articles.length}</h4><p>المقالات</p></div>
-                <div class="stat-card"><i class="fas fa-eye"></i><h4>${totalViews}</h4><p>إجمالي المشاهدات</p></div>
-            `;
+    };
+
+    // عرض الصور المرفوعة بشكل مصغر
+    document.getElementById('article-images').addEventListener('change', function(e) {
+        let previews = document.getElementById('image-previews');
+        previews.innerHTML = '';
+        Array.from(e.target.files).forEach(file => {
+            let reader = new FileReader();
+            reader.onload = function(ev) {
+                let img = document.createElement('img');
+                img.src = ev.target.result;
+                previews.appendChild(img);
+            };
+            reader.readAsDataURL(file);
+        });
+    });
+
+    // حفظ المقال (نشر أو تحديث)
+    function saveArticle() {
+        let id = document.getElementById('edit-id').value;
+        let title = document.getElementById('article-title').value.trim();
+        let author = document.getElementById('article-author').value.trim();
+        let category = document.getElementById('article-category').value;
+        let subfield = document.getElementById('article-subfield').value;
+        let titleFont = document.getElementById('title-font').value;
+        let bodyFont = document.getElementById('body-font').value;
+        let content = document.getElementById('article-content').value.trim();
+        let images = [];
+        let files = document.getElementById('article-images').files;
+        if (files.length > 0) {
+            // تحويل الصور إلى Base64 (للتخزين في localStorage)
+            let readers = Array.from(files).map(file => {
+                return new Promise((resolve) => {
+                    let reader = new FileReader();
+                    reader.onload = (e) => resolve(e.target.result);
+                    reader.readAsDataURL(file);
+                });
+            });
+            Promise.all(readers).then(imagesBase64 => {
+                images = imagesBase64;
+                commitArticle(id, title, author, category, subfield, titleFont, bodyFont, content, images);
+            });
+        } else {
+            // إذا لم يتم رفع صور جديدة، نحتفظ بالصور القديمة في حالة التعديل
+            if (id) {
+                let { articles } = loadData();
+                let existing = articles.find(a => a.id == id);
+                if (existing) images = existing.images || [];
+            }
+            commitArticle(id, title, author, category, subfield, titleFont, bodyFont, content, images);
         }
     }
 
-    // ----------------------------- إضافة تبويبة أو مجال فرعي -----------------------------
-    function addCategory() {
-        let tab = document.getElementById('new-tab').value.trim();
-        let field = document.getElementById('new-field').value.trim();
-        if (!tab || !field) {
-            alert("الرجاء إدخال التبويبة والمجال الفرعي.");
+    function commitArticle(id, title, author, category, subfield, titleFont, bodyFont, content, images) {
+        if (!title || !author || !category || !subfield || !content) {
+            alert("الرجاء ملء جميع الحقول الأساسية");
             return;
         }
         let { awjData, articles } = loadData();
-        if (!awjData[tab]) {
-            awjData[tab] = [];
+        let now = new Date().toLocaleString('ar-EG');
+        if (id) {
+            // تعديل مقال موجود
+            let index = articles.findIndex(a => a.id == id);
+            if (index !== -1) {
+                articles[index] = { ...articles[index], title, author, category, subfield, titleFont, bodyFont, content, images, date: now };
+                addSecurityLog(`تعديل مقال: ${title}`);
+            }
+        } else {
+            // إضافة مقال جديد
+            let newId = Date.now();
+            let newArticle = { id: newId, title, author, category, subfield, titleFont, bodyFont, content, images, date: now, views: 0 };
+            articles.unshift(newArticle);
+            addSecurityLog(`نشر مقال جديد: ${title}`);
         }
+        saveData(awjData, articles);
+        resetForm();
+        renderArticlesList();
+        alert("تم حفظ المقال بنجاح");
+    }
+
+    function resetForm() {
+        document.getElementById('edit-id').value = '';
+        document.getElementById('article-title').value = '';
+        document.getElementById('article-author').value = '';
+        document.getElementById('article-category').value = '';
+        document.getElementById('article-subfield').innerHTML = '<option value="">اختر المجال الفرعي</option>';
+        document.getElementById('title-font').value = 'Amiri';
+        document.getElementById('body-font').value = 'Tajawal';
+        document.getElementById('article-content').value = '';
+        document.getElementById('article-images').value = '';
+        document.getElementById('image-previews').innerHTML = '';
+    }
+
+    function editArticle(id) {
+        let { articles } = loadData();
+        let art = articles.find(a => a.id == id);
+        if (art) {
+            document.getElementById('edit-id').value = art.id;
+            document.getElementById('article-title').value = art.title;
+            document.getElementById('article-author').value = art.author;
+            document.getElementById('article-category').value = art.category;
+            updateSubfields();
+            setTimeout(() => {
+                document.getElementById('article-subfield').value = art.subfield;
+            }, 50);
+            document.getElementById('title-font').value = art.titleFont || 'Amiri';
+            document.getElementById('body-font').value = art.bodyFont || 'Tajawal';
+            document.getElementById('article-content').value = art.content;
+            // عرض الصور القديمة (إن وجدت)
+            let previews = document.getElementById('image-previews');
+            previews.innerHTML = '';
+            if (art.images && art.images.length) {
+                art.images.forEach(src => {
+                    let img = document.createElement('img');
+                    img.src = src;
+                    img.style.width = '80px';
+                    previews.appendChild(img);
+                });
+            }
+        }
+    }
+
+    function deleteArticle(id) {
+        if (confirm("هل تريد حذف هذا المقال نهائياً؟")) {
+            let { awjData, articles } = loadData();
+            articles = articles.filter(a => a.id != id);
+            saveData(awjData, articles);
+            renderArticlesList();
+            addSecurityLog(`حذف مقال رقم ${id}`);
+            if (document.getElementById('edit-id').value == id) resetForm();
+        }
+    }
+
+    function renderArticlesList() {
+        let { articles } = loadData();
+        let container = document.getElementById('articles-list');
+        if (articles.length === 0) {
+            container.innerHTML = '<p>لا توجد مقالات بعد. ابدأ بنشر مقال جديد.</p>';
+            return;
+        }
+        container.innerHTML = articles.map(art => `
+            <div class="article-item">
+                <div class="article-info">
+                    <h4>${art.title}</h4>
+                    <div style="font-size:0.8rem;">${art.author} | ${art.category} / ${art.subfield} | ${art.date}</div>
+                    <div style="font-size:0.7rem;">👁️ ${art.views || 0} مشاهدة</div>
+                </div>
+                <div class="article-actions">
+                    <button onclick="editArticle(${art.id})"><i class="fas fa-edit"></i> تعديل</button>
+                    <button onclick="deleteArticle(${art.id})" class="btn-danger"><i class="fas fa-trash"></i> حذف</button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // ----------------------------- إدارة التصنيفات -----------------------------
+    function refreshCategorySelects() {
+        let { awjData, articles } = loadData();
+        let catSelect = document.getElementById('article-category');
+        let deleteSelect = document.getElementById('delete-tab-select');
+        let tabs = Object.keys(awjData);
+        catSelect.innerHTML = '<option value="">اختر التبويبة</option>' + tabs.map(t => `<option value="${t}">${t}</option>`).join('');
+        deleteSelect.innerHTML = '<option value="">-- اختر تبويبة --</option>' + tabs.map(t => `<option value="${t}">${t} (${articles.filter(a=>a.category===t).length} مقال)</option>`).join('');
+        // تحديث الإحصائيات
+        let statsDiv = document.getElementById('stats-preview');
+        let totalFields = Object.values(awjData).reduce((s,arr) => s+arr.length, 0);
+        statsDiv.innerHTML = `
+            <div><i class="fas fa-folder"></i> ${tabs.length} تبويبة</div>
+            <div><i class="fas fa-tags"></i> ${totalFields} مجال</div>
+            <div><i class="fas fa-newspaper"></i> ${articles.length} مقال</div>
+        `;
+    }
+
+    function addCategory() {
+        let tab = document.getElementById('new-tab').value.trim();
+        let field = document.getElementById('new-field').value.trim();
+        if (!tab || !field) { alert("أدخل التبويبة والمجال"); return; }
+        let { awjData, articles } = loadData();
+        if (!awjData[tab]) awjData[tab] = [];
         if (!awjData[tab].includes(field)) {
             awjData[tab].push(field);
             saveData(awjData, articles);
-            addSecurityLog(`إضافة مجال جديد: "${field}" ضمن تبويبة "${tab}"`);
-            alert(`✅ تمت إضافة المجال "${field}" إلى التبويبة "${tab}"`);
-            document.getElementById('new-field').value = '';
-        } else {
-            alert("هذا المجال موجود مسبقاً في هذه التبويبة.");
-        }
-        refreshAll();
+            addSecurityLog(`إضافة: ${field} في ${tab}`);
+            alert("تمت الإضافة");
+        } else alert("المجال موجود مسبقاً");
+        document.getElementById('new-field').value = '';
+        refreshCategorySelects();
     }
+
+    function deleteTab() {
+        let tab = document.getElementById('delete-tab-select').value;
+        if (!tab) return;
+        if (confirm(`حذف التبويبة "${tab}" وجميع مقالاتها؟`)) {
+            let { awjData, articles } = loadData();
+            delete awjData[tab];
+            articles = articles.filter(a => a.category !== tab);
+            saveData(awjData, articles);
+            refreshCategorySelects();
+            renderArticlesList();
+            addSecurityLog(`حذف تبويبة: ${tab}`);
+            alert("تم الحذف");
+            resetForm();
+        }
+    }
+
+    // ----------------------------- قاعدة البيانات والتصدير -----------------------------
+    async function exportData() {
+        let data = {
+            awjData: JSON.parse(localStorage.getItem('awj_logic')||'{}'),
+            articles: JSON.parse(localStorage.getItem('awj_articles')||'[]'),
+            userStats: JSON.parse(localStorage.getItem('user_stats')||'{}'),
+            favorites: JSON.parse(localStorage.getItem('favorites')||'[]'),
+            viewHistory: JSON.parse(localStorage.getItem('view_history')||'[]'),
+            securityLogs: JSON.parse(localStorage.getItem('security_logs')||'[]')
+        };
+        let blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+        let url = URL.createObjectURL(blob);
+        let a = document.createElement('a');
+        a.href = url;
+        a.download = 'awj_backup.json';
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+
+    document.getElementById('import-data-btn')?.addEventListener('click', () => {
+        document.getElementById('import-file').click();
+    });
+    document.getElementById('import-file')?.addEventListener('change', (e) => {
+        let file = e.target.files[0];
+        if (!file) return;
+        let reader = new FileReader();
+        reader.onload = (ev) => {
+            try {
+                let data = JSON.parse(ev.target.result);
+                if (data.awjData) localStorage.setItem('awj_logic', JSON.stringify(data.awjData));
+                if (data.articles) localStorage.setItem('awj_articles', JSON.stringify(data.articles));
+                if (data.userStats) localStorage.setItem('user_stats', JSON.stringify(data.userStats));
+                if (data.favorites) localStorage.setItem('favorites', JSON.stringify(data.favorites));
+                if (data.viewHistory) localStorage.setItem('view_history', JSON.stringify(data.viewHistory));
+                if (data.securityLogs) localStorage.setItem('security_logs', JSON.stringify(data.securityLogs));
+                refreshCategorySelects();
+                renderArticlesList();
+                alert("تم استيراد البيانات بنجاح");
+            } catch(err) { alert("الملف غير صالح"); }
+        };
+        reader.readAsText(file);
+    });
+
+    async function saveToServer() { alert("جاهز لربط API الحقيقي"); }
+    async function loadFromServer() { alert("جاهز لربط API الحقيقي"); }
+
+    // ----------------------------- ربط الأحداث -----------------------------
     document.getElementById('add-category-btn').addEventListener('click', addCategory);
+    document.getElementById('delete-tab-btn').addEventListener('click', deleteTab);
+    document.getElementById('publish-btn').addEventListener('click', saveArticle);
+    document.getElementById('new-article-btn').addEventListener('click', resetForm);
+    document.getElementById('sync-database-btn').addEventListener('click', saveToServer);
+    document.getElementById('load-from-db-btn').addEventListener('click', loadFromServer);
+    document.getElementById('export-data-btn').addEventListener('click', exportData);
 
-    // ----------------------------- حذف تبويبة -----------------------------
-    document.getElementById('delete-tab-btn')?.addEventListener('click', () => {
-        let tabName = document.getElementById('delete-tab-select').value;
-        if (!tabName) { alert("اختر تبويبة أولاً"); return; }
-        let { awjData, articles } = loadData();
-        let count = articles.filter(a => a.category === tabName).length;
-        if (confirm(`⚠️ هل أنت متأكد من حذف التبويبة "${tabName}" وجميع مقالاتها (${count} مقال)؟`)) {
-            delete awjData[tabName];
-            articles = articles.filter(a => a.category !== tabName);
-            saveData(awjData, articles);
-            addSecurityLog(`حذف تبويبة: ${tabName}`);
-            alert(`✅ تم حذف التبويبة "${tabName}"`);
-            refreshAll();
-        }
-    });
-
-    // ----------------------------- حذف مقال -----------------------------
-    document.getElementById('delete-article-btn')?.addEventListener('click', () => {
-        let artId = document.getElementById('delete-article-select').value;
-        if (!artId) { alert("اختر مقالاً أولاً"); return; }
-        let { awjData, articles } = loadData();
-        let article = articles.find(a => a.id == artId);
-        if (!article) return;
-        if (confirm(`⚠️ هل أنت متأكد من حذف المقال "${article.title}"؟`)) {
-            articles = articles.filter(a => a.id != artId);
-            saveData(awjData, articles);
-            addSecurityLog(`حذف مقال: ${article.title} (${article.category})`);
-            alert(`✅ تم حذف المقال "${article.title}"`);
-            refreshAll();
-        }
-    });
-
-    // ----------------------------- دوال قاعدة البيانات (جاهزة للتعديل) -----------------------------
-    async function saveToDatabase() {
-        let { awjData, articles } = loadData();
-        let userStats = JSON.parse(localStorage.getItem('user_stats') || '{}');
-        let favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
-        let viewHistory = JSON.parse(localStorage.getItem('view_history') || '[]');
-        let securityLogs = JSON.parse(localStorage.getItem('security_logs') || '[]');
-        const fullData = { awjData, articles, userStats, favorites, viewHistory, securityLogs };
-        console.log("📡 حفظ البيانات إلى الخادم:", fullData);
-        // await fetch('/api/save', { method: 'POST', body: JSON.stringify(fullData), headers: { 'Content-Type': 'application/json' } });
-        alert("جاهز للحفظ! قم بإضافة كود fetch الخاص بك.");
-    }
-    async function loadFromDatabase() {
-        console.log("📡 تحميل البيانات من الخادم");
-        // const res = await fetch('/api/load');
-        // const data = await res.json();
-        // localStorage.setItem('awj_logic', JSON.stringify(data.awjData));
-        // localStorage.setItem('awj_articles', JSON.stringify(data.articles));
-        // localStorage.setItem('user_stats', JSON.stringify(data.userStats));
-        // localStorage.setItem('favorites', JSON.stringify(data.favorites));
-        // localStorage.setItem('view_history', JSON.stringify(data.viewHistory));
-        // localStorage.setItem('security_logs', JSON.stringify(data.securityLogs));
-        alert("جاهز للتحميل! قم بإضافة كود fetch الخاص بك.");
-        refreshAll();
-    }
-    document.getElementById('sync-database-btn')?.addEventListener('click', saveToDatabase);
-    document.getElementById('load-from-db-btn')?.addEventListener('click', loadFromDatabase);
-
-    // ----------------------------- التهيئة الأولية -----------------------------
-    refreshAll();
-    addSecurityLog("فتح لوحة الإدارة السيادية (نسخة كاملة)");
+    // بدء التشغيل
+    refreshCategorySelects();
+    renderArticlesList();
+    addSecurityLog("فتح لوحة الإدارة المتكاملة");
 </script>
 </body>
 </html>

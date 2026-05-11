@@ -6,19 +6,13 @@
     <meta name="description" content="أوج | منصة المعرفة السيادية والذكاء الاستراتيجي">
     <title>أوج | AWJ - القمة</title>
     
-    <!-- الخطوط الملكية -->
-    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@300;600&family=Cinzel:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@300;600&family=Cinzel:wght@700&family=Tajawal&family=Almarai&family=Scheherazade+New:wght@400;700&display=swap" rel="stylesheet">
     
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
             --gold: #D4AF37;
-            --gold-dim: rgba(212, 175, 55, 0.6);
+            --gold-dim: rgba(212, 175, 55, 0.15);
             --dark-bg: #050505;
             --card-bg: #0c0c0c;
             --danger: #ff3333;
@@ -31,211 +25,105 @@
             color: #e0e0e0;
             font-family: 'Amiri', serif;
             overflow-x: hidden;
-            user-select: none; /* منع تحديد النص */
+            user-select: none;
         }
 
-        /* شريط التمرير الجميل */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: #111; }
         ::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 10px; }
 
-        /* ========== الهيدر الملكي ========== */
         header {
-            position: fixed;
-            top: 0;
-            width: 100%;
-            height: 80px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 5%;
-            background: rgba(5, 5, 5, 0.96);
-            backdrop-filter: blur(16px);
-            border-bottom: 1px solid var(--glass);
-            z-index: 2000;
-            transition: transform 0.3s ease;
+            position: fixed; top: 0; width: 100%; height: 80px;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 5%; background: rgba(5, 5, 5, 0.96);
+            backdrop-filter: blur(16px); border-bottom: 1px solid var(--glass);
+            z-index: 2000; transition: transform 0.3s ease;
         }
-
         .logo {
-            font-family: 'Cinzel', serif;
-            font-size: 2.3rem;
-            color: var(--gold);
-            text-shadow: 0 0 12px rgba(212, 175, 55, 0.5);
-            letter-spacing: 4px;
+            font-family: 'Cinzel', serif; font-size: 2.3rem;
+            color: var(--gold); text-shadow: 0 0 12px rgba(212, 175, 55, 0.5);
+            letter-spacing: 4px; cursor: pointer;
         }
 
-        /* ========== شريط التبويبات ========== */
         .tabs-nav {
-            position: fixed;
-            top: 80px;
-            width: 100%;
-            background: rgba(8, 8, 8, 0.96);
-            backdrop-filter: blur(8px);
-            z-index: 1900;
-            border-bottom: 1px solid rgba(212, 175, 55, 0.15);
+            position: fixed; top: 80px; width: 100%;
+            background: rgba(8, 8, 8, 0.96); backdrop-filter: blur(8px);
+            z-index: 1900; border-bottom: 1px solid rgba(212, 175, 55, 0.15);
         }
-
         .tabs-wrapper {
-            display: flex;
-            overflow-x: auto;
-            white-space: nowrap;
-            padding: 12px 5%;
-            gap: 12px;
-            scrollbar-width: thin;
+            display: flex; overflow-x: auto; white-space: nowrap;
+            padding: 12px 5%; gap: 12px; scrollbar-width: thin;
         }
-
-        .tabs-wrapper::-webkit-scrollbar { height: 3px; }
-
         .tab-item {
-            background: transparent;
-            border: 1px solid #2a2a2a;
-            color: #aaa;
-            padding: 8px 24px;
-            border-radius: 40px;
-            cursor: pointer;
-            font-family: 'Cairo', sans-serif;
-            font-weight: 600;
-            transition: 0.25s;
-            flex: 0 0 auto;
+            background: transparent; border: 1px solid #2a2a2a;
+            color: #aaa; padding: 8px 24px; border-radius: 40px;
+            cursor: pointer; font-family: 'Cairo', sans-serif;
+            font-weight: 600; transition: 0.2s; flex: 0 0 auto;
         }
-
         .tab-item.active {
-            background: var(--gold);
-            color: #000;
-            border-color: var(--gold);
-            box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
+            background: var(--gold); color: #000;
+            border-color: var(--gold); box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
         }
 
-        /* ========== شريط المجالات الفرعية ========== */
         .sub-fields-bar {
-            position: fixed;
-            top: 145px;
-            width: 100%;
-            background: rgba(12, 12, 12, 0.96);
-            backdrop-filter: blur(12px);
-            z-index: 1800;
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.4s ease-out;
-            border-bottom: 1px solid transparent;
+            position: fixed; top: 145px; width: 100%;
+            background: rgba(12, 12, 12, 0.96); backdrop-filter: blur(12px);
+            z-index: 1800; max-height: 0; overflow: hidden;
+            transition: max-height 0.4s ease-out; border-bottom: 1px solid transparent;
         }
-
-        .sub-fields-bar.active {
-            max-height: 80px;
-            border-bottom-color: var(--gold-dim);
-        }
-
+        .sub-fields-bar.active { max-height: 80px; border-bottom-color: var(--gold-dim); }
         .fields-flex {
-            display: flex;
-            justify-content: center;
-            gap: 28px;
-            padding: 16px;
-            flex-wrap: wrap;
+            display: flex; justify-content: center; gap: 28px;
+            padding: 16px; flex-wrap: wrap;
         }
-
         .field-node {
-            font-size: 0.9rem;
-            color: #ccc;
-            cursor: pointer;
-            transition: 0.2s;
-            font-family: 'Cairo', sans-serif;
-            border-bottom: 1px solid transparent;
-            padding-bottom: 4px;
+            font-size: 0.9rem; color: #ccc; cursor: pointer;
+            transition: 0.2s; font-family: 'Cairo', sans-serif;
+            border-bottom: 1px solid transparent; padding-bottom: 4px;
         }
+        .field-node:hover { color: var(--gold); border-bottom-color: var(--gold); }
 
-        .field-node:hover {
-            color: var(--gold);
-            border-bottom-color: var(--gold);
-        }
-
-        /* ========== منطقة المحتوى ========== */
         .article-viewport {
-            margin-top: 230px;
-            padding: 0 8% 100px;
+            margin-top: 230px; padding: 0 8% 100px;
             animation: fadeSlideUp 0.6s ease-out;
         }
-
         @keyframes fadeSlideUp {
             from { opacity: 0; transform: translateY(24px); }
             to { opacity: 1; transform: translateY(0); }
         }
-
         .main-article-card {
             border-right: 4px solid var(--gold);
             background: linear-gradient(135deg, var(--card-bg), rgba(0,0,0,0.7));
-            padding: 40px;
-            border-radius: 24px;
-            backdrop-filter: blur(2px);
-            box-shadow: 0 20px 35px -12px rgba(0,0,0,0.5);
+            padding: 40px; border-radius: 24px;
+            backdrop-filter: blur(2px); box-shadow: 0 20px 35px -12px rgba(0,0,0,0.5);
         }
 
-        /* ========== فخ المتسلل (The Trap) ========== */
         #horror-trap {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: #000000e6;
-            backdrop-filter: blur(12px);
-            z-index: 10000;
-            padding: 30px;
-            color: var(--danger);
-            font-family: monospace;
-            text-align: center;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
+            display: none; position: fixed; inset: 0;
+            background: #000000e6; backdrop-filter: blur(12px);
+            z-index: 10000; padding: 30px; color: var(--danger);
+            font-family: monospace; text-align: center;
+            flex-direction: column; justify-content: center; align-items: center;
         }
-
         .glitch-text {
-            font-size: 2.2rem;
-            animation: glitch 0.3s infinite;
-            margin-bottom: 30px;
+            font-size: 2.2rem; animation: glitch 0.3s infinite; margin-bottom: 30px;
         }
-
         @keyframes glitch {
             0% { text-shadow: -2px 0 red, 2px 0 blue; transform: skew(0.5deg);}
             50% { text-shadow: 2px 0 red, -2px 0 blue; transform: skew(-0.5deg);}
             100% { text-shadow: -2px 0 blue, 2px 0 red; transform: skew(0);}
         }
+        .progress-bar { width: 80%; height: 4px; background: #222; margin: 30px auto; border-radius: 4px; overflow: hidden; }
+        .progress-fill { width: 0%; height: 100%; background: var(--danger); transition: width 0.08s linear; }
 
-        .progress-bar {
-            width: 80%;
-            height: 4px;
-            background: #222;
-            margin: 30px auto;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            width: 0%;
-            height: 100%;
-            background: var(--danger);
-            transition: width 0.08s linear;
-        }
-
-        /* ========== تذييل ========== */
-        footer {
-            text-align: center;
-            padding: 40px;
-            opacity: 0.4;
-            font-size: 0.8rem;
-            border-top: 1px solid #1a1a1a;
-            margin-top: 40px;
-        }
-
-        #vault-trigger {
-            cursor: pointer;
-            transition: 0.2s;
-        }
+        footer { text-align: center; padding: 40px; opacity: 0.4; font-size: 0.8rem; border-top: 1px solid #1a1a1a; margin-top: 40px; }
+        #vault-trigger { cursor: pointer; transition: 0.2s; }
         #vault-trigger:hover { color: var(--gold); opacity: 1; }
 
-        /* تحسينات الجوال */
         @media (max-width: 768px) {
             .logo { font-size: 1.6rem; }
             .article-viewport { margin-top: 200px; padding: 0 5% 80px; }
             .main-article-card { padding: 24px; }
-            .fields-flex { gap: 16px; }
             .glitch-text { font-size: 1.3rem; }
         }
     </style>
@@ -248,13 +136,7 @@
 </header>
 
 <nav class="tabs-nav">
-    <div class="tabs-wrapper" id="main-tabs">
-        <button class="tab-item active" data-tab="home">الرئيسية</button>
-        <button class="tab-item" data-tab="intel">الذكاء الاستراتيجي</button>
-        <button class="tab-item" data-tab="cyber">الأمن الرقمي</button>
-        <button class="tab-item" data-tab="philosophy">مدارس الفكر</button>
-        <button class="tab-item" data-tab="black" style="border-color: #a00; color: #c44;">الأرشيف الأسود</button>
-    </div>
+    <div class="tabs-wrapper" id="main-tabs"></div>
 </nav>
 
 <div id="sub-bar" class="sub-fields-bar">
@@ -263,17 +145,16 @@
 
 <main class="article-viewport">
     <div id="content-render" class="main-article-card">
-        <!-- سيتم تعبئته ديناميكياً -->
         <h1 style="font-size: 2.8rem; color: var(--gold);">أوج | منصة المعرفة السيادية</h1>
-        <p style="font-size: 1.2rem; line-height: 1.8; margin-top: 20px;">اختر قسماً من الأعلى لتغوص في عوالم الذكاء الاستراتيجي، الأمن الرقمي، والفلسفة العميقة.</p>
+        <p style="font-size: 1.2rem; line-height: 1.8; margin-top: 20px;">اختر قسماً من الأعلى لاستعراض المقالات أو العلوم المصنفة.</p>
     </div>
 </main>
 
 <div id="horror-trap">
     <div class="glitch-text">⚠️ تَم رَصْدُ مُحَاوَلَةِ اِخْتِرَاقٍ ⚠️</div>
-    <p style="color: white; font-size: 1.2rem;">جاري تتبع الـ IP ونظام التشغيل... تَم تَثْبِيتُ حَزْمَةِ التَّعْقِيب.</p>
+    <p style="color: white; font-size: 1.2rem;">جاري تتبع الـ IP ونظام التشغيل...</p>
     <div class="progress-bar"><div id="trapProgress" class="progress-fill"></div></div>
-    <p id="trapMsg" style="color: #aaa;">نظام الدفاع السيادي يُسَجِّلُ وَجْهَكَ الآن...</p>
+    <p id="trapMsg" style="color: #aaa;">نظام الدفاع السيادي يُسَجِّلُ...</p>
     <p style="color: var(--gold); margin-top: 30px;">لن تُسْتَطَاعُ الخُرُوجُ مِنْ هَذِهِ الشَّبَكَةِ.</p>
 </div>
 
@@ -282,137 +163,162 @@
 </footer>
 
 <script>
-    // ----------------------------------------------
-    // 1. المحتوى الديناميكي للتبويبات والمجالات الفرعية
-    // ----------------------------------------------
-    const contentMap = {
-        home: {
-            title: "مَرْكَزُ القِيَادَة",
-            body: "أهلاً بك في القمة. هنا تلتقي الحكمة القديمة بالذكاء الاصطناعي. نُقَدِّمُ رؤى لا تُقدَّم في العادة. استعد لاستكشاف الأبعاد الخفية للمعرفة."
-        },
-        intel: {
-            title: "الذكاء الاستراتيجي",
-            body: "تحليل جيوسياسي، استشراف مستقبلي، واقتصاد الظل. أدوات صناع القرار وأسياد العالم."
-        },
-        cyber: {
-            title: "الأمن الرقمي",
-            body: "تشفير، حروب إلكترونية، وحماية الأصول الرقمية. تقنيات تستخدمها النخب."
-        },
-        philosophy: {
-            title: "مدارس الفكر",
-            body: "من الوجودية إلى العدمية الفعالة. أسئلة تؤرق الإنسانية وإجابات من الأعماق."
-        },
-        black: {
-            title: "الأرشيف الأسود",
-            body: "معلومات مصنفة. لا تُفتح إلا بإذن خاص. محتوى حساس يتطلب أعلى مستويات التصريح."
+    // ----------------------------- قراءة البيانات من localStorage (من admin panel) -----------------------------
+    let awjData = JSON.parse(localStorage.getItem('awj_logic')) || {};
+    let articles = JSON.parse(localStorage.getItem('awj_articles')) || [];
+    let currentTab = null;
+    let currentField = null;
+    let subTimer = null;
+
+    // عرض التبويبات في الشريط العلوي
+    function renderTabs() {
+        const container = document.getElementById('main-tabs');
+        const tabs = Object.keys(awjData);
+        if (tabs.length === 0) {
+            // إذا لم توجد بيانات، نعرض تبويبات افتراضية تحفيزية
+            container.innerHTML = `<button class="tab-item active" data-tab="home">الرئيسية</button>
+                                    <button class="tab-item" data-tab="wisdom">الحكمة الخالدة</button>
+                                    <button class="tab-item" data-tab="strategic">الاستراتيجية</button>`;
+            // إضافة بيانات افتراضية مؤقتة للعرض
+            if (!awjData['الحكمة الخالدة']) awjData['الحكمة الخالدة'] = ['أسرار القدماء', 'فلسفة الروح'];
+            if (!awjData['الاستراتيجية']) awjData['الاستراتيجية'] = ['تخطيط القوة', 'المناورة'];
+            localStorage.setItem('awj_logic', JSON.stringify(awjData));
+            // إعادة تحميل الـ tabs بعد التهيئة
+            renderTabs();
+            return;
         }
-    };
-
-    // محتوى المجالات الفرعية (كل مجال يظهر مقالة جديدة)
-    const subContent = {
-        'الجيوسياسة': "صراع القوى الكبرى، خرائط النفوذ، والمناطق الرمادية. تحليل استخباراتي بامتياز.",
-        'اقتصاد الظل': "الأموال غير المرئية، شبكات التهريب، وتأثيرها على الاقتصاد العالمي.",
-        'الاستشراف': "أدوات توقع المستقبل، سيناريوهات 2030-2050، ونماذج المحاكاة الاستراتيجية.",
-        'تشفير البيانات': "بروتوكولات التشفير العسكري، التشفير الكمي، وكسر الأصفار.",
-        'اختراق العقول': "الهندسة الاجتماعية، البرمجة العصبية، والتأثير الخفي.",
-        'الحروب الرقمية': "العمليات السيبرانية، الأسلحة البرمجية، وحروب المعلومات.",
-        'الوجودية': "سارتر، كامو، والبحث عن المعنى في اللامعنى.",
-        'العدمية الفعالة': "فلسفة العبث وإعادة بناء القيم بعد التفكيك.",
-        'المنطق': "منطق أرسطو إلى المنطق الباراكسي، أسس التفكير السليم.",
-        'ملفات سرية': "مجلدات مصنفة بتوقيعات زمنية. غير متاحة للقراءة العامة."
-    };
-
-    let activeTabId = 'home';
-    let timer = null;
-
-    // عرض المحتوى في المنطقة الرئيسية
-    function renderContent(title, contentHtml) {
-        const container = document.getElementById('content-render');
-        container.innerHTML = `
-            <h1 style="font-size: 2.6rem; color: var(--gold); margin-bottom: 20px;">${title}</h1>
-            <div style="font-size: 1.1rem; line-height: 1.8; opacity: 0.9;">${contentHtml}</div>
-        `;
+        container.innerHTML = '';
+        tabs.forEach(tab => {
+            const btn = document.createElement('button');
+            btn.className = 'tab-item';
+            if (!currentTab && tab === tabs[0]) btn.classList.add('active');
+            btn.setAttribute('data-tab', tab);
+            btn.innerText = tab;
+            btn.onclick = () => switchTab(tab, btn);
+            container.appendChild(btn);
+        });
+        // إذا لم يكن هناك تبويب نشط، فعّل الأول
+        if (!currentTab && tabs.length) switchTab(tabs[0], document.querySelector('.tab-item'));
     }
 
     // تبديل التبويب
     function switchTab(tabId, btnElement) {
-        activeTabId = tabId;
+        currentTab = tabId;
         // تحديث حالة الأزرار
         document.querySelectorAll('.tab-item').forEach(btn => btn.classList.remove('active'));
         if (btnElement) btnElement.classList.add('active');
         else {
-            // إذا لم يمر العنصر، ابحث عنه
             const foundBtn = document.querySelector(`.tab-item[data-tab="${tabId}"]`);
-            if(foundBtn) foundBtn.classList.add('active');
+            if (foundBtn) foundBtn.classList.add('active');
         }
 
-        // عرض المحتوى الأساسي للتبويب
-        if (contentMap[tabId]) {
-            renderContent(contentMap[tabId].title, `<p>${contentMap[tabId].body}</p>`);
-        } else {
-            renderContent("غير مصنف", "<p>هذا القسم قيد الترميز السيادي.</p>");
-        }
+        // عرض المقالات التي تخص هذا التبويب في المحتوى
+        displayArticlesForTab(tabId);
 
-        // التعامل مع الشريط الفرعي حسب التبويب
+        // عرض المجالات الفرعية لهذا التبويب
+        const fields = awjData[tabId] || [];
         const subBar = document.getElementById('sub-bar');
         const fieldsList = document.getElementById('fields-list');
-        
-        // تحديد قائمة المجالات المرتبطة بالتبويب
-        let fields = [];
-        if (tabId === 'intel') fields = ['الجيوسياسة', 'اقتصاد الظل', 'الاستشراف'];
-        else if (tabId === 'cyber') fields = ['تشفير البيانات', 'اختراق العقول', 'الحروب الرقمية'];
-        else if (tabId === 'philosophy') fields = ['الوجودية', 'العدمية الفعالة', 'المنطق'];
-        else if (tabId === 'black') fields = ['ملفات سرية'];
-        else fields = [];
-
         if (fields.length > 0) {
             fieldsList.innerHTML = fields.map(f => `<span class="field-node" data-field="${f}">${f}</span>`).join('');
             subBar.classList.add('active');
-            // إعادة ضبط المؤقت
-            if (timer) clearTimeout(timer);
-            timer = setTimeout(() => {
-                subBar.classList.remove('active');
-            }, 7000);
+            if (subTimer) clearTimeout(subTimer);
+            subTimer = setTimeout(() => subBar.classList.remove('active'), 7000);
+            // ربط الأحداث للمجالات الفرعية
+            document.querySelectorAll('.field-node').forEach(node => {
+                node.removeEventListener('click', handleFieldClick);
+                node.addEventListener('click', handleFieldClick);
+            });
         } else {
             subBar.classList.remove('active');
-            if (timer) clearTimeout(timer);
         }
-
-        // إضافة مستمعات النقر على المجالات الفرعية
-        document.querySelectorAll('.field-node').forEach(node => {
-            node.removeEventListener('click', handleFieldClick);
-            node.addEventListener('click', handleFieldClick);
-        });
     }
 
     function handleFieldClick(e) {
         const fieldName = e.target.getAttribute('data-field');
         if (!fieldName) return;
-        let article = subContent[fieldName] || "معلومات عن هذا المجال قيد التجميع من المصادر المغلقة.";
-        renderContent(fieldName, `<p>${article}</p><hr style='margin:20px 0;border-color:#333'><small>المجال: ${activeTabId}</small>`);
-        // إبقاء الشريط الفرعي ظاهراً لمدة إضافية عند التفاعل
+        currentField = fieldName;
+        displayArticlesForField(currentTab, fieldName);
+        // إبقاء الشريط الفرعي ظاهراً
         const subBar = document.getElementById('sub-bar');
-        if (timer) clearTimeout(timer);
+        if (subTimer) clearTimeout(subTimer);
         subBar.classList.add('active');
-        timer = setTimeout(() => subBar.classList.remove('active'), 7000);
+        subTimer = setTimeout(() => subBar.classList.remove('active'), 7000);
     }
 
-    // ربط أزرار التبويبات
-    function initTabs() {
-        const tabs = document.querySelectorAll('.tab-item');
-        tabs.forEach(btn => {
-            const tabId = btn.getAttribute('data-tab');
-            btn.onclick = () => switchTab(tabId, btn);
-        });
-        // تفعيل التبويب النشط افتراضياً
-        const defaultTab = document.querySelector('.tab-item.active');
-        if (defaultTab) switchTab(defaultTab.getAttribute('data-tab'), defaultTab);
-        else switchTab('home', null);
+    // عرض المقالات المرتبطة بتبويب معين (جميع المقالات التي تحمل نفس التبويب)
+    function displayArticlesForTab(tabName) {
+        const filtered = articles.filter(art => art.category === tabName);
+        if (filtered.length === 0) {
+            renderContent(`📂 ${tabName}`, `<p>لا توجد مقالات منشورة في هذا القسم حتى الآن. يمكنك إضافتها من لوحة الإدارة.</p>`);
+        } else {
+            let articlesHtml = filtered.map(art => `
+                <div style="border-bottom: 1px solid #333; margin-bottom: 25px; padding-bottom: 15px;">
+                    <h2 style="color: var(--gold); font-family: '${art.titleFont || 'Amiri'}', serif;">${art.title}</h2>
+                    <div style="display: flex; gap: 15px; color: #aaa; font-size: 0.8rem; margin: 8px 0;">
+                        <span>✍️ ${art.author}</span>
+                        <span>📅 ${art.date}</span>
+                        <span>🏷️ ${art.subfield}</span>
+                    </div>
+                    <div style="font-family: '${art.bodyFont || 'Tajawal'}', sans-serif; line-height: 1.7;">
+                        ${art.content.substring(0, 500)}${art.content.length > 500 ? '...' : ''}
+                    </div>
+                    ${art.images && art.images.length ? `<div style="margin-top: 10px;">🖼️ صور مرفقة: ${art.images.join(', ')}</div>` : ''}
+                    <button onclick="viewFullArticle(${art.id})" style="background: var(--gold-dim); border: none; padding: 5px 15px; margin-top: 12px; border-radius: 20px; cursor: pointer;">اقرأ المزيد</button>
+                </div>
+            `).join('');
+            renderContent(`📂 ${tabName}`, articlesHtml);
+        }
     }
 
-    // ----------------------------------------------
-    // 2. نظام الفخ والحماية (مكافحة الاختراق)
-    // ----------------------------------------------
+    function displayArticlesForField(tabName, fieldName) {
+        const filtered = articles.filter(art => art.category === tabName && art.subfield === fieldName);
+        if (filtered.length === 0) {
+            renderContent(`🔍 ${fieldName}`, `<p>لا توجد مقالات في هذا المجال الفرعي "${fieldName}" داخل قسم "${tabName}".</p><p>يمكنك نشر مقال جديد من لوحة التحكم.</p>`);
+        } else {
+            let articlesHtml = filtered.map(art => `
+                <div style="border-bottom: 1px solid #333; margin-bottom: 25px; padding-bottom: 15px;">
+                    <h2 style="color: var(--gold); font-family: '${art.titleFont || 'Amiri'}', serif;">${art.title}</h2>
+                    <div style="display: flex; gap: 15px; color: #aaa; font-size: 0.8rem; margin: 8px 0;">
+                        <span>✍️ ${art.author}</span>
+                        <span>📅 ${art.date}</span>
+                    </div>
+                    <div style="font-family: '${art.bodyFont || 'Tajawal'}', sans-serif;">${art.content.substring(0, 500)}...</div>
+                    <button onclick="viewFullArticle(${art.id})" style="background: var(--gold-dim); border: none; padding: 5px 15px; margin-top: 12px; border-radius: 20px; cursor: pointer;">اقرأ المزيد</button>
+                </div>
+            `).join('');
+            renderContent(`🔍 ${fieldName} (في ${tabName})`, articlesHtml);
+        }
+    }
+
+    function renderContent(title, bodyHtml) {
+        const container = document.getElementById('content-render');
+        container.innerHTML = `
+            <h1 style="font-size: 2.2rem; color: var(--gold); margin-bottom: 20px;">${title}</h1>
+            <div style="font-size: 1rem; line-height: 1.7;">${bodyHtml}</div>
+        `;
+    }
+
+    window.viewFullArticle = (id) => {
+        const article = articles.find(a => a.id === id);
+        if (article) {
+            renderContent(article.title, `
+                <div>
+                    <div style="color: var(--gold); margin-bottom: 10px;">✍️ ${article.author} | 📅 ${article.date} | 🏷️ ${article.category} / ${article.subfield}</div>
+                    <div style="font-family: '${article.bodyFont || 'Tajawal'}', sans-serif; line-height: 1.8;">
+                        ${article.content}
+                    </div>
+                    ${article.images && article.images.length ? `<div style="margin-top: 20px;">🖼️ الصور المرفقة: ${article.images.map(img => `<div>📷 ${img}</div>`).join('')}</div>` : ''}
+                    <hr style="margin: 20px 0;">
+                    <button onclick="location.reload()" style="background: transparent; border: 1px solid var(--gold); padding: 8px 20px; border-radius: 30px; cursor: pointer;">العودة</button>
+                </div>
+            `);
+        } else {
+            alert("المقال غير موجود");
+        }
+    };
+
+    // ----------------------------- أنظمة الحماية والفخ -----------------------------
     function activateTrap() {
         const trapDiv = document.getElementById('horror-trap');
         trapDiv.style.display = 'flex';
@@ -424,82 +330,56 @@
             fill.style.width = progress + '%';
             if (progress >= 100) {
                 clearInterval(interval);
-                msgSpan.innerText = "✅ تَمَّ إرْسَالُ جَمِيعِ البيانات إِلَى خَادِمِ الأَمْنِ السِّيَادِيّ. نَرَاكَ فِي مَحْكَمَةِ النُّخَب.";
+                msgSpan.innerText = "✅ تَمَّ إرْسَالُ البيانات إِلَى خَادِمِ الأَمْنِ السِّيَادِيّ.";
             } else if (progress > 40) {
-                msgSpan.innerText = "جاري رفع بيانات الـ GPS والكاميرا الأمامية...";
+                msgSpan.innerText = "جاري رفع بيانات الموقع والكاميرا...";
             }
         }, 50);
-        // تسجيل في console للتهديد
         console.warn("%c⚠️ نظام الدفاع السيادي: تم تسجيل محاولة اختراق ⚠️", "color: red; font-size: 16px");
     }
 
-    // الحماية من أدوات المطور
-    document.addEventListener('contextmenu', (e) => {
-        e.preventDefault();
-        console.warn("منع النقر الأيمن - تم التسجيل");
-    });
-
+    document.addEventListener('contextmenu', (e) => e.preventDefault());
     document.addEventListener('keydown', (e) => {
-        // F12, Ctrl+Shift+I, Ctrl+Shift+C, Ctrl+U, Ctrl+S
         if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'C')) ||
             (e.ctrlKey && e.key === 'u') || (e.ctrlKey && e.key === 's')) {
             e.preventDefault();
             activateTrap();
         }
     });
+    setInterval(() => console.clear(), 1000);
 
-    // محاولة لمنع فتح console من البداية (حيلة بسيطة)
-    setInterval(() => {
-        if (typeof window.console !== 'undefined') {
-            console.clear();
+    // ----------------------------- الدخول السري -----------------------------
+    let clickCount = 0;
+    document.getElementById('vault-trigger').addEventListener('click', () => {
+        clickCount++;
+        setTimeout(() => clickCount = 0, 1500);
+        if (clickCount === 3) {
+            const pass = prompt("شَفَرَةُ العُبُورِ:");
+            if (pass === "@...Alshanfricc_1998...@") {
+                alert("مَرْحَباً بِكَ يَا سَيِّدَ أَوَجْ. تَمَّ فَتْحُ الْخَزْنَةِ السَّرِّيَّة.");
+                renderContent("الخزنة المقدسة", "<p>لقد وصلت إلى أعلى درجات التصريح. هنا توجد المفاتيح السرية والملفات المؤرشفة.</p><pre style='background:#000;padding:10px;border-radius:8px'>🔓 الوصول الكامل مُتَاح</pre>");
+            } else alert("شَفَرَةٌ خَاطِئَةٌ.");
         }
-    }, 1000);
+    });
 
-    // --- الدخول للخزنة (فتح صفحة الأدمن) ---
-let clicks = 0;
-document.getElementById('vault-trigger').onclick = () => {
-    clicks++;
-    if(clicks === 3) {
-        const pass = prompt("أدخل شفرة العبور السيادية:");
-        
-        // التحقق من الشفرة
-        if(pass === "@...Alshanfricc_1998...@") {
-            alert("تم التحقق.. جاري فتح مركز القيادة.");
-            
-            // هذا السطر هو المسؤول عن الانتقال لصفحة الأدمن
-            // تأكد أن ملف الأدمن محفوظ بنفس المجلد واسمه admin.html
-            window.location.href = "admin.html"; 
-            
-        } else {
-            // تسجيل محاولة دخول خاطئة في سجل الأرواح
-            logIntruder('Wrong Admin Password');
-            alert("المكان يراقبك.. لا تكررها.");
-        }
-    }
-    // تصفير العداد بعد ثانيتين إذا لم يكمل الضغطات الثلاث
-    setTimeout(() => clicks = 0, 2000);
-};
-
-
-    // ----------------------------------------------
-    // 4. إخفاء الهيدر عند التمرير (بسلاسة)
-    // ----------------------------------------------
+    // ----------------------------- إخفاء الهيدر عند التمرير -----------------------------
     let lastScroll = 0;
     window.addEventListener('scroll', () => {
         const header = document.getElementById('awj-header');
-        const currentScroll = window.scrollY;
-        if (currentScroll > lastScroll && currentScroll > 120) {
-            header.style.transform = 'translateY(-100%)';
-        } else {
-            header.style.transform = 'translateY(0)';
-        }
-        lastScroll = currentScroll;
+        const curScroll = window.scrollY;
+        if (curScroll > lastScroll && curScroll > 120) header.style.transform = 'translateY(-100%)';
+        else header.style.transform = 'translateY(0)';
+        lastScroll = curScroll;
     });
 
-    // ----------------------------------------------
-    // 5. تشغيل كل شيء
-    // ----------------------------------------------
-    initTabs();
+    // ----------------------------- بدء التحميل -----------------------------
+    window.onload = () => {
+        renderTabs();
+        // إذا لم توجد مقالات بعد، نعرض رسالة ترحيب
+        if (articles.length === 0) {
+            renderContent("أوج | السيادة المعرفية", "<p>مرحباً بك في منصة أوج. لا توجد مقالات منشورة بعد. الرجاء استخدام لوحة الإدارة لإضافة التصنيفات والمقالات.</p><p style='margin-top:20px;'>🚀 يمكنك الدخول إلى لوحة التحكم عبر إضافة <code>/admin.html</code> إلى الرابط الحالي.</p>");
+        }
+    };
 </script>
 </body>
 </html>

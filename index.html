@@ -3,11 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <meta name="description" content="أوج | منصة المعرفة السيادية والذكاء الاستراتيجي">
     <title>أوج | AWJ - القمة</title>
-    
     <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@300;600&family=Cinzel:wght@700&family=Tajawal&family=Almarai&family=Scheherazade+New:wght@400;700&display=swap" rel="stylesheet">
-    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
@@ -19,7 +17,6 @@
             --glass: rgba(212, 175, 55, 0.08);
             --transition: 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
         }
-
         body {
             background-color: var(--dark-bg);
             color: #e0e0e0;
@@ -27,7 +24,52 @@
             overflow-x: hidden;
             user-select: none;
         }
+        /* شاشة الانتظار الفخمة */
+        #loading-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #000000;
+            z-index: 100000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 1.5s ease;
+        }
+        .walking-man {
+            width: 80px;
+            height: 80px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="30" r="12" fill="%23D4AF37"/><rect x="45" y="42" width="10" height="25" fill="%23D4AF37"/><rect x="35" y="50" width="10" height="20" fill="%23D4AF37"/><rect x="55" y="50" width="10" height="20" fill="%23D4AF37"/></svg>') no-repeat center;
+            background-size: contain;
+            animation: walk 0.5s infinite alternate;
+            margin-bottom: 30px;
+        }
+        @keyframes walk {
+            0% { transform: translateX(-10px); }
+            100% { transform: translateX(10px); }
+        }
+        .progress-line {
+            width: 80%;
+            height: 4px;
+            background: #222;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 20px;
+        }
+        .progress-fill-line {
+            width: 0%;
+            height: 100%;
+            background: var(--gold);
+            transition: width 0.1s linear;
+        }
+        .loading-text {
+            margin-top: 20px;
+            font-family: monospace;
+            color: var(--gold);
+            letter-spacing: 2px;
+        }
 
+        /* باقي التنسيقات */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: #111; }
         ::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 10px; }
@@ -44,6 +86,11 @@
             color: var(--gold); text-shadow: 0 0 12px rgba(212, 175, 55, 0.5);
             letter-spacing: 4px; cursor: pointer;
         }
+        .search-icon, .subscribe-icon {
+            cursor: pointer; font-size: 1.4rem; margin-left: 15px;
+            transition: 0.2s;
+        }
+        .search-icon:hover, .subscribe-icon:hover { color: var(--gold); }
 
         .tabs-nav {
             position: fixed; top: 80px; width: 100%;
@@ -97,93 +144,178 @@
             padding: 40px; border-radius: 24px;
             backdrop-filter: blur(2px); box-shadow: 0 20px 35px -12px rgba(0,0,0,0.5);
         }
+        .article-item {
+            border-bottom: 1px solid #2a2a2a;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+        }
+        .article-meta {
+            display: flex; gap: 20px; font-size: 0.8rem; color: #aaa; margin: 8px 0;
+        }
+        .article-cats {
+            display: flex; gap: 10px; margin-bottom: 10px;
+        }
+        .cat-badge-sm {
+            background: var(--gold-dim); padding: 2px 12px; border-radius: 20px; font-size: 0.7rem;
+        }
+        .scroll-top {
+            position: fixed; bottom: 30px; left: 30px; background: var(--gold);
+            color: black; width: 50px; height: 50px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; opacity: 0; transition: 0.3s; z-index: 9999;
+            box-shadow: 0 0 10px rgba(212,175,55,0.5);
+        }
+        .scroll-top.visible { opacity: 1; }
 
-        #horror-trap {
-            display: none; position: fixed; inset: 0;
-            background: #000000e6; backdrop-filter: blur(12px);
-            z-index: 10000; padding: 30px; color: var(--danger);
-            font-family: monospace; text-align: center;
-            flex-direction: column; justify-content: center; align-items: center;
+        /* المودال للصفحات الثابتة والاشتراك والبحث */
+        .modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95); z-index: 10001; justify-content: center; align-items: center;
         }
-        .glitch-text {
-            font-size: 2.2rem; animation: glitch 0.3s infinite; margin-bottom: 30px;
+        .modal-content {
+            background: #0c0c0c; border: 1px solid var(--gold); padding: 30px; border-radius: 24px;
+            width: 90%; max-width: 600px; max-height: 80vh; overflow-y: auto;
         }
-        @keyframes glitch {
-            0% { text-shadow: -2px 0 red, 2px 0 blue; transform: skew(0.5deg);}
-            50% { text-shadow: 2px 0 red, -2px 0 blue; transform: skew(-0.5deg);}
-            100% { text-shadow: -2px 0 blue, 2px 0 red; transform: skew(0);}
-        }
-        .progress-bar { width: 80%; height: 4px; background: #222; margin: 30px auto; border-radius: 4px; overflow: hidden; }
-        .progress-fill { width: 0%; height: 100%; background: var(--danger); transition: width 0.08s linear; }
+        .modal-content h3 { color: var(--gold); margin-bottom: 20px; }
+        .close-modal { float: left; cursor: pointer; font-size: 1.5rem; }
+        .search-input { width: 100%; padding: 12px; margin: 20px 0; background: #1a1a1a; border: 1px solid #333; color: white; border-radius: 30px; }
+        .search-result { border-bottom: 1px solid #333; padding: 10px 0; cursor: pointer; }
+        .search-result:hover { background: var(--gold-dim); }
 
-        footer { text-align: center; padding: 40px; opacity: 0.4; font-size: 0.8rem; border-top: 1px solid #1a1a1a; margin-top: 40px; }
-        #vault-trigger { cursor: pointer; transition: 0.2s; }
-        #vault-trigger:hover { color: var(--gold); opacity: 1; }
+        /* الأقسام الثلاثة السفلية */
+        .bottom-sections {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px;
+            margin: 60px 0 40px;
+        }
+        .bottom-card {
+            background: #0a0a0a; padding: 20px; border-radius: 20px; border: 1px solid #1f1f1f;
+        }
+        .bottom-card h4 { color: var(--gold); margin-bottom: 15px; font-family: 'Cairo'; }
+        .bottom-card ul { list-style: none; }
+        .bottom-card li { margin-bottom: 10px; cursor: pointer; border-bottom: 1px dashed #222; padding: 5px 0; }
+        .bottom-card li:hover { color: var(--gold); }
+
+        footer { text-align: center; padding: 40px; opacity: 0.8; border-top: 1px solid #1a1a1a; margin-top: 20px; }
+        .footer-links { display: flex; gap: 30px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap; }
+        .footer-links span { cursor: pointer; font-size: 0.9rem; }
+        .footer-links span:hover { color: var(--gold); }
 
         @media (max-width: 768px) {
+            .bottom-sections { grid-template-columns: 1fr; }
             .logo { font-size: 1.6rem; }
             .article-viewport { margin-top: 200px; padding: 0 5% 80px; }
-            .main-article-card { padding: 24px; }
-            .glitch-text { font-size: 1.3rem; }
         }
     </style>
 </head>
 <body>
 
+<!-- شاشة الانتظار -->
+<div id="loading-screen">
+    <div class="walking-man"></div>
+    <div class="progress-line"><div id="load-progress-fill" class="progress-fill-line"></div></div>
+    <div class="loading-text" id="loading-percent">0%</div>
+    <div style="margin-top: 30px; font-size: 0.8rem;">تجهيز السيادة المعرفية...</div>
+</div>
+
 <header id="awj-header">
     <div class="logo">AWJ</div>
-    <div style="color: var(--gold); font-family: 'Cairo'; letter-spacing: 1px;">سِيادة المَعنى</div>
+    <div style="display: flex; align-items: center;">
+        <i class="fas fa-search search-icon" id="open-search-btn"></i>
+        <i class="fas fa-envelope subscribe-icon" id="open-subscribe-btn"></i>
+        <div style="color: var(--gold); font-family: 'Cairo'; margin-right: 15px;">سِيادة المَعنى</div>
+    </div>
 </header>
 
 <nav class="tabs-nav">
     <div class="tabs-wrapper" id="main-tabs"></div>
 </nav>
-
 <div id="sub-bar" class="sub-fields-bar">
     <div id="fields-list" class="fields-flex"></div>
 </div>
 
 <main class="article-viewport">
     <div id="content-render" class="main-article-card">
+        <!-- يتم تعبئة المحتوى ديناميكياً -->
         <h1 style="font-size: 2.8rem; color: var(--gold);">أوج | منصة المعرفة السيادية</h1>
         <p style="font-size: 1.2rem; line-height: 1.8; margin-top: 20px;">اختر قسماً من الأعلى لاستعراض المقالات أو العلوم المصنفة.</p>
     </div>
 </main>
 
-<div id="horror-trap">
-    <div class="glitch-text">⚠️ تَم رَصْدُ مُحَاوَلَةِ اِخْتِرَاقٍ ⚠️</div>
-    <p style="color: white; font-size: 1.2rem;">جاري تتبع الـ IP ونظام التشغيل...</p>
-    <div class="progress-bar"><div id="trapProgress" class="progress-fill"></div></div>
-    <p id="trapMsg" style="color: #aaa;">نظام الدفاع السيادي يُسَجِّلُ...</p>
-    <p style="color: var(--gold); margin-top: 30px;">لن تُسْتَطَاعُ الخُرُوجُ مِنْ هَذِهِ الشَّبَكَةِ.</p>
+<!-- الأقسام السفلية -->
+<div class="article-viewport" style="margin-top: 0;">
+    <div class="bottom-sections" id="bottom-sections-container">
+        <div class="bottom-card"><h4>📰 مقالات ذات صلة</h4><ul id="related-posts"></ul></div>
+        <div class="bottom-card"><h4>🕒 أحدث المقالات</h4><ul id="latest-posts"></ul></div>
+        <div class="bottom-card"><h4>👑 الأكثر مشاهدة</h4><ul id="most-viewed-posts"></ul></div>
+    </div>
 </div>
 
 <footer>
+    <div class="footer-links">
+        <span onclick="openStaticPage('about')">من نحن</span>
+        <span onclick="openStaticPage('privacy')">الخصوصية</span>
+        <span onclick="openStaticPage('cookies')">سياسة الكوكيز</span>
+        <span onclick="openStaticPage('terms')">شروط الاستخدام</span>
+    </div>
     <p>جميع الحقوق محفوظة © <span id="vault-trigger">2026</span> | طاقة سيادية</p>
 </footer>
 
+<!-- مودال الصفحات الثابتة -->
+<div id="static-modal" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal()">&times;</span><div id="static-content"></div></div></div>
+<!-- مودال الاشتراك -->
+<div id="subscribe-modal" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal()">&times;</span><h3>📧 اشترك في النشرة السيادية</h3><input type="email" id="sub-email" placeholder="بريدك الإلكتروني" style="width:100%;padding:10px;margin:15px 0;"><button id="do-subscribe" class="btn-gold" style="background:var(--gold);color:#000;border:none;padding:10px 20px;">اشتراك</button><p id="sub-message" style="margin-top:15px;"></p></div></div>
+<!-- مودال البحث -->
+<div id="search-modal" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal()">&times;</span><h3>🔍 بحث في المعرفة</h3><input type="text" id="search-query" class="search-input" placeholder="اكتب كلمة مفتاحية..."><div id="search-results-list"></div></div></div>
+
+<!-- زر الرجوع للأعلى -->
+<div id="scroll-top-btn" class="scroll-top"><i class="fas fa-arrow-up"></i></div>
+
 <script>
-    // ----------------------------- قراءة البيانات من localStorage (من admin panel) -----------------------------
+    // ----------------------------- شاشة الانتظار والمحاكاة -----------------------------
+    let loadProgress = 0;
+    const loadInterval = setInterval(() => {
+        loadProgress += Math.floor(Math.random() * 15) + 5;
+        if (loadProgress >= 100) loadProgress = 100;
+        document.getElementById('load-progress-fill').style.width = loadProgress + '%';
+        document.getElementById('loading-percent').innerText = loadProgress + '%';
+        if (loadProgress === 100) {
+            clearInterval(loadInterval);
+            setTimeout(() => {
+                document.getElementById('loading-screen').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('loading-screen').style.display = 'none';
+                }, 1500);
+            }, 500);
+        }
+    }, 100);
+
+    // ----------------------------- بيانات الموقع (من localStorage أو افتراضية) -----------------------------
     let awjData = JSON.parse(localStorage.getItem('awj_logic')) || {};
     let articles = JSON.parse(localStorage.getItem('awj_articles')) || [];
     let currentTab = null;
     let currentField = null;
     let subTimer = null;
 
-    // عرض التبويبات في الشريط العلوي
+    // دالة لزيادة المشاهدات
+    function incrementView(articleId) {
+        let art = articles.find(a => a.id == articleId);
+        if (art) {
+            art.views = (art.views || 0) + 1;
+            localStorage.setItem('awj_articles', JSON.stringify(articles));
+        }
+    }
+
+    // عرض التبويبات
     function renderTabs() {
         const container = document.getElementById('main-tabs');
         const tabs = Object.keys(awjData);
         if (tabs.length === 0) {
-            // إذا لم توجد بيانات، نعرض تبويبات افتراضية تحفيزية
-            container.innerHTML = `<button class="tab-item active" data-tab="home">الرئيسية</button>
-                                    <button class="tab-item" data-tab="wisdom">الحكمة الخالدة</button>
-                                    <button class="tab-item" data-tab="strategic">الاستراتيجية</button>`;
-            // إضافة بيانات افتراضية مؤقتة للعرض
-            if (!awjData['الحكمة الخالدة']) awjData['الحكمة الخالدة'] = ['أسرار القدماء', 'فلسفة الروح'];
-            if (!awjData['الاستراتيجية']) awjData['الاستراتيجية'] = ['تخطيط القوة', 'المناورة'];
+            // بيانات افتراضية إذا لم توجد
+            awjData = {
+                "الحكمة": ["فلسفة", "روحانيات"],
+                "الاستراتيجية": ["جيوسياسة", "اقتصاد"]
+            };
             localStorage.setItem('awj_logic', JSON.stringify(awjData));
-            // إعادة تحميل الـ tabs بعد التهيئة
             renderTabs();
             return;
         }
@@ -197,25 +329,14 @@
             btn.onclick = () => switchTab(tab, btn);
             container.appendChild(btn);
         });
-        // إذا لم يكن هناك تبويب نشط، فعّل الأول
         if (!currentTab && tabs.length) switchTab(tabs[0], document.querySelector('.tab-item'));
     }
 
-    // تبديل التبويب
     function switchTab(tabId, btnElement) {
         currentTab = tabId;
-        // تحديث حالة الأزرار
         document.querySelectorAll('.tab-item').forEach(btn => btn.classList.remove('active'));
-        if (btnElement) btnElement.classList.add('active');
-        else {
-            const foundBtn = document.querySelector(`.tab-item[data-tab="${tabId}"]`);
-            if (foundBtn) foundBtn.classList.add('active');
-        }
-
-        // عرض المقالات التي تخص هذا التبويب في المحتوى
+        btnElement.classList.add('active');
         displayArticlesForTab(tabId);
-
-        // عرض المجالات الفرعية لهذا التبويب
         const fields = awjData[tabId] || [];
         const subBar = document.getElementById('sub-bar');
         const fieldsList = document.getElementById('fields-list');
@@ -224,161 +345,173 @@
             subBar.classList.add('active');
             if (subTimer) clearTimeout(subTimer);
             subTimer = setTimeout(() => subBar.classList.remove('active'), 7000);
-            // ربط الأحداث للمجالات الفرعية
             document.querySelectorAll('.field-node').forEach(node => {
                 node.removeEventListener('click', handleFieldClick);
                 node.addEventListener('click', handleFieldClick);
             });
-        } else {
-            subBar.classList.remove('active');
-        }
+        } else subBar.classList.remove('active');
     }
 
     function handleFieldClick(e) {
-        const fieldName = e.target.getAttribute('data-field');
-        if (!fieldName) return;
-        currentField = fieldName;
-        displayArticlesForField(currentTab, fieldName);
-        // إبقاء الشريط الفرعي ظاهراً
+        currentField = e.target.getAttribute('data-field');
+        displayArticlesForField(currentTab, currentField);
         const subBar = document.getElementById('sub-bar');
         if (subTimer) clearTimeout(subTimer);
         subBar.classList.add('active');
         subTimer = setTimeout(() => subBar.classList.remove('active'), 7000);
     }
 
-    // عرض المقالات المرتبطة بتبويب معين (جميع المقالات التي تحمل نفس التبويب)
     function displayArticlesForTab(tabName) {
-        const filtered = articles.filter(art => art.category === tabName);
-        if (filtered.length === 0) {
-            renderContent(`📂 ${tabName}`, `<p>لا توجد مقالات منشورة في هذا القسم حتى الآن. يمكنك إضافتها من لوحة الإدارة.</p>`);
-        } else {
-            let articlesHtml = filtered.map(art => `
-                <div style="border-bottom: 1px solid #333; margin-bottom: 25px; padding-bottom: 15px;">
-                    <h2 style="color: var(--gold); font-family: '${art.titleFont || 'Amiri'}', serif;">${art.title}</h2>
-                    <div style="display: flex; gap: 15px; color: #aaa; font-size: 0.8rem; margin: 8px 0;">
-                        <span>✍️ ${art.author}</span>
-                        <span>📅 ${art.date}</span>
-                        <span>🏷️ ${art.subfield}</span>
-                    </div>
-                    <div style="font-family: '${art.bodyFont || 'Tajawal'}', sans-serif; line-height: 1.7;">
-                        ${art.content.substring(0, 500)}${art.content.length > 500 ? '...' : ''}
-                    </div>
-                    ${art.images && art.images.length ? `<div style="margin-top: 10px;">🖼️ صور مرفقة: ${art.images.join(', ')}</div>` : ''}
-                    <button onclick="viewFullArticle(${art.id})" style="background: var(--gold-dim); border: none; padding: 5px 15px; margin-top: 12px; border-radius: 20px; cursor: pointer;">اقرأ المزيد</button>
-                </div>
-            `).join('');
-            renderContent(`📂 ${tabName}`, articlesHtml);
-        }
+        const filtered = articles.filter(a => a.category === tabName);
+        if (filtered.length === 0) renderContent(`📂 ${tabName}`, `<p>لا توجد مقالات في هذا القسم بعد. أضفها من لوحة الإدارة.</p>`);
+        else renderArticlesList(filtered, `📂 ${tabName}`);
     }
 
     function displayArticlesForField(tabName, fieldName) {
-        const filtered = articles.filter(art => art.category === tabName && art.subfield === fieldName);
-        if (filtered.length === 0) {
-            renderContent(`🔍 ${fieldName}`, `<p>لا توجد مقالات في هذا المجال الفرعي "${fieldName}" داخل قسم "${tabName}".</p><p>يمكنك نشر مقال جديد من لوحة التحكم.</p>`);
-        } else {
-            let articlesHtml = filtered.map(art => `
-                <div style="border-bottom: 1px solid #333; margin-bottom: 25px; padding-bottom: 15px;">
-                    <h2 style="color: var(--gold); font-family: '${art.titleFont || 'Amiri'}', serif;">${art.title}</h2>
-                    <div style="display: flex; gap: 15px; color: #aaa; font-size: 0.8rem; margin: 8px 0;">
-                        <span>✍️ ${art.author}</span>
-                        <span>📅 ${art.date}</span>
+        const filtered = articles.filter(a => a.category === tabName && a.subfield === fieldName);
+        if (filtered.length === 0) renderContent(`🔍 ${fieldName}`, `<p>لا توجد مقالات في هذا المجال الفرعي.</p>`);
+        else renderArticlesList(filtered, `🔍 ${fieldName} (في ${tabName})`);
+    }
+
+    function renderArticlesList(articlesArray, title) {
+        let html = `<h1 style="font-size: 2.2rem; color: var(--gold); margin-bottom: 20px;">${title}</h1>`;
+        articlesArray.forEach(art => {
+            html += `
+                <div class="article-item" data-id="${art.id}">
+                    <div class="article-cats">
+                        <span class="cat-badge-sm">${art.category}</span>
+                        <span class="cat-badge-sm">${art.subfield}</span>
                     </div>
-                    <div style="font-family: '${art.bodyFont || 'Tajawal'}', sans-serif;">${art.content.substring(0, 500)}...</div>
-                    <button onclick="viewFullArticle(${art.id})" style="background: var(--gold-dim); border: none; padding: 5px 15px; margin-top: 12px; border-radius: 20px; cursor: pointer;">اقرأ المزيد</button>
+                    <h2 style="cursor:pointer; color: var(--gold);" onclick="viewFullArticle(${art.id})">${art.title}</h2>
+                    <div class="article-meta">
+                        <span><i class="fas fa-user"></i> ${art.author}</span>
+                        <span><i class="fas fa-calendar"></i> ${art.date || 'تاريخ غير محدد'}</span>
+                        <span><i class="fas fa-eye"></i> ${art.views || 0} مشاهدة</span>
+                    </div>
+                    <div style="font-family: '${art.bodyFont || 'Tajawal'}', sans-serif; line-height: 1.7;">
+                        ${art.content.substring(0, 300)}...
+                    </div>
+                    <button onclick="viewFullArticle(${art.id})" style="margin-top:12px; background:transparent; border:1px solid var(--gold); padding:5px 15px; border-radius:20px;">اقرأ المزيد</button>
                 </div>
-            `).join('');
-            renderContent(`🔍 ${fieldName} (في ${tabName})`, articlesHtml);
-        }
+            `;
+        });
+        document.getElementById('content-render').innerHTML = html;
     }
 
-    function renderContent(title, bodyHtml) {
-        const container = document.getElementById('content-render');
-        container.innerHTML = `
-            <h1 style="font-size: 2.2rem; color: var(--gold); margin-bottom: 20px;">${title}</h1>
-            <div style="font-size: 1rem; line-height: 1.7;">${bodyHtml}</div>
-        `;
-    }
-
-    window.viewFullArticle = (id) => {
+    window.viewFullArticle = function(id) {
+        incrementView(id);
         const article = articles.find(a => a.id === id);
         if (article) {
             renderContent(article.title, `
-                <div>
-                    <div style="color: var(--gold); margin-bottom: 10px;">✍️ ${article.author} | 📅 ${article.date} | 🏷️ ${article.category} / ${article.subfield}</div>
-                    <div style="font-family: '${article.bodyFont || 'Tajawal'}', sans-serif; line-height: 1.8;">
-                        ${article.content}
-                    </div>
-                    ${article.images && article.images.length ? `<div style="margin-top: 20px;">🖼️ الصور المرفقة: ${article.images.map(img => `<div>📷 ${img}</div>`).join('')}</div>` : ''}
-                    <hr style="margin: 20px 0;">
-                    <button onclick="location.reload()" style="background: transparent; border: 1px solid var(--gold); padding: 8px 20px; border-radius: 30px; cursor: pointer;">العودة</button>
-                </div>
+                <div class="article-cats"><span class="cat-badge-sm">${article.category}</span><span class="cat-badge-sm">${article.subfield}</span></div>
+                <div class="article-meta"><span><i class="fas fa-user"></i> ${article.author}</span><span><i class="fas fa-calendar"></i> ${article.date}</span><span><i class="fas fa-eye"></i> ${article.views || 0}</span></div>
+                <div style="font-family: '${article.bodyFont || 'Tajawal'}', sans-serif; line-height: 1.8; margin-top:20px;">${article.content}</div>
+                ${article.images && article.images.length ? `<div style="margin-top:20px;">🖼️ الصور: ${article.images.join(', ')}</div>` : ''}
+                <hr style="margin:30px 0;"><button onclick="location.reload()" style="background:transparent; border:1px solid var(--gold); padding:8px 20px; border-radius:30px;">العودة</button>
             `);
-        } else {
-            alert("المقال غير موجود");
-        }
+        } else alert("المقال غير موجود");
     };
 
-    // ----------------------------- أنظمة الحماية والفخ -----------------------------
-    function activateTrap() {
-        const trapDiv = document.getElementById('horror-trap');
-        trapDiv.style.display = 'flex';
-        let progress = 0;
-        const fill = document.getElementById('trapProgress');
-        const msgSpan = document.getElementById('trapMsg');
-        const interval = setInterval(() => {
-            progress += 2;
-            fill.style.width = progress + '%';
-            if (progress >= 100) {
-                clearInterval(interval);
-                msgSpan.innerText = "✅ تَمَّ إرْسَالُ البيانات إِلَى خَادِمِ الأَمْنِ السِّيَادِيّ.";
-            } else if (progress > 40) {
-                msgSpan.innerText = "جاري رفع بيانات الموقع والكاميرا...";
-            }
-        }, 50);
-        console.warn("%c⚠️ نظام الدفاع السيادي: تم تسجيل محاولة اختراق ⚠️", "color: red; font-size: 16px");
+    function renderContent(title, bodyHtml) {
+        document.getElementById('content-render').innerHTML = `<h1 style="font-size:2rem;color:var(--gold);margin-bottom:20px;">${title}</h1><div>${bodyHtml}</div>`;
     }
 
-    document.addEventListener('contextmenu', (e) => e.preventDefault());
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'C')) ||
-            (e.ctrlKey && e.key === 'u') || (e.ctrlKey && e.key === 's')) {
-            e.preventDefault();
-            activateTrap();
+    // ----------------------------- الأقسام السفلية (ذات صلة، أحدث، أكثر مشاهدة) -----------------------------
+    function updateBottomSections(currentArticleId = null) {
+        // أحدث المقالات (حسب id التنازلي)
+        const latest = [...articles].sort((a,b) => b.id - a.id).slice(0,5);
+        // الأكثر مشاهدة
+        const mostViewed = [...articles].sort((a,b) => (b.views||0) - (a.views||0)).slice(0,5);
+        // مقالات ذات صلة: إذا كان هناك مقال حالي نأخذ من نفس التصنيف، وإلا نأخذ عشوائي
+        let related = [];
+        if (currentArticleId) {
+            const current = articles.find(a => a.id == currentArticleId);
+            if (current) {
+                related = articles.filter(a => a.category === current.category && a.id !== current.id).slice(0,5);
+            }
+        }
+        if (related.length === 0) related = articles.slice(0,5);
+        const relatedList = document.getElementById('related-posts');
+        const latestList = document.getElementById('latest-posts');
+        const mostList = document.getElementById('most-viewed-posts');
+        relatedList.innerHTML = related.map(a => `<li onclick="viewFullArticle(${a.id})">${a.title} (${a.views||0})</li>`).join('');
+        latestList.innerHTML = latest.map(a => `<li onclick="viewFullArticle(${a.id})">${a.title} - ${a.date || 'قديم'}</li>`).join('');
+        mostList.innerHTML = mostViewed.map(a => `<li onclick="viewFullArticle(${a.id})">${a.title} 👁️ ${a.views||0}</li>`).join('');
+    }
+
+    // ----------------------------- الصفحات الثابتة -----------------------------
+    function openStaticPage(page) {
+        const modal = document.getElementById('static-modal');
+        const contentDiv = document.getElementById('static-content');
+        let html = '';
+        if (page === 'about') html = `<h2>من نحن</h2><p>أوج هي منصة معرفية سيادية تهدف إلى تقديم محتوى استراتيجي وفلسفي وعلمي للنخبة المثقفة.</p>`;
+        else if (page === 'privacy') html = `<h2>سياسة الخصوصية</h2><p>نحن لا نشارك بياناتك مع أي طرف ثالث. جميع البيانات مخزنة محلياً على جهازك.</p>`;
+        else if (page === 'cookies') html = `<h2>سياسة الكوكيز</h2><p>نستخدم التخزين المحلي لتحسين تجربتك. لا نستخدم كوكيز خارجية.</p>`;
+        else if (page === 'terms') html = `<h2>شروط الاستخدام</h2><p>المحتوى محمي بحقوق النشر. يمنع النسخ أو إعادة النشر دون إذن.</p>`;
+        contentDiv.innerHTML = html;
+        modal.style.display = 'flex';
+    }
+
+    // ----------------------------- الاشتراك (واجهة مؤقتة) -----------------------------
+    document.getElementById('do-subscribe')?.addEventListener('click', () => {
+        const email = document.getElementById('sub-email').value;
+        if (email.includes('@')) {
+            document.getElementById('sub-message').innerHTML = '✓ تم استلام بريدك. سيتم تفعيل الخدمة قريباً.';
+            setTimeout(() => closeModal(), 1500);
+        } else {
+            document.getElementById('sub-message').innerHTML = '❌ بريد إلكتروني غير صالح';
         }
     });
-    setInterval(() => console.clear(), 1000);
 
-    // ----------------------------- الدخول السري -----------------------------
-    let clickCount = 0;
-    document.getElementById('vault-trigger').addEventListener('click', () => {
-        clickCount++;
-        setTimeout(() => clickCount = 0, 1500);
-        if (clickCount === 3) {
-            const pass = prompt("شَفَرَةُ العُبُورِ:");
-            if (pass === "@...Alshanfricc_1998...@") {
-                alert("مَرْحَباً بِكَ يَا سَيِّدَ أَوَجْ. تَمَّ فَتْحُ الْخَزْنَةِ السَّرِّيَّة.");
-                renderContent("الخزنة المقدسة", "<p>لقد وصلت إلى أعلى درجات التصريح. هنا توجد المفاتيح السرية والملفات المؤرشفة.</p><pre style='background:#000;padding:10px;border-radius:8px'>🔓 الوصول الكامل مُتَاح</pre>");
-            } else alert("شَفَرَةٌ خَاطِئَةٌ.");
-        }
-    });
+    // ----------------------------- البحث -----------------------------
+    function performSearch() {
+        const query = document.getElementById('search-query').value.toLowerCase();
+        const results = articles.filter(a => a.title.includes(query) || a.content.includes(query));
+        const resultsDiv = document.getElementById('search-results-list');
+        if (results.length === 0) resultsDiv.innerHTML = '<p>لا نتائج</p>';
+        else resultsDiv.innerHTML = results.map(a => `<div class="search-result" onclick="viewFullArticle(${a.id}); closeModal();">${a.title} - ${a.author}</div>`).join('');
+    }
+    document.getElementById('search-query')?.addEventListener('input', performSearch);
 
-    // ----------------------------- إخفاء الهيدر عند التمرير -----------------------------
-    let lastScroll = 0;
-    window.addEventListener('scroll', () => {
-        const header = document.getElementById('awj-header');
-        const curScroll = window.scrollY;
-        if (curScroll > lastScroll && curScroll > 120) header.style.transform = 'translateY(-100%)';
-        else header.style.transform = 'translateY(0)';
-        lastScroll = curScroll;
-    });
+    // ----------------------------- مودالات -----------------------------
+    function closeModal() { document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); }
+    document.getElementById('open-search-btn').onclick = () => { document.getElementById('search-modal').style.display = 'flex'; document.getElementById('search-query').value = ''; document.getElementById('search-results-list').innerHTML = ''; };
+    document.getElementById('open-subscribe-btn').onclick = () => { document.getElementById('subscribe-modal').style.display = 'flex'; };
+    document.querySelectorAll('.close-modal').forEach(btn => btn.onclick = closeModal);
+    window.onclick = function(e) { if (e.target.classList.contains('modal')) closeModal(); };
 
-    // ----------------------------- بدء التحميل -----------------------------
+    // ----------------------------- زر الرجوع للأعلى -----------------------------
+    const scrollBtn = document.getElementById('scroll-top-btn');
+    window.onscroll = () => {
+        if (window.scrollY > 300) scrollBtn.classList.add('visible');
+        else scrollBtn.classList.remove('visible');
+    };
+    scrollBtn.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    // ----------------------------- التهيئة النهائية -----------------------------
     window.onload = () => {
         renderTabs();
-        // إذا لم توجد مقالات بعد، نعرض رسالة ترحيب
-        if (articles.length === 0) {
-            renderContent("أوج | السيادة المعرفية", "<p>مرحباً بك في منصة أوج. لا توجد مقالات منشورة بعد. الرجاء استخدام لوحة الإدارة لإضافة التصنيفات والمقالات.</p><p style='margin-top:20px;'>🚀 يمكنك الدخول إلى لوحة التحكم عبر إضافة <code>/admin.html</code> إلى الرابط الحالي.</p>");
-        }
+        updateBottomSections();
+        // إذا كان هناك مقال معروض حالياً، نحدث ذات الصلة
+        // لكن سنقوم بربط عند فتح مقال لتحديث القسم السفلي.
+        // نضيف استدعاء ديناميكي لـ viewFullArticle الأصلية لتحديث الـ related
+        const originalView = window.viewFullArticle;
+        window.viewFullArticle = function(id) {
+            incrementView(id);
+            updateBottomSections(id);
+            const article = articles.find(a => a.id === id);
+            if (article) {
+                renderContent(article.title, `...`); // نفس المحتوى السابق
+                // نعيد كتابة المحتوى مع البيانات المحدثة
+                const fullHtml = `
+                    <div class="article-cats"><span class="cat-badge-sm">${article.category}</span><span class="cat-badge-sm">${article.subfield}</span></div>
+                    <div class="article-meta"><span><i class="fas fa-user"></i> ${article.author}</span><span><i class="fas fa-calendar"></i> ${article.date}</span><span><i class="fas fa-eye"></i> ${article.views||0}</span></div>
+                    <div style="font-family: '${article.bodyFont || 'Tajawal'}', sans-serif; line-height: 1.8; margin-top:20px;">${article.content}</div>
+                    <hr><button onclick="location.reload()" style="background:transparent; border:1px solid var(--gold); padding:8px 20px;">العودة</button>
+                `;
+                document.getElementById('content-render').innerHTML = `<h1 style="font-size:2rem;color:var(--gold);">${article.title}</h1>${fullHtml}`;
+            } else alert("المقال غير موجود");
+        };
     };
 </script>
 </body>

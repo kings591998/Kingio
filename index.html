@@ -10,6 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@300;600&family=Cinzel:wght@700&family=Tajawal&family=Almarai&family=Scheherazade+New:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
+        /* === جميع الأنماط السابقة محسنة === */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
             --gold: #D4AF37;
@@ -53,7 +54,6 @@
         ::-webkit-scrollbar-track { background: #111; }
         ::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 10px; }
         
-        /* حاوية قابلة للتمرير بدلاً من الجسم */
         .scrollable-container {
             height: 100vh;
             overflow-y: auto;
@@ -71,7 +71,6 @@
         .search-icon, .subscribe-icon, .user-settings-icon { cursor: pointer; font-size: 1.4rem; margin-left: 15px; transition: 0.2s; }
         .search-icon:hover, .subscribe-icon:hover, .user-settings-icon:hover { color: var(--gold); }
         
-        /* أزرار التكبير والتصغير في الهيدر فقط */
         .header-controls { display: flex; align-items: center; gap: 10px; margin-left: 15px; }
         .header-controls i { cursor: pointer; font-size: 1.2rem; transition: 0.2s; padding: 5px; border-radius: 50%; }
         .header-controls i:hover { color: var(--gold); background: var(--gold-dim); }
@@ -113,13 +112,6 @@
         .focus-mode-active .article-viewport { margin-top: 20px; }
         .toc { background: #1a1a1a; padding: 15px; border-radius: 15px; margin-bottom: 20px; }
         .toc a { color: var(--gold); text-decoration: none; display: block; margin: 5px 0; }
-        
-        /* لوحة الأدمن المخفية */
-        .admin-panel { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #0a0a0a; border: 2px solid var(--gold); border-radius: 24px; padding: 30px; z-index: 20000; width: 90%; max-width: 500px; box-shadow: 0 0 50px rgba(0,0,0,0.9); }
-        .admin-panel h3 { color: var(--gold); margin-bottom: 20px; }
-        .admin-panel button { margin: 10px 0; padding: 12px; width: 100%; background: #1a1a1a; border: 1px solid var(--gold-dim); color: white; border-radius: 12px; cursor: pointer; }
-        .admin-panel button:hover { background: var(--gold-dim); color: var(--gold); }
-        .admin-panel .danger-btn { border-color: var(--danger); color: var(--danger); }
         
         @media (max-width: 768px) { .bottom-sections { grid-template-columns: 1fr; } .logo { font-size: 1.6rem; } }
     </style>
@@ -196,24 +188,7 @@
 <div id="achievement-modal" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal()">&times;</span><h3>🏆 إنجاز جديد!</h3><p id="achievement-text"></p></div></div>
 <div id="2fa-modal" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal()">&times;</span><h3>🔐 التحقق بخطوتين</h3><p>رمز التحقق: 123456 (تجريبي)</p><input type="text" id="2fa-code" placeholder="أدخل الرمز"><button onclick="verify2FA()">تحقق</button></div></div>
 
-<!-- لوحة الأدمن المخفية (تظهر بعد 3 نقرات على 2026) -->
-<div id="admin-panel" class="admin-panel">
-    <span class="close-modal" onclick="closeAdminPanel()" style="float:left; cursor:pointer;">&times;</span>
-    <h3>👑 لوحة تحكم الأدمن</h3>
-    <button id="delete-tab-btn" class="danger-btn">🗑️ حذف تبويبة (اختر من القائمة)</button>
-    <select id="delete-tab-select" style="width:100%; margin:5px 0; padding:8px; background:#1a1a1a; color:white;"><option>-- اختر تبويبة --</option></select>
-    <button id="delete-article-btn" class="danger-btn">🗑️ حذف مقال (اختر من القائمة)</button>
-    <select id="delete-article-select" style="width:100%; margin:5px 0; padding:8px; background:#1a1a1a; color:white;"><option>-- اختر مقال --</option></select>
-    <hr>
-    <button id="sync-database-btn">💾 مزامنة مع قاعدة البيانات (جاهز)</button>
-    <button id="load-from-db-btn">📥 تحميل من قاعدة البيانات</button>
-    <p style="font-size:12px; margin-top:15px; color:#888;">⚠️ حذف التبويبة سيحذف جميع مقالاتها</p>
-</div>
-
 <script>
-    // ----------------------------- منع التمرير لأسفل (يمكن التحكم به) -----------------------------
-    let scrollingEnabled = false; // تغيير إلى true لتفعيل التمرير
-    
     // ----------------------------- شاشة التحميل -----------------------------
     let loadProgress = 0;
     const loadInterval = setInterval(() => {
@@ -236,33 +211,21 @@
     let viewHistory = JSON.parse(localStorage.getItem('view_history')) || [];
     let currentTab = null, subTimer = null, focusMode = false;
     
-    // تفضيلات القارئ (تُحفظ وتُستعاد)
-    let userPreferences = JSON.parse(localStorage.getItem('user_preferences')) || {
-        theme: 'dark',
-        font: 'Amiri',
-        fontSize: 16
-    };
-    
-    function savePreferences() {
-        localStorage.setItem('user_preferences', JSON.stringify(userPreferences));
-        applyPreferences();
-    }
-    
+    // تفضيلات القارئ
+    let userPreferences = JSON.parse(localStorage.getItem('user_preferences')) || { theme: 'dark', font: 'Amiri', fontSize: 16 };
+    function savePreferences() { localStorage.setItem('user_preferences', JSON.stringify(userPreferences)); applyPreferences(); }
     function applyPreferences() {
-        // تطبيق الوضع
         document.body.className = '';
         if (userPreferences.theme === 'light') document.body.classList.add('light-mode');
         else if (userPreferences.theme === 'gold') document.body.classList.add('gold-mode');
-        // تطبيق الخط
         document.body.style.fontFamily = `'${userPreferences.font}', serif`;
-        // تطبيق حجم الخط (على الجسم فقط، وليس على الهيدر)
         document.body.style.fontSize = userPreferences.fontSize + 'px';
-        // تحديث خيارات select في لوحة المستخدم
         if (document.getElementById('bg-select')) document.getElementById('bg-select').value = userPreferences.theme;
         if (document.getElementById('font-select')) document.getElementById('font-select').value = userPreferences.font;
     }
+    applyPreferences();
     
-    // أزرار التكبير والتصغير (تعمل على الهيدر فقط وتؤثر على الجسم)
+    // أزرار التكبير والتصغير (تعمل على الهيدر فقط)
     document.getElementById('header-font-plus')?.addEventListener('click', () => {
         userPreferences.fontSize = Math.min(28, userPreferences.fontSize + 2);
         savePreferences();
@@ -274,48 +237,16 @@
         showToast(`حجم الخط: ${userPreferences.fontSize}px`);
     });
     
-    // حفظ الإعدادات من لوحة المستخدم
-    document.getElementById('save-settings')?.addEventListener('click', () => {
-        userPreferences.theme = document.getElementById('bg-select').value;
-        userPreferences.font = document.getElementById('font-select').value;
-        savePreferences();
-        closeModal();
-        showToast("تم حفظ التفضيلات");
-    });
-    
-    // تطبيق التفضيلات عند التحميل
-    applyPreferences();
-
-    // ----------------------------- قاعدة البيانات (جاهز للربط) -----------------------------
-    async function saveToDatabase() {
-        const data = { awjData, articles, userStats, favorites, viewHistory };
-        console.log("📡 حفظ في قاعدة البيانات:", data);
-        // هنا يمكنك إضافة fetch إلى API الخاص بك
-        // await fetch('/api/save', { method: 'POST', body: JSON.stringify(data), headers: { 'Content-Type': 'application/json' } });
-        showToast("جاهز للحفظ في قاعدة البيانات - الرابط جاهز");
-    }
-    
-    async function loadFromDatabase() {
-        console.log("📡 تحميل من قاعدة البيانات");
-        // هنا يمكنك إضافة fetch لجلب البيانات
-        // const response = await fetch('/api/load');
-        // const data = await response.json();
-        showToast("جاهز للتحميل من قاعدة البيانات");
-    }
-    
-    document.getElementById('sync-database-btn')?.addEventListener('click', saveToDatabase);
-    document.getElementById('load-from-db-btn')?.addEventListener('click', loadFromDatabase);
-
-    // ----------------------------- إضافة سجل أمني -----------------------------
-    function addSecurityLog(action) { securityLogs.unshift({ time: new Date().toLocaleString(), action }); localStorage.setItem('security_logs', JSON.stringify(securityLogs.slice(0, 50))); }
-    
-    // ----------------------------- إشعارات -----------------------------
+    // دوال عامة
     function showToast(msg) { let toast = document.createElement('div'); toast.className = 'toast'; toast.innerText = msg; document.body.appendChild(toast); setTimeout(() => toast.remove(), 3000); }
+    function addSecurityLog(action) { securityLogs.unshift({ time: new Date().toLocaleString(), action }); localStorage.setItem('security_logs', JSON.stringify(securityLogs.slice(0, 50))); }
     function showAchievement(achieve) { if (!userStats.achievements.includes(achieve)) { userStats.achievements.push(achieve); localStorage.setItem('user_stats', JSON.stringify(userStats)); document.getElementById('achievement-text').innerText = achieve; document.getElementById('achievement-modal').style.display = 'flex'; showToast(`🏆 ${achieve}`); } }
+    function closeModal() { document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); }
+    window.closeModal = closeModal;
+    window.onclick = (e) => { if (e.target.classList.contains('modal')) closeModal(); };
     
-    // ----------------------------- عرض المقالات -----------------------------
+    // عرض المقالات
     function renderContent(title, bodyHtml) { document.getElementById('content-render').innerHTML = `<h1 style="font-size:2rem;color:var(--gold);">${title}</h1><div>${bodyHtml}</div>`; }
-    
     function renderArticlesList(articlesArray, title) {
         let html = `<h1 style="font-size:2.2rem;color:var(--gold);">${title}</h1>`;
         articlesArray.forEach(art => {
@@ -329,28 +260,19 @@
         });
         document.getElementById('content-render').innerHTML = html;
     }
-    
     window.toggleFavorite = function(id) { 
-        if (favorites.includes(id)) favorites = favorites.filter(f => f !== id); 
-        else favorites.push(id); 
+        if (favorites.includes(id)) favorites = favorites.filter(f => f !== id); else favorites.push(id); 
         localStorage.setItem('favorites', JSON.stringify(favorites)); 
         if (currentTab) renderArticlesList(articles.filter(a => a.category === currentTab), currentTab); 
         showToast(favorites.includes(id) ? "❤️ أضيف للمفضلة" : "💔 أزيل من المفضلة"); 
     };
-    
     window.viewFullArticle = function(id) {
         let art = articles.find(a => a.id === id);
         if (art) {
-            art.views = (art.views || 0) + 1; 
-            localStorage.setItem('awj_articles', JSON.stringify(articles));
-            if (!viewHistory.includes(id)) viewHistory.unshift(id); 
-            viewHistory = viewHistory.slice(0, 10); 
-            localStorage.setItem('view_history', JSON.stringify(viewHistory));
-            userStats.readCount++; 
-            localStorage.setItem('user_stats', JSON.stringify(userStats));
-            if (userStats.readCount === 5) showAchievement("قارئ ناشئ"); 
-            if (userStats.readCount === 20) showAchievement("قارئ ذهبي");
-            
+            art.views = (art.views || 0) + 1; localStorage.setItem('awj_articles', JSON.stringify(articles));
+            if (!viewHistory.includes(id)) viewHistory.unshift(id); viewHistory = viewHistory.slice(0, 10); localStorage.setItem('view_history', JSON.stringify(viewHistory));
+            userStats.readCount++; localStorage.setItem('user_stats', JSON.stringify(userStats));
+            if (userStats.readCount === 5) showAchievement("قارئ ناشئ"); if (userStats.readCount === 20) showAchievement("قارئ ذهبي");
             renderContent(art.title, `<div class="article-cats"><span class="cat-badge-sm">${art.category}</span><span class="cat-badge-sm">${art.subfield}</span></div>
             <div class="article-meta"><span><i class="fas fa-user"></i> ${art.author}</span><span><i class="fas fa-calendar"></i> ${art.date}</span><span><i class="fas fa-eye"></i> ${art.views}</span>
             <i class="fas fa-heart ${favorites.includes(id) ? 'fa-solid' : 'fa-regular'}" style="cursor:pointer;" onclick="toggleFavorite(${id})"></i>
@@ -362,145 +284,79 @@
             updateBottomSections(id);
         }
     };
-    
     function shareArticle(title) { if (navigator.share) navigator.share({ title, text: "اقرأ هذا المقال على أوج", url: location.href }); else showToast("المشاركة غير مدعومة"); }
     function copyFormatted(title, author) { let text = `"${title}" - ${author}\nالمصدر: أوج\n${location.href}`; navigator.clipboard.writeText(text); showToast("تم نسخ النص مع المصدر"); }
+    function donateNow() { document.getElementById('donate-modal').style.display = 'flex'; }
     
-    // ----------------------------- وضع التركيز -----------------------------
+    // وضع التركيز
     document.getElementById('focus-mode-btn').onclick = () => { focusMode = !focusMode; document.body.classList.toggle('focus-mode-active', focusMode); showToast(focusMode ? "وضع التركيز مفعل" : "تم الخروج"); };
+    // الوضع الليلي
+    document.getElementById('theme-toggle').onclick = () => { let themes = ['dark', 'light', 'gold']; let idx = themes.indexOf(userPreferences.theme); userPreferences.theme = themes[(idx+1)%3]; savePreferences(); };
+    // آلة الحظ
+    document.getElementById('lucky-read-btn')?.addEventListener('click', () => { if (articles.length) { let r = articles[Math.floor(Math.random() * articles.length)]; viewFullArticle(r.id); showToast(`🎲 ${r.title}`); } else showToast("لا توجد مقالات"); });
+    // لوحة المستخدم
+    function updateUserPanel() { document.getElementById('user-stats').innerHTML = `<p>📚 مقروءة: ${userStats.readCount}</p><p>⭐ الإنجازات: ${userStats.achievements.join(', ') || 'لا يوجد'}</p><p>❤️ المفضلة: ${favorites.length}</p><p>👁️ سجل: ${viewHistory.length}</p>`; }
+    document.getElementById('open-user-panel').onclick = () => { updateUserPanel(); document.getElementById('user-panel-modal').style.display = 'flex'; };
+    document.getElementById('save-settings')?.addEventListener('click', () => { userPreferences.theme = document.getElementById('bg-select').value; userPreferences.font = document.getElementById('font-select').value; savePreferences(); closeModal(); showToast("تم حفظ التفضيلات"); });
     
-    // ----------------------------- الوضع الليلي -----------------------------
-    document.getElementById('theme-toggle').onclick = () => {
-        let themes = ['dark', 'light', 'gold'];
-        let currentIndex = themes.indexOf(userPreferences.theme);
-        let nextTheme = themes[(currentIndex + 1) % themes.length];
-        userPreferences.theme = nextTheme;
-        savePreferences();
+    // الصفحات الثابتة
+    window.openStaticPage = function(page) {
+        let html = { about: '<h2>من نحن</h2><p>أوج منصة سيادية...</p>', privacy: '<h2>الخصوصية</h2><p>بياناتك مخزنة محلياً...</p>', cookies: '<h2>سياسة الكوكيز</h2><p>نستخدم localStorage...</p>', terms: '<h2>شروط الاستخدام</h2><p>النسخ محظور...</p>' }[page];
+        document.getElementById('static-content').innerHTML = html;
+        document.getElementById('static-modal').style.display = 'flex';
     };
     
-    // ----------------------------- آلة الحظ -----------------------------
-    document.getElementById('lucky-read-btn')?.addEventListener('click', () => {
-        if (articles.length) { let random = articles[Math.floor(Math.random() * articles.length)]; viewFullArticle(random.id); showToast(`🎲 ${random.title}`); }
-        else showToast("لا توجد مقالات");
-    });
+    // البحث
+    function performSearch() { let q = document.getElementById('search-query').value.toLowerCase(); let res = articles.filter(a => a.title.includes(q) || a.content.includes(q)); document.getElementById('search-results-list').innerHTML = res.length ? res.map(a => `<div class="search-result" onclick="viewFullArticle(${a.id}); closeModal();">${a.title}</div>`).join('') : '<p>لا نتائج</p>'; }
+    document.getElementById('search-query')?.addEventListener('input', performSearch);
+    document.getElementById('open-search-btn').onclick = () => document.getElementById('search-modal').style.display = 'flex';
+    document.getElementById('open-subscribe-btn').onclick = () => document.getElementById('subscribe-modal').style.display = 'flex';
+    document.getElementById('do-subscribe').onclick = () => { let email = document.getElementById('sub-email').value; if(email) { localStorage.setItem('subscriber_email', email); showToast("تم الاشتراك!"); closeModal(); } };
     
-    // ----------------------------- لوحة تحليلات المستخدم -----------------------------
-    function updateUserPanel() { 
-        document.getElementById('user-stats').innerHTML = `<p>📚 مقروءة: ${userStats.readCount}</p><p>⭐ الإنجازات: ${userStats.achievements.join(', ') || 'لا يوجد'}</p><p>❤️ المفضلة: ${favorites.length}</p><p>👁️ سجل: ${viewHistory.length}</p>`; 
-    }
-    document.getElementById('open-user-panel').onclick = () => { updateUserPanel(); document.getElementById('user-panel-modal').style.display = 'flex'; };
-    
-    // ----------------------------- منع التصيد والمخالفات -----------------------------
-    function checkPhishing(url) { let blacklist = ['fake-login.com']; if (blacklist.some(b => url.includes(b))) { addSecurityLog(`محاولة تصيد: ${url}`); alert("⚠️ تحذير: رابط مشبوه"); return false; } return true; }
-    
+    // منع التصيد والشاشة المتصدعة
     function crackedScreen() { let div = document.createElement('div'); div.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:radial-gradient(circle,#000 2%,transparent 3%);background-size:30px 30px;z-index:99999;pointer-events:none'; document.body.appendChild(div); setTimeout(() => div.remove(), 2000); addSecurityLog("تم تفعيل الشاشة المتصدعة"); }
     document.addEventListener('keydown', (e) => { if (e.key === 'F12') { e.preventDefault(); crackedScreen(); } });
     
-    // ----------------------------- التحقق بخطوتين -----------------------------
+    // التحقق بخطوتين للخزنة (المستخدمة لفتح admin)
     let vaultUnlocked = false;
-    function verify2FA() { let code = document.getElementById('2fa-code')?.value; if (code === '123456') { vaultUnlocked = true; closeModal(); showToast("🔓 تم فتح الخزنة"); } else alert("رمز خاطئ"); }
+    window.verify2FA = function() { let code = document.getElementById('2fa-code')?.value; if (code === '123456') { vaultUnlocked = true; closeModal(); showToast("🔓 تم فتح الخزنة"); } else alert("رمز خاطئ"); };
     
-    // ----------------------------- زر 2026 (لوحة الأدمن المخفية) -----------------------------
+    // زر 2026: فتح admin.html بعد التحقق
     let clickCount2026 = 0;
-    function openAdminPanel() {
-        // تحديث قائمة التبويبات في لوحة الأدمن
-        let tabSelect = document.getElementById('delete-tab-select');
-        if (tabSelect) {
-            tabSelect.innerHTML = '<option>-- اختر تبويبة --</option>' + Object.keys(awjData).map(t => `<option value="${t}">${t}</option>`).join('');
-        }
-        let articleSelect = document.getElementById('delete-article-select');
-        if (articleSelect) {
-            articleSelect.innerHTML = '<option>-- اختر مقال --</option>' + articles.map(a => `<option value="${a.id}">${a.title}</option>`).join('');
-        }
-        document.getElementById('admin-panel').style.display = 'block';
-        addSecurityLog("فتح لوحة الأدمن");
-    }
-    
-    function closeAdminPanel() { document.getElementById('admin-panel').style.display = 'none'; }
-    
-    // حذف تبويبة
-    document.getElementById('delete-tab-btn')?.addEventListener('click', () => {
-        let tabName = document.getElementById('delete-tab-select').value;
-        if (tabName && tabName !== '-- اختر تبويبة --') {
-            if (confirm(`⚠️ هل أنت متأكد من حذف التبويبة "${tabName}" وجميع مقالاتها؟`)) {
-                delete awjData[tabName];
-                articles = articles.filter(a => a.category !== tabName);
-                localStorage.setItem('awj_logic', JSON.stringify(awjData));
-                localStorage.setItem('awj_articles', JSON.stringify(articles));
-                renderTabs();
-                updateBottomSections();
-                showToast(`✅ تم حذف التبويبة ${tabName}`);
-                closeAdminPanel();
-                addSecurityLog(`حذف تبويبة: ${tabName}`);
-            }
-        } else { alert("اختر تبويبة أولاً"); }
-    });
-    
-    // حذف مقال
-    document.getElementById('delete-article-btn')?.addEventListener('click', () => {
-        let articleId = document.getElementById('delete-article-select').value;
-        if (articleId && articleId !== '-- اختر مقال --') {
-            if (confirm(`⚠️ هل أنت متأكد من حذف هذا المقال؟`)) {
-                articles = articles.filter(a => a.id != articleId);
-                localStorage.setItem('awj_articles', JSON.stringify(articles));
-                if (currentTab) renderArticlesList(articles.filter(a => a.category === currentTab), currentTab);
-                updateBottomSections();
-                showToast(`✅ تم حذف المقال`);
-                closeAdminPanel();
-                addSecurityLog(`حذف مقال رقم: ${articleId}`);
-            }
-        } else { alert("اختر مقالاً أولاً"); }
-    });
-    
     document.getElementById('vault-trigger').onclick = () => {
         clickCount2026++;
         setTimeout(() => clickCount2026 = 0, 1500);
         if (clickCount2026 === 3) {
             if (!vaultUnlocked) {
                 document.getElementById('2fa-modal').style.display = 'flex';
-                addSecurityLog("محاولة فتح الخزنة - 2FA");
+                addSecurityLog("محاولة فتح الخزنة - طلب 2FA");
             } else {
                 let pass = prompt("شَفَرَةُ العُبُورِ:");
                 if (pass === "@...Alshanfricc_1998...@") {
-                    openAdminPanel();
+                    // فتح admin.html في نفس التبويب
+                    window.location.href = 'admin.html';
                 } else alert("شَفَرَةٌ خَاطِئَةٌ");
             }
             clickCount2026 = 0;
         }
     };
     
-    // ----------------------------- الصفحات الثابتة (تحفظ التفضيلات) -----------------------------
-    window.openStaticPage = function(page) {
-        let html = { about: '<h2>من نحن</h2><p>أوج منصة سيادية للمعرفة...</p>', privacy: '<h2>الخصوصية</h2><p>بياناتك مخزنة محلياً...</p>', cookies: '<h2>الكوكيز</h2><p>نستخدم localStorage...</p>', terms: '<h2>الشروط</h2><p>النسخ محظور...</p>' }[page];
-        document.getElementById('static-content').innerHTML = html;
-        document.getElementById('static-modal').style.display = 'flex';
-    };
-    
-    // ----------------------------- الإضافات الأخرى -----------------------------
-    function donateNow() { document.getElementById('donate-modal').style.display = 'flex'; }
-    document.getElementById('share-btn').onclick = () => shareArticle("أوج");
-    document.getElementById('copy-format-btn').onclick = () => copyFormatted("أوج", "المنصة");
-    document.getElementById('open-search-btn').onclick = () => document.getElementById('search-modal').style.display = 'flex';
-    document.getElementById('open-subscribe-btn').onclick = () => document.getElementById('subscribe-modal').style.display = 'flex';
-    document.getElementById('do-subscribe').onclick = () => { let email = document.getElementById('sub-email').value; if (email) { localStorage.setItem('subscriber_email', email); showToast("تم الاشتراك!"); closeModal(); } };
-    
-    function closeModal() { document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); }
-    window.closeModal = closeModal;
-    window.onclick = (e) => { if (e.target.classList.contains('modal')) closeModal(); };
-    
-    // ----------------------------- التبويبات -----------------------------
+    // أزرار التنقل والتبويبات
     function switchTab(tabId, btn) { currentTab = tabId; document.querySelectorAll('.tab-item').forEach(b => b.classList.remove('active')); btn.classList.add('active'); renderArticlesList(articles.filter(a => a.category === tabId), tabId); }
     function renderTabs() { let container = document.getElementById('main-tabs'); let tabs = Object.keys(awjData); if (!tabs.length) awjData = { "الحكمة": ["فلسفة"], "الاستراتيجية": ["جيوسياسة"] }; localStorage.setItem('awj_logic', JSON.stringify(awjData)); container.innerHTML = tabs.map(t => `<button class="tab-item" data-tab="${t}" onclick="switchTab('${t}', this)">${t}</button>`).join(''); if (tabs.length) switchTab(tabs[0], document.querySelector('.tab-item')); }
     function updateBottomSections(currentId = null) { let latest = [...articles].sort((a,b) => b.id - a.id).slice(0,5); let most = [...articles].sort((a,b) => (b.views||0)-(a.views||0)).slice(0,5); let related = currentId ? articles.filter(a => a.id !== currentId && a.category === articles.find(x=>x.id===currentId)?.category).slice(0,5) : articles.slice(0,5); document.getElementById('related-posts').innerHTML = related.map(a => `<li onclick="viewFullArticle(${a.id})">${a.title}</li>`).join(''); document.getElementById('latest-posts').innerHTML = latest.map(a => `<li onclick="viewFullArticle(${a.id})">${a.title}</li>`).join(''); document.getElementById('most-viewed-posts').innerHTML = most.map(a => `<li onclick="viewFullArticle(${a.id})">${a.title} (${a.views||0})</li>`).join(''); }
     
-    // ----------------------------- زر الرجوع للأعلى -----------------------------
-    const scrollBtn = document.getElementById('scroll-top-btn');
+    // زر الرجوع للأعلى
     const scrollContainer = document.getElementById('scrollable-container');
+    const scrollBtn = document.getElementById('scroll-top-btn');
     scrollContainer?.addEventListener('scroll', () => { if (scrollContainer.scrollTop > 300) scrollBtn.classList.add('visible'); else scrollBtn.classList.remove('visible'); });
     scrollBtn.onclick = () => scrollContainer?.scrollTo({ top: 0, behavior: 'smooth' });
     
-    // ----------------------------- التهيئة -----------------------------
-    window.onload = () => { renderTabs(); updateBottomSections(); showToast("مرحباً في أوج"); addSecurityLog("تم تحميل الموقع"); };
+    // بدء التشغيل
+    renderTabs();
+    updateBottomSections();
+    addSecurityLog("تم تحميل الموقع الرئيسي");
+    showToast("مرحباً في أوج");
 </script>
 </body>
 </html>

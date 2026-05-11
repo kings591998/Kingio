@@ -1,424 +1,497 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI IDE | 100 ميزة + OpenRouter + تلجرام</title>
-    <!-- Monaco Editor CSS -->
-    <link rel="stylesheet" data-name="vs/editor/editor.main" href="https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs/editor/editor.main.min.css">
-    <!-- CryptoJS للتشفير -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta name="description" content="أوج | منصة المعرفة السيادية والذكاء الاستراتيجي">
+    <title>أوج | AWJ - القمة</title>
+    
+    <!-- الخطوط الملكية -->
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@300;600&family=Cinzel:wght@700&display=swap" rel="stylesheet">
+    
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --gold: #D4AF37;
+            --gold-dim: rgba(212, 175, 55, 0.6);
+            --dark-bg: #050505;
+            --card-bg: #0c0c0c;
+            --danger: #ff3333;
+            --glass: rgba(212, 175, 55, 0.08);
+            --transition: 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+        }
+
         body {
-            background: #0a0e1a;
-            font-family: 'Segoe UI', system-ui;
-            color: #eef;
-            padding: 20px;
+            background-color: var(--dark-bg);
+            color: #e0e0e0;
+            font-family: 'Amiri', serif;
+            overflow-x: hidden;
+            user-select: none; /* منع تحديد النص */
         }
-        .main-grid {
-            display: grid;
-            grid-template-columns: 1fr 1.2fr 0.9fr;
-            gap: 18px;
-            height: 90vh;
-            margin-bottom: 20px;
-        }
-        .card {
-            background: #11161f;
-            border-radius: 24px;
-            border: 1px solid #2a2f3f;
+
+        /* شريط التمرير الجميل */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #111; }
+        ::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 10px; }
+
+        /* ========== الهيدر الملكي ========== */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            height: 80px;
             display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 5%;
+            background: rgba(5, 5, 5, 0.96);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--glass);
+            z-index: 2000;
+            transition: transform 0.3s ease;
         }
-        .card-header {
-            background: #0f121c;
-            padding: 14px 20px;
-            font-weight: bold;
-            border-bottom: 1px solid #2a2f3f;
+
+        .logo {
+            font-family: 'Cinzel', serif;
+            font-size: 2.3rem;
+            color: var(--gold);
+            text-shadow: 0 0 12px rgba(212, 175, 55, 0.5);
+            letter-spacing: 4px;
         }
-        .card-body {
-            flex: 1;
-            overflow-y: auto;
-            padding: 16px;
+
+        /* ========== شريط التبويبات ========== */
+        .tabs-nav {
+            position: fixed;
+            top: 80px;
+            width: 100%;
+            background: rgba(8, 8, 8, 0.96);
+            backdrop-filter: blur(8px);
+            z-index: 1900;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.15);
         }
-        button, .btn {
-            background: #1e2a3a;
-            border: none;
-            padding: 8px 14px;
-            border-radius: 12px;
-            color: white;
+
+        .tabs-wrapper {
+            display: flex;
+            overflow-x: auto;
+            white-space: nowrap;
+            padding: 12px 5%;
+            gap: 12px;
+            scrollbar-width: thin;
+        }
+
+        .tabs-wrapper::-webkit-scrollbar { height: 3px; }
+
+        .tab-item {
+            background: transparent;
+            border: 1px solid #2a2a2a;
+            color: #aaa;
+            padding: 8px 24px;
+            border-radius: 40px;
             cursor: pointer;
+            font-family: 'Cairo', sans-serif;
+            font-weight: 600;
+            transition: 0.25s;
+            flex: 0 0 auto;
+        }
+
+        .tab-item.active {
+            background: var(--gold);
+            color: #000;
+            border-color: var(--gold);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
+        }
+
+        /* ========== شريط المجالات الفرعية ========== */
+        .sub-fields-bar {
+            position: fixed;
+            top: 145px;
+            width: 100%;
+            background: rgba(12, 12, 12, 0.96);
+            backdrop-filter: blur(12px);
+            z-index: 1800;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-out;
+            border-bottom: 1px solid transparent;
+        }
+
+        .sub-fields-bar.active {
+            max-height: 80px;
+            border-bottom-color: var(--gold-dim);
+        }
+
+        .fields-flex {
+            display: flex;
+            justify-content: center;
+            gap: 28px;
+            padding: 16px;
+            flex-wrap: wrap;
+        }
+
+        .field-node {
+            font-size: 0.9rem;
+            color: #ccc;
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: 'Cairo', sans-serif;
+            border-bottom: 1px solid transparent;
+            padding-bottom: 4px;
+        }
+
+        .field-node:hover {
+            color: var(--gold);
+            border-bottom-color: var(--gold);
+        }
+
+        /* ========== منطقة المحتوى ========== */
+        .article-viewport {
+            margin-top: 230px;
+            padding: 0 8% 100px;
+            animation: fadeSlideUp 0.6s ease-out;
+        }
+
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(24px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .main-article-card {
+            border-right: 4px solid var(--gold);
+            background: linear-gradient(135deg, var(--card-bg), rgba(0,0,0,0.7));
+            padding: 40px;
+            border-radius: 24px;
+            backdrop-filter: blur(2px);
+            box-shadow: 0 20px 35px -12px rgba(0,0,0,0.5);
+        }
+
+        /* ========== فخ المتسلل (The Trap) ========== */
+        #horror-trap {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: #000000e6;
+            backdrop-filter: blur(12px);
+            z-index: 10000;
+            padding: 30px;
+            color: var(--danger);
+            font-family: monospace;
+            text-align: center;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .glitch-text {
+            font-size: 2.2rem;
+            animation: glitch 0.3s infinite;
+            margin-bottom: 30px;
+        }
+
+        @keyframes glitch {
+            0% { text-shadow: -2px 0 red, 2px 0 blue; transform: skew(0.5deg);}
+            50% { text-shadow: 2px 0 red, -2px 0 blue; transform: skew(-0.5deg);}
+            100% { text-shadow: -2px 0 blue, 2px 0 red; transform: skew(0);}
+        }
+
+        .progress-bar {
+            width: 80%;
+            height: 4px;
+            background: #222;
+            margin: 30px auto;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            width: 0%;
+            height: 100%;
+            background: var(--danger);
+            transition: width 0.08s linear;
+        }
+
+        /* ========== تذييل ========== */
+        footer {
+            text-align: center;
+            padding: 40px;
+            opacity: 0.4;
             font-size: 0.8rem;
-            margin: 4px;
+            border-top: 1px solid #1a1a1a;
+            margin-top: 40px;
+        }
+
+        #vault-trigger {
+            cursor: pointer;
             transition: 0.2s;
         }
-        button:hover { background: #2d3e54; transform: scale(0.97); }
-        .btn-primary { background: #3b82f6; }
-        .btn-primary:hover { background: #2563eb; }
-        .btn-success { background: #10b981; }
-        .btn-warning { background: #f59e0b; }
-        .btn-danger { background: #ef4444; }
-        input, textarea, select {
-            background: #0a0f18;
-            border: 1px solid #2d3748;
-            border-radius: 12px;
-            padding: 10px;
-            color: white;
-            width: 100%;
-            margin-bottom: 12px;
+        #vault-trigger:hover { color: var(--gold); opacity: 1; }
+
+        /* تحسينات الجوال */
+        @media (max-width: 768px) {
+            .logo { font-size: 1.6rem; }
+            .article-viewport { margin-top: 200px; padding: 0 5% 80px; }
+            .main-article-card { padding: 24px; }
+            .fields-flex { gap: 16px; }
+            .glitch-text { font-size: 1.3rem; }
         }
-        .code-editor {
-            height: 280px;
-            border-radius: 16px;
-            overflow: hidden;
-            margin-bottom: 12px;
-        }
-        .chat-msg {
-            background: #1e293b;
-            margin: 8px 0;
-            padding: 8px 12px;
-            border-radius: 14px;
-            font-size: 0.85rem;
-        }
-        .chat-user { background: #2d3a4b; text-align: right; border-left: 3px solid #3b82f6; }
-        .chat-bot { background: #111827; border-left: 3px solid #10b981; }
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 8px;
-            margin-top: 10px;
-        }
-        .feature-btn {
-            background: #1f2a3e;
-            font-size: 0.7rem;
-            padding: 6px;
-        }
-        .status-badge {
-            display: inline-block;
-            width: 10px;
-            height: 10px;
-            border-radius: 10px;
-            background: #555;
-            margin-right: 8px;
-        }
-        .active { background: #10b981; box-shadow: 0 0 4px #10b981; }
-        hr { border-color: #2a2f3f; margin: 12px 0; }
-        .flex { display: flex; gap: 8px; flex-wrap: wrap; }
     </style>
 </head>
 <body>
-<div class="main-grid">
-    <!-- عمود الإدارة -->
-    <div class="card">
-        <div class="card-header">🔐 APIs + تلجرام</div>
-        <div class="card-body">
-            <div class="flex">
-                <button id="resetKeysBtn" class="btn-danger">إعادة تعيين المفاتيح</button>
-                <button id="testOpenRouterBtn" class="btn-primary">اختبار OpenRouter</button>
-                <button id="testTelegramBtn" class="btn-success">اختبار البوت</button>
-            </div>
-            <div id="keysPanel"></div>
-            <hr>
-            <div class="card-header" style="padding:0 0 8px 0;">🤖 الأتمتة الذكية</div>
-            <input type="text" id="autoCommand" placeholder="مثال: اكتب دالة لجمع رقمين">
-            <button id="runAutoBtn" class="btn-primary">نفّذ بالذكاء الاصطناعي</button>
-            <div id="autoResult" style="background:#0a0f18; border-radius:12px; padding:8px; margin-top:8px; font-size:13px;"></div>
-        </div>
-    </div>
 
-    <!-- عمود المحرر -->
-    <div class="card">
-        <div class="card-header">📝 محرر الكود (Monaco)</div>
-        <div class="card-body">
-            <div id="editorContainer" class="code-editor"></div>
-            <div class="flex">
-                <button id="runCodeBtn" class="btn-success">تشغيل الكود</button>
-                <button id="clearEditorBtn" class="btn-warning">مسح</button>
-                <button id="askAiEditBtn" class="btn-primary">اطلب من AI تعديل</button>
-                <button id="copyCodeBtn" class="btn">نسخ</button>
-            </div>
-            <div id="outputArea" style="background:#0a0f18; border-radius:12px; padding:10px; margin-top:8px; font-family:monospace; max-height:150px; overflow:auto;"></div>
-        </div>
-    </div>
+<header id="awj-header">
+    <div class="logo">AWJ</div>
+    <div style="color: var(--gold); font-family: 'Cairo'; letter-spacing: 1px;">سِيادة المَعنى</div>
+</header>
 
-    <!-- عمود الدردشة والتلجرام -->
-    <div class="card">
-        <div class="card-header">💬 دردشة ذكية + تلجرام</div>
-        <div class="card-body" style="display:flex; flex-direction:column; height:100%;">
-            <div id="chatBox" style="flex:1; overflow-y:auto; margin-bottom:12px;"></div>
-            <textarea id="chatInput" rows="2" placeholder="أرسل سؤالاً أو أمراً..."></textarea>
-            <div class="flex">
-                <button id="sendChatBtn" class="btn-primary">إرسال</button>
-                <button id="applyChatToEditorBtn" class="btn">تطبيق على المحرر</button>
-                <button id="sendLastToTelegramBtn" class="btn-success">إرسال إلى تلجرام</button>
-            </div>
-            <hr>
-            <details>
-                <summary>🎯 100 ميزة إضافية (اضغط لعرض الأزرار)</summary>
-                <div id="hundredFeatures" class="features-grid"></div>
-            </details>
-        </div>
+<nav class="tabs-nav">
+    <div class="tabs-wrapper" id="main-tabs">
+        <button class="tab-item active" data-tab="home">الرئيسية</button>
+        <button class="tab-item" data-tab="intel">الذكاء الاستراتيجي</button>
+        <button class="tab-item" data-tab="cyber">الأمن الرقمي</button>
+        <button class="tab-item" data-tab="philosophy">مدارس الفكر</button>
+        <button class="tab-item" data-tab="black" style="border-color: #a00; color: #c44;">الأرشيف الأسود</button>
     </div>
+</nav>
+
+<div id="sub-bar" class="sub-fields-bar">
+    <div id="fields-list" class="fields-flex"></div>
 </div>
 
-<!-- نافذة تأكيد -->
-<div id="confirmModal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); display:none; align-items:center; justify-content:center; z-index:9999;">
-    <div style="background:#1e293b; padding:24px; border-radius:24px; width:300px; text-align:center;">
-        <p id="confirmMsg">تأكيد؟</p>
-        <div class="flex" style="justify-content:center;">
-            <button id="confirmYes">نعم</button>
-            <button id="confirmNo">إلغاء</button>
-        </div>
+<main class="article-viewport">
+    <div id="content-render" class="main-article-card">
+        <!-- سيتم تعبئته ديناميكياً -->
+        <h1 style="font-size: 2.8rem; color: var(--gold);">أوج | منصة المعرفة السيادية</h1>
+        <p style="font-size: 1.2rem; line-height: 1.8; margin-top: 20px;">اختر قسماً من الأعلى لتغوص في عوالم الذكاء الاستراتيجي، الأمن الرقمي، والفلسفة العميقة.</p>
     </div>
+</main>
+
+<div id="horror-trap">
+    <div class="glitch-text">⚠️ تَم رَصْدُ مُحَاوَلَةِ اِخْتِرَاقٍ ⚠️</div>
+    <p style="color: white; font-size: 1.2rem;">جاري تتبع الـ IP ونظام التشغيل... تَم تَثْبِيتُ حَزْمَةِ التَّعْقِيب.</p>
+    <div class="progress-bar"><div id="trapProgress" class="progress-fill"></div></div>
+    <p id="trapMsg" style="color: #aaa;">نظام الدفاع السيادي يُسَجِّلُ وَجْهَكَ الآن...</p>
+    <p style="color: var(--gold); margin-top: 30px;">لن تُسْتَطَاعُ الخُرُوجُ مِنْ هَذِهِ الشَّبَكَةِ.</p>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs/loader.js"></script>
+<footer>
+    <p>جميع الحقوق محفوظة © <span id="vault-trigger">2026</span> | طاقة سيادية</p>
+</footer>
+
 <script>
-    // ---------- 1. إدارة المفاتيح والتشفير ----------
-    const SALT = "SECURE_SALT_2025";
-    function encrypt(text) { return CryptoJS.AES.encrypt(text, SALT).toString(); }
-    function decrypt(cipher) { try { return CryptoJS.AES.decrypt(cipher, SALT).toString(CryptoJS.enc.Utf8); } catch(e) { return null; } }
-
-    const DEFAULT_KEYS = {
-        openrouter: "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",
-        telegram_bot: "8514269501:AAEOBb7QzOmO8ALKTCox9uYxX8onf8QUan0",
-        telegram_chat_id: "3623917372"
-    };
-    let keys = { ...DEFAULT_KEYS };
-
-    function loadKeys() {
-        const stored = localStorage.getItem("encrypted_keys_v2");
-        if (stored) {
-            const dec = decrypt(stored);
-            if (dec) try { keys = JSON.parse(dec); } catch(e) {}
+    // ----------------------------------------------
+    // 1. المحتوى الديناميكي للتبويبات والمجالات الفرعية
+    // ----------------------------------------------
+    const contentMap = {
+        home: {
+            title: "مَرْكَزُ القِيَادَة",
+            body: "أهلاً بك في القمة. هنا تلتقي الحكمة القديمة بالذكاء الاصطناعي. نُقَدِّمُ رؤى لا تُقدَّم في العادة. استعد لاستكشاف الأبعاد الخفية للمعرفة."
+        },
+        intel: {
+            title: "الذكاء الاستراتيجي",
+            body: "تحليل جيوسياسي، استشراف مستقبلي، واقتصاد الظل. أدوات صناع القرار وأسياد العالم."
+        },
+        cyber: {
+            title: "الأمن الرقمي",
+            body: "تشفير، حروب إلكترونية، وحماية الأصول الرقمية. تقنيات تستخدمها النخب."
+        },
+        philosophy: {
+            title: "مدارس الفكر",
+            body: "من الوجودية إلى العدمية الفعالة. أسئلة تؤرق الإنسانية وإجابات من الأعماق."
+        },
+        black: {
+            title: "الأرشيف الأسود",
+            body: "معلومات مصنفة. لا تُفتح إلا بإذن خاص. محتوى حساس يتطلب أعلى مستويات التصريح."
         }
-        saveKeys();
-        renderKeysUI();
-    }
-    function saveKeys() { localStorage.setItem("encrypted_keys_v2", encrypt(JSON.stringify(keys))); }
-    function renderKeysUI() {
-        const panel = document.getElementById("keysPanel");
-        panel.innerHTML = `
-            <div class="flex" style="justify-content:space-between; margin-top:8px;">
-                <span><span class="status-badge ${keys.openrouter ? 'active' : ''}"></span> OpenRouter</span>
-                <button class="editKeyBtn" data-key="openrouter">تعديل</button>
-            </div>
-            <div class="flex" style="justify-content:space-between;">
-                <span><span class="status-badge ${keys.telegram_bot ? 'active' : ''}"></span> بوت تلجرام</span>
-                <button class="editKeyBtn" data-key="telegram_bot">تعديل</button>
-            </div>
-            <div class="flex" style="justify-content:space-between;">
-                <span><span class="status-badge ${keys.telegram_chat_id ? 'active' : ''}"></span> معرف القناة</span>
-                <button class="editKeyBtn" data-key="telegram_chat_id">تعديل</button>
-            </div>
+    };
+
+    // محتوى المجالات الفرعية (كل مجال يظهر مقالة جديدة)
+    const subContent = {
+        'الجيوسياسة': "صراع القوى الكبرى، خرائط النفوذ، والمناطق الرمادية. تحليل استخباراتي بامتياز.",
+        'اقتصاد الظل': "الأموال غير المرئية، شبكات التهريب، وتأثيرها على الاقتصاد العالمي.",
+        'الاستشراف': "أدوات توقع المستقبل، سيناريوهات 2030-2050، ونماذج المحاكاة الاستراتيجية.",
+        'تشفير البيانات': "بروتوكولات التشفير العسكري، التشفير الكمي، وكسر الأصفار.",
+        'اختراق العقول': "الهندسة الاجتماعية، البرمجة العصبية، والتأثير الخفي.",
+        'الحروب الرقمية': "العمليات السيبرانية، الأسلحة البرمجية، وحروب المعلومات.",
+        'الوجودية': "سارتر، كامو، والبحث عن المعنى في اللامعنى.",
+        'العدمية الفعالة': "فلسفة العبث وإعادة بناء القيم بعد التفكيك.",
+        'المنطق': "منطق أرسطو إلى المنطق الباراكسي، أسس التفكير السليم.",
+        'ملفات سرية': "مجلدات مصنفة بتوقيعات زمنية. غير متاحة للقراءة العامة."
+    };
+
+    let activeTabId = 'home';
+    let timer = null;
+
+    // عرض المحتوى في المنطقة الرئيسية
+    function renderContent(title, contentHtml) {
+        const container = document.getElementById('content-render');
+        container.innerHTML = `
+            <h1 style="font-size: 2.6rem; color: var(--gold); margin-bottom: 20px;">${title}</h1>
+            <div style="font-size: 1.1rem; line-height: 1.8; opacity: 0.9;">${contentHtml}</div>
         `;
-        document.querySelectorAll('.editKeyBtn').forEach(btn => {
-            btn.onclick = () => {
-                const k = btn.dataset.key;
-                let newVal = prompt(`أدخل القيمة الجديدة لـ ${k}:`, keys[k] || '');
-                if(newVal !== null) { keys[k] = newVal; saveKeys(); renderKeysUI(); addChatMsg("bot", `✅ تم تحديث ${k}`); }
-            };
+    }
+
+    // تبديل التبويب
+    function switchTab(tabId, btnElement) {
+        activeTabId = tabId;
+        // تحديث حالة الأزرار
+        document.querySelectorAll('.tab-item').forEach(btn => btn.classList.remove('active'));
+        if (btnElement) btnElement.classList.add('active');
+        else {
+            // إذا لم يمر العنصر، ابحث عنه
+            const foundBtn = document.querySelector(`.tab-item[data-tab="${tabId}"]`);
+            if(foundBtn) foundBtn.classList.add('active');
+        }
+
+        // عرض المحتوى الأساسي للتبويب
+        if (contentMap[tabId]) {
+            renderContent(contentMap[tabId].title, `<p>${contentMap[tabId].body}</p>`);
+        } else {
+            renderContent("غير مصنف", "<p>هذا القسم قيد الترميز السيادي.</p>");
+        }
+
+        // التعامل مع الشريط الفرعي حسب التبويب
+        const subBar = document.getElementById('sub-bar');
+        const fieldsList = document.getElementById('fields-list');
+        
+        // تحديد قائمة المجالات المرتبطة بالتبويب
+        let fields = [];
+        if (tabId === 'intel') fields = ['الجيوسياسة', 'اقتصاد الظل', 'الاستشراف'];
+        else if (tabId === 'cyber') fields = ['تشفير البيانات', 'اختراق العقول', 'الحروب الرقمية'];
+        else if (tabId === 'philosophy') fields = ['الوجودية', 'العدمية الفعالة', 'المنطق'];
+        else if (tabId === 'black') fields = ['ملفات سرية'];
+        else fields = [];
+
+        if (fields.length > 0) {
+            fieldsList.innerHTML = fields.map(f => `<span class="field-node" data-field="${f}">${f}</span>`).join('');
+            subBar.classList.add('active');
+            // إعادة ضبط المؤقت
+            if (timer) clearTimeout(timer);
+            timer = setTimeout(() => {
+                subBar.classList.remove('active');
+            }, 7000);
+        } else {
+            subBar.classList.remove('active');
+            if (timer) clearTimeout(timer);
+        }
+
+        // إضافة مستمعات النقر على المجالات الفرعية
+        document.querySelectorAll('.field-node').forEach(node => {
+            node.removeEventListener('click', handleFieldClick);
+            node.addEventListener('click', handleFieldClick);
         });
     }
 
-    // ---------- 2. الاتصال بـ OpenRouter (حقيقي) ----------
-    async function callOpenRouter(prompt, system = "أنت مساعد ذكي. أجب بالعربية أو حسب لغة المستخدم.") {
-        if (!keys.openrouter) throw new Error("مفتاح OpenRouter مفقود");
-        const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-            method: "POST",
-            headers: {
-                "Authorization": `Bearer ${keys.openrouter}`,
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                model: "mistralai/mistral-7b-instruct:free",
-                messages: [{ role: "system", content: system }, { role: "user", content: prompt }],
-                temperature: 0.7,
-                max_tokens: 800
-            })
+    function handleFieldClick(e) {
+        const fieldName = e.target.getAttribute('data-field');
+        if (!fieldName) return;
+        let article = subContent[fieldName] || "معلومات عن هذا المجال قيد التجميع من المصادر المغلقة.";
+        renderContent(fieldName, `<p>${article}</p><hr style='margin:20px 0;border-color:#333'><small>المجال: ${activeTabId}</small>`);
+        // إبقاء الشريط الفرعي ظاهراً لمدة إضافية عند التفاعل
+        const subBar = document.getElementById('sub-bar');
+        if (timer) clearTimeout(timer);
+        subBar.classList.add('active');
+        timer = setTimeout(() => subBar.classList.remove('active'), 7000);
+    }
+
+    // ربط أزرار التبويبات
+    function initTabs() {
+        const tabs = document.querySelectorAll('.tab-item');
+        tabs.forEach(btn => {
+            const tabId = btn.getAttribute('data-tab');
+            btn.onclick = () => switchTab(tabId, btn);
         });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error?.message || "فشل الاتصال");
-        return data.choices[0].message.content;
+        // تفعيل التبويب النشط افتراضياً
+        const defaultTab = document.querySelector('.tab-item.active');
+        if (defaultTab) switchTab(defaultTab.getAttribute('data-tab'), defaultTab);
+        else switchTab('home', null);
     }
 
-    async function testOpenRouter() {
-        try {
-            const reply = await callOpenRouter("قل مرحبا، أنا أعمل بنجاح");
-            alert("✅ نجح OpenRouter: " + reply.slice(0, 100));
-            addChatMsg("bot", `✅ اختبار OpenRouter: ${reply}`);
-        } catch(e) { alert("❌ فشل: "+e.message); addChatMsg("bot", `❌ ${e.message}`); }
+    // ----------------------------------------------
+    // 2. نظام الفخ والحماية (مكافحة الاختراق)
+    // ----------------------------------------------
+    function activateTrap() {
+        const trapDiv = document.getElementById('horror-trap');
+        trapDiv.style.display = 'flex';
+        let progress = 0;
+        const fill = document.getElementById('trapProgress');
+        const msgSpan = document.getElementById('trapMsg');
+        const interval = setInterval(() => {
+            progress += 2;
+            fill.style.width = progress + '%';
+            if (progress >= 100) {
+                clearInterval(interval);
+                msgSpan.innerText = "✅ تَمَّ إرْسَالُ جَمِيعِ البيانات إِلَى خَادِمِ الأَمْنِ السِّيَادِيّ. نَرَاكَ فِي مَحْكَمَةِ النُّخَب.";
+            } else if (progress > 40) {
+                msgSpan.innerText = "جاري رفع بيانات الـ GPS والكاميرا الأمامية...";
+            }
+        }, 50);
+        // تسجيل في console للتهديد
+        console.warn("%c⚠️ نظام الدفاع السيادي: تم تسجيل محاولة اختراق ⚠️", "color: red; font-size: 16px");
     }
 
-    // ---------- 3. تلجرام ----------
-    async function sendTelegramMessage(text) {
-        if (!keys.telegram_bot || !keys.telegram_chat_id) throw new Error("بيانات التلجرام ناقصة");
-        const url = `https://api.telegram.org/bot${keys.telegram_bot}/sendMessage`;
-        const res = await fetch(url, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ chat_id: keys.telegram_chat_id, text: text, parse_mode: "HTML" })
-        });
-        if (!res.ok) throw new Error(await res.text());
-        return await res.json();
-    }
-    async function testTelegram() {
-        try {
-            await sendTelegramMessage("🧪 اختبار من موقع الأتمتة - تم التفعيل ✅");
-            alert("تم الإرسال إلى تلجرام");
-            addChatMsg("bot", "📨 تم إرسال رسالة اختبار");
-        } catch(e) { alert("خطأ تلجرام: "+e.message); addChatMsg("bot", `❌ تلجرام: ${e.message}`); }
-    }
-
-    // ---------- 4. المحرر والمتغيرات ----------
-    let editor = null;
-    let lastChatMessage = "";
-    let lastAiReply = "";
-
-    function showConfirm(msg, onYes) {
-        const modal = document.getElementById("confirmModal");
-        document.getElementById("confirmMsg").innerText = msg;
-        modal.style.display = "flex";
-        const yesBtn = document.getElementById("confirmYes");
-        const noBtn = document.getElementById("confirmNo");
-        const handler = (res) => {
-            modal.style.display = "none";
-            yesBtn.removeEventListener("click", yesHandler);
-            noBtn.removeEventListener("click", noHandler);
-            if (res) onYes();
-        };
-        const yesHandler = () => handler(true);
-        const noHandler = () => handler(false);
-        yesBtn.addEventListener("click", yesHandler);
-        noBtn.addEventListener("click", noHandler);
-    }
-
-    function evalCode(code) {
-        try {
-            let out = "";
-            const oldLog = console.log;
-            console.log = (...args) => { out += args.map(a=>String(a)).join(' ') + '\n'; oldLog(...args); };
-            new Function(code)();
-            console.log = oldLog;
-            return out || "✅ تم التنفيذ (بدون مخرجات console.log)";
-        } catch(e) { return "❌ خطأ: " + e.message; }
-    }
-
-    // تهيئة موناكو
-    require.config({ paths: { vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs' } });
-    require(['vs/editor/editor.main'], function () {
-        editor = monaco.editor.create(document.getElementById('editorContainer'), {
-            value: '// اكتب كودك هنا\nconsole.log("مرحباً بالعالم");',
-            language: 'javascript',
-            theme: 'vs-dark',
-            automaticLayout: true
-        });
-        document.getElementById("runCodeBtn").disabled = false;
+    // الحماية من أدوات المطور
+    document.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+        console.warn("منع النقر الأيمن - تم التسجيل");
     });
 
-    // وظائف مساعدة
-    function addChatMsg(role, text) {
-        const box = document.getElementById("chatBox");
-        const div = document.createElement("div");
-        div.className = `chat-msg ${role === 'user' ? 'chat-user' : 'chat-bot'}`;
-        div.innerText = (role === 'user' ? '👤: ' : '🤖: ') + text;
-        box.appendChild(div);
-        box.scrollTop = box.scrollHeight;
-    }
-
-    async function runSmartAutomation(cmd) {
-        const outDiv = document.getElementById("autoResult");
-        outDiv.innerHTML = "🧠 جاري الاتصال بـ OpenRouter...";
-        try {
-            const aiResp = await callOpenRouter(`قم بتوليد كود جافاسكربت لتنفيذ: ${cmd}. أخرج الكود فقط بين علامتي \`\`\`javascript و \`\`\``, "أنت مبرمج خبير.");
-            const codeMatch = aiResp.match(/```javascript\n([\s\S]*?)```/);
-            if (codeMatch && editor) {
-                editor.setValue(codeMatch[1]);
-                outDiv.innerHTML = `✅ تم إنشاء الكود بواسطة AI. الرد: ${aiResp.substring(0, 150)}...`;
-                addChatMsg("bot", `🤖 تم إنشاء كود للأمر: ${cmd}`);
-            } else {
-                outDiv.innerHTML = `📝 رد AI (بدون كود): ${aiResp.substring(0, 200)}`;
-                addChatMsg("bot", aiResp.substring(0, 200));
-            }
-        } catch(e) { outDiv.innerHTML = `❌ خطأ: ${e.message}`; addChatMsg("bot", `فشل: ${e.message}`); }
-    }
-
-    // ---------- 5. إنشاء 100 ميزة (أزرار تفاعلية) ----------
-    function generate100Features() {
-        const container = document.getElementById("hundredFeatures");
-        container.innerHTML = "";
-        for (let i = 1; i <= 100; i++) {
-            const btn = document.createElement("button");
-            btn.className = "feature-btn";
-            btn.innerText = `ميزة ${i}`;
-            btn.onclick = () => {
-                const actions = [
-                    `إضافة console.log("ميزة ${i} تم تفعيلها")`,
-                    `تغيير لون الخلفية إلى #${Math.floor(Math.random()*16777215).toString(16)}`,
-                    `إظهار تنبيه "تم تشغيل الميزة ${i}"`,
-                    `كتابة النص "Feature ${i}" في المحرر`,
-                    `إرسال رسالة إلى الدردشة: تم تفعيل الميزة ${i}`
-                ];
-                const action = actions[i % actions.length];
-                if (editor) {
-                    const current = editor.getValue();
-                    editor.setValue(current + `\n// ميزة ${i}: ${action}\n`);
-                }
-                addChatMsg("bot", `✨ تم تفعيل الميزة ${i}: ${action}`);
-                document.getElementById("outputArea").innerHTML += `🟢 ميزة ${i} نشطة\n`;
-            };
-            container.appendChild(btn);
+    document.addEventListener('keydown', (e) => {
+        // F12, Ctrl+Shift+I, Ctrl+Shift+C, Ctrl+U, Ctrl+S
+        if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'C')) ||
+            (e.ctrlKey && e.key === 'u') || (e.ctrlKey && e.key === 's')) {
+            e.preventDefault();
+            activateTrap();
         }
-    }
+    });
 
-    // ---------- 6. ربط الأزرار الرئيسية ----------
-    window.onload = () => {
-        loadKeys();
-        generate100Features();
+    // محاولة لمنع فتح console من البداية (حيلة بسيطة)
+    setInterval(() => {
+        if (typeof window.console !== 'undefined') {
+            console.clear();
+        }
+    }, 1000);
 
-        document.getElementById("resetKeysBtn").onclick = () => { keys = { ...DEFAULT_KEYS }; saveKeys(); renderKeysUI(); addChatMsg("bot", "تم إعادة تعيين المفاتيح."); };
-        document.getElementById("testOpenRouterBtn").onclick = testOpenRouter;
-        document.getElementById("testTelegramBtn").onclick = testTelegram;
-        document.getElementById("runAutoBtn").onclick = () => { const cmd = document.getElementById("autoCommand").value.trim(); if(cmd) runSmartAutomation(cmd); else alert("أدخل أمراً"); };
-        document.getElementById("runCodeBtn").onclick = () => { if(editor) { const code = editor.getValue(); const res = evalCode(code); document.getElementById("outputArea").innerHTML = `<pre>${res}</pre>`; addChatMsg("bot", `نتيجة التنفيذ:\n${res.substring(0, 150)}`); } };
-        document.getElementById("clearEditorBtn").onclick = () => { if(editor) editor.setValue(""); addChatMsg("bot", "تم مسح المحرر."); };
-        document.getElementById("copyCodeBtn").onclick = () => { if(editor) { navigator.clipboard.writeText(editor.getValue()); addChatMsg("bot", "تم نسخ الكود."); } };
-        document.getElementById("askAiEditBtn").onclick = async () => { const prompt = prompt("ماذا تريد تعديله في الكود؟"); if(prompt && editor) { await runSmartAutomation(prompt); } };
-        document.getElementById("sendChatBtn").onclick = async () => {
-            const msg = document.getElementById("chatInput").value.trim();
-            if(!msg) return;
-            addChatMsg("user", msg);
-            lastChatMessage = msg;
-            document.getElementById("chatInput").value = "";
-            try {
-                const reply = await callOpenRouter(msg);
-                lastAiReply = reply;
-                addChatMsg("bot", reply);
-            } catch(e) { addChatMsg("bot", `خطأ: ${e.message}`); }
-        };
-        document.getElementById("applyChatToEditorBtn").onclick = () => {
-            if(!editor) return;
-            const text = lastChatMessage || "لا توجد رسالة";
-            showConfirm(`تطبيق آخر رسالة على المحرر؟\n"${text}"`, () => {
-                const newCode = `// تم تطبيق: ${text}\n${editor.getValue()}\n// الوقت: ${new Date()}`;
-                editor.setValue(newCode);
-                addChatMsg("bot", "تم تطبيق الأمر على المحرر");
-            });
-        };
-        document.getElementById("sendLastToTelegramBtn").onclick = async () => {
-            if(!lastAiReply && !lastChatMessage) { addChatMsg("bot", "لا يوجد رد سابق"); return; }
-            const msgToSend = `👤 أمر: ${lastChatMessage}\n🤖 رد AI: ${lastAiReply || "لا يوجد"}`;
-            try {
-                await sendTelegramMessage(msgToSend);
-                addChatMsg("bot", "✅ تم إرسال المحادثة إلى تلجرام");
-            } catch(e) { addChatMsg("bot", `❌ إرسال فاشل: ${e.message}`); }
-        };
+    // ----------------------------------------------
+    // 3. الدخول السري للخزنة (ثلاث نقرات)
+    // ----------------------------------------------
+    let clickCount = 0;
+    document.getElementById('vault-trigger').addEventListener('click', () => {
+        clickCount++;
+        setTimeout(() => clickCount = 0, 1500);
+        if (clickCount === 3) {
+            const pass = prompt("شَفَرَةُ العُبُورِ:");
+            if (pass === "@...Alshanfricc_1998...@") {
+                alert("مَرْحَباً بِكَ يَا سَيِّدَ أَوَجْ. تَمَّ فَتْحُ الْخَزْنَةِ السَّرِّيَّة.");
+                renderContent("الخزنة المقدسة", "<p>لقد وصلت إلى أعلى درجات التصريح. هُنا توجد المفاتيح السرية والملفات المؤرشفة من عصور السيادة.</p><pre style='background:#000;padding:10px;border-radius:8px'>🔓 الوصول الكامل مُتَاح</pre>");
+            } else {
+                alert("شَفَرَةٌ خَاطِئَةٌ. حَظُّ أَوَجَ يَرْعَاكَ.");
+            }
+        }
+    });
 
-        addChatMsg("bot", "🚀 النظام جاهز. جميع APIs حقيقية. 100 ميزة جاهزة في الأسفل.");
-        document.getElementById("autoResult").innerHTML = "جاهز";
-    };
+    // ----------------------------------------------
+    // 4. إخفاء الهيدر عند التمرير (بسلاسة)
+    // ----------------------------------------------
+    let lastScroll = 0;
+    window.addEventListener('scroll', () => {
+        const header = document.getElementById('awj-header');
+        const currentScroll = window.scrollY;
+        if (currentScroll > lastScroll && currentScroll > 120) {
+            header.style.transform = 'translateY(-100%)';
+        } else {
+            header.style.transform = 'translateY(0)';
+        }
+        lastScroll = currentScroll;
+    });
+
+    // ----------------------------------------------
+    // 5. تشغيل كل شيء
+    // ----------------------------------------------
+    initTabs();
 </script>
 </body>
 </html>

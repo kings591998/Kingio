@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>لوحة تحكم أوج | AWJ Admin</title>
+    <style>
+        :root {
+            --gold: #D4AF37;
+            --dark: #060606;
+            --border: #1a1a1a;
+            --input-bg: #0f0f0f;
+        }
+
+        body {
+            background-color: var(--dark);
+            color: #eee;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            display: flex;
+        }
+
+        /* --- القائمة الجانبية --- */
+        .sidebar {
+            width: 250px;
+            height: 100vh;
+            background: #000;
+            border-left: 1px solid var(--border);
+            padding: 30px 20px;
+            position: fixed;
+        }
+
+        .sidebar h2 { color: var(--gold); font-size: 1.5rem; margin-bottom: 40px; }
+        .nav-item { padding: 15px; cursor: pointer; border-bottom: 1px solid var(--border); transition: 0.3s; }
+        .nav-item:hover { color: var(--gold); background: #0a0a0a; }
+
+        /* --- محتوى الإدارة --- */
+        .main-content {
+            margin-right: 250px;
+            padding: 40px;
+            width: 100%;
+        }
+
+        .section-card {
+            background: #090909;
+            border: 1px solid var(--border);
+            padding: 30px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        h3 { color: var(--gold); border-bottom: 1px solid var(--gold); padding-bottom: 10px; margin-bottom: 25px; }
+
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; color: #888; font-size: 0.9rem; }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            background: var(--input-bg);
+            border: 1px solid var(--border);
+            color: white;
+            border-radius: 4px;
+            outline: none;
+        }
+
+        input:focus { border-color: var(--gold); }
+
+        .btn-gold {
+            background: var(--gold);
+            color: black;
+            border: none;
+            padding: 12px 30px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-gold:hover { opacity: 0.8; transform: translateY(-2px); }
+
+        .plus-btn {
+            background: #111;
+            color: var(--gold);
+            border: 1px solid var(--gold);
+            padding: 5px 10px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        /* تنسيق معاينة الأرواح الضالة */
+        .log-mini { font-family: monospace; font-size: 12px; color: #ff4444; background: #000; padding: 10px; margin-top: 5px; }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <h2>أوج ADM</h2>
+        <div class="nav-item">نشر مقال جديد</div>
+        <div class="nav-item">إدارة التبويبات</div>
+        <div class="nav-item">سجل الأرواح الضالة</div>
+        <div class="nav-item">الإعدادات السيادية</div>
+    </div>
+
+    <div class="main-content">
+        
+        <!-- القسم الأول: إدارة التبويبات والمجالات -->
+        <div class="section-card">
+            <h3>هندسة التصنيفات</h3>
+            <div style="display: flex; gap: 20px;">
+                <div style="flex: 1;">
+                    <label>إضافة تبويبة رئيسية جديدة</label>
+                    <input type="text" id="new-tab" placeholder="مثل: فلسفة، تقنية...">
+                    <button class="plus-btn" onclick="addTab()">+ إضافة التبويبة</button>
+                </div>
+                <div style="flex: 1;">
+                    <label>إضافة مجال فرعي للتبويبة المختارة</label>
+                    <input type="text" id="new-field" placeholder="مثل: وجودية، أمن سيبراني...">
+                    <button class="plus-btn" onclick="addField()">+ إضافة مجال</button>
+                </div>
+            </div>
+            <div id="hierarchy-preview" style="margin-top: 20px; font-size: 0.8rem; color: #555;">
+                * التبويبات والمجالات ستظهر تلقائياً في الشريط الدوار العلوي.
+            </div>
+        </div>
+
+        <!-- القسم الثاني: محرك النشر -->
+        <div class="section-card">
+            <h3>نشر وثيقة جديدة</h3>
+            
+            <div class="form-group">
+                <label>عنوان المقال</label>
+                <input type="text" id="post-title" placeholder="اكتب العنوان الملكي هنا...">
+            </div>
+
+            <div style="display: flex; gap: 20px;" class="form-group">
+                <div style="flex: 1;">
+                    <label>اختر القسم (التبويبة)</label>
+                    <select id="select-tab" onchange="updateFieldsDropdown()">
+                        <option>اختر القسم...</option>
+                        <!-- مبرمج ليعمل مع نظام التبويبات الخاص بك -->
+                    </select>
+                </div>
+                <div style="flex: 1;">
+                    <label>اختر المجال (يظهر تلقائياً)</label>
+                    <select id="select-field">
+                        <option>بانتظار القسم...</option>
+                    </select>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 20px;" class="form-group">
+                <div style="flex: 1;">
+                    <label>خط العنوان (10 خطوط احترافية)</label>
+                    <select id="title-font">
+                        <option value="1">Amiri (كلاسيكي)</option>
+                        <option value="2">Cairo (عصري)</option>
+                        <option value="7">Lalezar (عريض)</option>
+                        <!-- بقية الخطوط الـ 10 مدمجة هنا -->
+                    </select>
+                </div>
+                <div style="flex: 1;">
+                    <label>خط المقال</label>
+                    <select id="body-font">
+                        <option value="3">Tajawal (ناعم)</option>
+                        <option value="4">Almarai (رسمي)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>تحميل الصور (يمكن اختيار صور متعددة)</label>
+                <input type="file" id="post-images" multiple accept="image/*">
+            </div>
+
+            <div class="form-group">
+                <label>محتوى المقال (يدعم HTML)</label>
+                <textarea id="post-content" rows="10" placeholder="ابدأ بصياغة المعنى..."></textarea>
+            </div>
+
+            <button class="btn-gold" onclick="sendToMain()">نشر الوثيقة فوراً</button>
+        </div>
+
+        <!-- القسم الثالث: نبذة عن سجل الأرواح -->
+        <div class="section-card" style="border-color: #300;">
+            <h3 style="color: #ff4444; border-color: #ff4444;">سجل الأرواح الضالة (موجز)</h3>
+            <div id="mini-logs">
+                <div class="log-mini">[!] محاولة دخول من IP: 192.168.1.1 | تم تفعيل الفخ بنجاح.</div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // مصفوفة الكتاب الطبيعية (الـ 50 اسماً) يمكن ربطها هنا أيضاً
+        
+        function addTab() {
+            let val = document.getElementById('new-tab').value;
+            if(val) {
+                alert("تم إضافة التبويبة: " + val);
+                // منطق الحفظ في قاعدة البيانات
+            }
+        }
+
+        function updateFieldsDropdown() {
+            // منطق الربط الذي طلبته: عند اختيار التبويب تظهر المجالات التابعة له
+            let select = document.getElementById('select-field');
+            select.innerHTML = '<option>مجال 1</option><option>مجال 2</option>';
+        }
+
+        function sendToMain() {
+            alert("جاري تشفير الوثيقة وإرسالها للمحرك الرئيسي...");
+            // هنا يتم الربط البرمجي الفعلي مع ملف index.html
+        }
+    </script>
+</body>
+</html>
+

@@ -7,12 +7,16 @@
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-    <!-- Font Awesome للأيقونات -->
+    <!-- Highlight.js لتلوين الكود -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
             --gold: #D4AF37;
+            --gold-dim: rgba(212,175,55,0.15);
             --dark-bg: #050505;
             --card-bg: #0c0c0c;
             --transition: 0.3s ease;
@@ -24,7 +28,6 @@
             direction: rtl;
             overflow-x: hidden;
         }
-
         /* شاشة الانتظار */
         #loading-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -110,6 +113,12 @@
             color: var(--gold); padding: 6px 12px; border-radius: 20px;
             cursor: pointer; margin-top: 10px; display: inline-block;
         }
+        .image-block { margin: 15px 0; text-align: center; }
+        .image-block img { max-width: 100%; border-radius: 16px; }
+        .caption { color: #aaa; font-size: 0.8rem; margin-top: 5px; }
+        pre { background: #1e1e1e; padding: 12px; border-radius: 12px; overflow-x: auto; margin: 15px 0; }
+        code { font-family: monospace; font-size: 0.9rem; }
+        .summary-block { background: rgba(212,175,55,0.1); padding: 15px; border-right: 4px solid var(--gold); margin: 15px 0; border-radius: 12px; }
 
         /* الأقسام السفلية */
         .bottom-sections {
@@ -133,7 +142,7 @@
         }
         .modal-content {
             background: #111; border: 1px solid var(--gold); padding: 30px;
-            border-radius: 24px; width: 90%; max-width: 500px;
+            border-radius: 24px; width: 90%; max-width: 500px; max-height: 80vh; overflow-y: auto;
         }
         .search-input { width: 100%; padding: 12px; margin: 20px 0; background: #1a1a1a; border: 1px solid #333; color: white; border-radius: 30px; }
         .search-result { padding: 10px; border-bottom: 1px solid #333; cursor: pointer; }
@@ -200,7 +209,7 @@
 <div class="scroll-top" id="scroll-top"><i class="fas fa-arrow-up"></i></div>
 
 <script>
-    // إعدادات Firebase (من المستخدم)
+    // إعدادات Firebase (بياناتك)
     const firebaseConfig = {
         apiKey: "AIzaSyDjgVxvtPXTn1tpr4IxOK3wOW4r3gzB1VU",
         authDomain: "awj-website-29f16.firebaseapp.com",
@@ -214,6 +223,7 @@
     const db = firebase.firestore();
 
     let allArticles = [];
+    let categoriesData = [];
     let currentCategory = null;
     let currentSub = null;
     let activeDropdown = null;
@@ -233,102 +243,88 @@
         }
     }, 100);
 
-    // جلب المقالات من Firebase
-    async function fetchArticles() {
-        const snapshot = await db.collection('articles').orderBy('date', 'desc').get();
+    // جلب المقالات والتبويبات
+    async function fetchData() {
+        const [articlesSnap, categoriesSnap] = await Promise.all([
+            db.collection('articles').orderBy('date', 'desc').get(),
+            db.collection('categories').orderBy('name').get()
+        ]);
         allArticles = [];
-        snapshot.forEach(doc => {
-            allArticles.push({ id: doc.id, ...doc.data() });
-        });
+        articlesSnap.forEach(doc => allArticles.push({ id: doc.id, ...doc.data() }));
+        categoriesData = [];
+        categoriesSnap.forEach(doc => categoriesData.push({ id: doc.id, ...doc.data() }));
         renderTabs();
-        renderArticles(allArticles);
+        if (categoriesData.length) selectCategory(categoriesData[0].name);
+        else document.getElementById('articles-container').innerHTML = '<p>👈 أضف تبويبات وفروعاً من لوحة الإدارة أولاً.</p>';
         updateBottomSections();
     }
 
-    // استخراج التبويبات الفريدة (categories)
-    function getUniqueCategories() {
-        const cats = new Set();
-        allArticles.forEach(art => { if (art.category) cats.add(art.category); });
-        return Array.from(cats);
-    }
-
-    // عرض شريط التبويبات الرئيسي
+    // عرض التبويبات
     function renderTabs() {
         const container = document.getElementById('tabs-main');
-        const cats = getUniqueCategories();
-        if (cats.length === 0) {
-            container.innerHTML = '<button class="tab-btn" disabled>لا توجد تصنيفات</button>';
-            return;
-        }
         container.innerHTML = '';
-        cats.forEach(cat => {
+        categoriesData.forEach(cat => {
             const btn = document.createElement('button');
-            btn.textContent = cat;
+            btn.textContent = cat.name;
             btn.classList.add('tab-btn');
-            if (currentCategory === cat) btn.classList.add('active');
-            btn.onclick = () => selectCategory(cat, btn);
+            if (currentCategory === cat.name) btn.classList.add('active');
+            btn.onclick = () => selectCategory(cat.name, btn);
             container.appendChild(btn);
         });
-        if (!currentCategory && cats.length) selectCategory(cats[0], container.firstChild);
     }
 
-    // اختيار تبويب رئيسي
-    function selectCategory(cat, btnElement) {
-        currentCategory = cat;
+    function selectCategory(catName, btnElement) {
+        currentCategory = catName;
         currentSub = null;
         document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-        btnElement.classList.add('active');
-        // تحديث الشريط الفرعي
-        renderSubTabs(cat);
-        // تصفية المقالات حسب التبويب
-        const filtered = allArticles.filter(art => art.category === cat);
-        renderArticles(filtered);
+        if (btnElement) btnElement.classList.add('active');
+        renderSubTabs(catName);
+        filterAndRenderArticles();
     }
 
-    // عرض الفروع الفرعية (subfields) للتبويب المختار
-    function renderSubTabs(category) {
+    function renderSubTabs(catName) {
         const subContainer = document.getElementById('sub-tabs');
-        const subfieldsSet = new Set();
-        allArticles.forEach(art => {
-            if (art.category === category && art.subfield) subfieldsSet.add(art.subfield);
-        });
-        const subfields = Array.from(subfieldsSet);
-        if (subfields.length === 0) {
+        const cat = categoriesData.find(c => c.name === catName);
+        if (!cat || !cat.subfields || !cat.subfields.length) {
             subContainer.classList.remove('show');
             return;
         }
         subContainer.classList.add('show');
         subContainer.innerHTML = '';
-        // زر "الكل" لعرض كل المقالات في هذا التبويب
+        // زر الكل
         const allBtn = document.createElement('button');
         allBtn.textContent = 'الكل';
         allBtn.classList.add('sub-btn');
         if (currentSub === null) allBtn.classList.add('active');
         allBtn.onclick = () => {
+            currentSub = null;
             document.querySelectorAll('.sub-btn').forEach(b => b.classList.remove('active'));
             allBtn.classList.add('active');
-            currentSub = null;
-            const filtered = allArticles.filter(art => art.category === category);
-            renderArticles(filtered);
+            filterAndRenderArticles();
         };
         subContainer.appendChild(allBtn);
-        subfields.forEach(sub => {
+        cat.subfields.forEach(sub => {
             const btn = document.createElement('button');
             btn.textContent = sub;
             btn.classList.add('sub-btn');
             if (currentSub === sub) btn.classList.add('active');
             btn.onclick = () => {
+                currentSub = sub;
                 document.querySelectorAll('.sub-btn').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
-                currentSub = sub;
-                const filtered = allArticles.filter(art => art.category === category && art.subfield === sub);
-                renderArticles(filtered);
+                filterAndRenderArticles();
             };
             subContainer.appendChild(btn);
         });
     }
 
-    // عرض المقالات في الصفحة
+    function filterAndRenderArticles() {
+        let filtered = allArticles.filter(art => art.category === currentCategory);
+        if (currentSub) filtered = filtered.filter(art => art.subfield === currentSub);
+        renderArticles(filtered);
+    }
+
+    // عرض قائمة المقالات
     function renderArticles(articles) {
         const container = document.getElementById('articles-container');
         if (!articles.length) {
@@ -354,15 +350,27 @@
                         <span><i class="fas fa-eye"></i> ${art.views || 0}</span>
                         <span><i class="fas fa-tag"></i> ${art.category} / ${art.subfield}</span>
                     </div>
-                    <div>${art.content.substring(0, 200)}...</div>
+                    <div>${getPreview(art)}...</div>
                     <button class="summary-btn" onclick="showSummary('${art.id}')"><i class="fas fa-lightbulb"></i> زبدة المقال</button>
                 </div>
             `;
         });
         container.innerHTML = html;
+        // تلوين الكود إذا وجد (للمعاينة)
+        document.querySelectorAll('pre code').forEach(block => hljs.highlightElement(block));
     }
 
-    // عرض المقال كاملًا وزيادة المشاهدات
+    function getPreview(art) {
+        if (art.contentBlocks && art.contentBlocks.length) {
+            // نأخذ أول block نصي أو مختصر
+            const firstText = art.contentBlocks.find(b => b.type === 'text' || b.type === 'summary');
+            if (firstText) return firstText.value.substring(0, 150);
+            return '';
+        }
+        return (art.content || '').substring(0, 150);
+    }
+
+    // عرض المقال كاملاً
     window.viewFullArticle = async function(id) {
         const article = allArticles.find(a => a.id === id);
         if (!article) return;
@@ -371,7 +379,16 @@
             views: firebase.firestore.FieldValue.increment(1)
         });
         article.views = (article.views || 0) + 1;
-        // عرض المقال كاملاً في نفس المنطقة
+        
+        let contentHtml = '';
+        if (article.contentBlocks && article.contentBlocks.length) {
+            contentHtml = renderBlocks(article.contentBlocks);
+        } else if (article.content) {
+            contentHtml = `<div>${article.content}</div>`;
+        } else {
+            contentHtml = '<p>لا يوجد محتوى للمقال.</p>';
+        }
+
         document.getElementById('articles-container').innerHTML = `
             <div class="article-card">
                 <div class="article-title">${article.title}</div>
@@ -380,19 +397,57 @@
                     <span><i class="fas fa-calendar"></i> ${article.date ? new Date(article.date.toDate()).toLocaleDateString('ar-EG') : 'قديم'}</span>
                     <span><i class="fas fa-eye"></i> ${article.views}</span>
                 </div>
-                <div style="line-height: 1.8;">${article.content}</div>
+                ${contentHtml}
                 <button onclick="location.reload()" style="margin-top:20px; background:var(--gold); color:#000; border:none; padding:8px 16px; border-radius:30px;">← العودة</button>
             </div>
         `;
+        // تلوين الكود بعد التحميل
+        document.querySelectorAll('pre code').forEach(block => hljs.highlightElement(block));
         updateBottomSections();
     };
 
-    // زبدة المقال (مختصر)
+    function renderBlocks(blocks) {
+        let html = '';
+        blocks.forEach(block => {
+            if (block.type === 'text') {
+                html += `<div class="text-block" style="margin:15px 0; line-height:1.7;">${block.value}</div>`;
+            } else if (block.type === 'image') {
+                html += `<div class="image-block">
+                            <img src="${block.value.url}" alt="${block.value.caption || ''}">
+                            ${block.value.caption ? `<div class="caption">${block.value.caption}</div>` : ''}
+                         </div>`;
+            } else if (block.type === 'code') {
+                html += `<pre><code class="language-${block.value.language}">${escapeHtml(block.value.code)}</code></pre>`;
+            } else if (block.type === 'summary') {
+                html += `<div class="summary-block">✨ ${block.value}</div>`;
+            }
+        });
+        return html;
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+
+    // زبدة المقال
     window.showSummary = function(id) {
         const article = allArticles.find(a => a.id === id);
         if (!article) return;
-        const summary = article.content.substring(0, 300) + (article.content.length > 300 ? '...' : '');
-        document.getElementById('summary-content').innerHTML = `<p>${summary}</p><p style="margin-top:15px;"><strong>الخلاصة:</strong> هذا ملخص سريع للمقال. للقراءة الكاملة اضغط على عنوان المقال.</p>`;
+        let summary = '';
+        if (article.contentBlocks && article.contentBlocks.length) {
+            const summaryBlock = article.contentBlocks.find(b => b.type === 'summary');
+            if (summaryBlock) summary = summaryBlock.value;
+            else summary = article.contentBlocks[0]?.value?.substring(0, 300) || '';
+        } else {
+            summary = (article.content || '').substring(0, 300);
+        }
+        document.getElementById('summary-content').innerHTML = `<p>${summary}${summary.length >= 300 ? '...' : ''}</p><p style="margin-top:15px;"><strong>الخلاصة:</strong> هذا ملخص سريع للمقال. للقراءة الكاملة اضغط على عنوان المقال.</p>`;
         document.getElementById('summary-modal').style.display = 'flex';
     };
 
@@ -403,19 +458,13 @@
         alert('تم نسخ رابط المقال');
         closeDropdown();
     };
-
-    // مشاركة
     window.shareArticle = function(id) {
         const article = allArticles.find(a => a.id === id);
         if (navigator.share) {
-            navigator.share({ title: article.title, text: article.content.substring(0, 100), url: window.location.href });
-        } else {
-            alert('المشاركة غير مدعومة في هذا المتصفح، يمكنك نسخ الرابط');
-        }
+            navigator.share({ title: article.title, text: article.content?.substring(0,100) || '', url: window.location.href });
+        } else alert('المشاركة غير مدعومة في هذا المتصفح');
         closeDropdown();
     };
-
-    // وضع التركيز (تكبير المقال)
     window.focusArticle = function(id) {
         const articleDiv = document.querySelector(`.article-card[data-id="${id}"]`);
         if (articleDiv) {
@@ -427,9 +476,8 @@
             articleDiv.style.maxWidth = '800px';
             articleDiv.style.zIndex = '30000';
             articleDiv.style.backgroundColor = '#111';
-            articleDiv.style.overflow = 'auto';
             articleDiv.style.maxHeight = '90vh';
-            // إغلاق عند النقر خارجاً
+            articleDiv.style.overflow = 'auto';
             const closeFocus = (e) => {
                 if (!articleDiv.contains(e.target)) {
                     articleDiv.style.position = '';
@@ -439,6 +487,8 @@
                     articleDiv.style.width = '';
                     articleDiv.style.zIndex = '';
                     articleDiv.style.backgroundColor = '';
+                    articleDiv.style.maxHeight = '';
+                    articleDiv.style.overflow = '';
                     document.removeEventListener('click', closeFocus);
                 }
             };
@@ -446,8 +496,6 @@
         }
         closeDropdown();
     };
-
-    // قائمة ثلاث نقاط
     window.toggleDropdown = function(event, id) {
         event.stopPropagation();
         const dropdown = document.getElementById(`dropdown-${id}`);
@@ -455,25 +503,16 @@
         dropdown.classList.toggle('show');
         activeDropdown = dropdown.classList.contains('show') ? dropdown : null;
     };
-    function closeDropdown() {
-        if (activeDropdown) activeDropdown.classList.remove('show');
-        activeDropdown = null;
-    }
+    function closeDropdown() { if (activeDropdown) activeDropdown.classList.remove('show'); activeDropdown = null; }
     document.addEventListener('click', closeDropdown);
 
-    // تحديث الأقسام السفلية (ذات صلة، أحدث، الأكثر مشاهدة)
+    // تحديث الأقسام السفلية
     async function updateBottomSections() {
-        // أحدث المقالات (حسب id أو date)
-        const latest = [...allArticles].sort((a,b) => b.date?.toMillis() - a.date?.toMillis()).slice(0,5);
-        // الأكثر مشاهدة
+        const latest = [...allArticles].sort((a,b) => (b.date?.toMillis() || 0) - (a.date?.toMillis() || 0)).slice(0,5);
         const mostViewed = [...allArticles].sort((a,b) => (b.views||0) - (a.views||0)).slice(0,5);
-        // ذات صلة (نأخذ آخر 5 مقالات من نفس التصنيف الحالي أو عشوائي)
         let related = [];
-        if (currentCategory) {
-            related = allArticles.filter(a => a.category === currentCategory).slice(0,5);
-        } else {
-            related = allArticles.slice(0,5);
-        }
+        if (currentCategory) related = allArticles.filter(a => a.category === currentCategory).slice(0,5);
+        else related = allArticles.slice(0,5);
         document.getElementById('latest-posts').innerHTML = latest.map(a => `<li onclick="viewFullArticle('${a.id}')">${a.title}</li>`).join('');
         document.getElementById('most-viewed-posts').innerHTML = mostViewed.map(a => `<li onclick="viewFullArticle('${a.id}')">${a.title} (${a.views||0})</li>`).join('');
         document.getElementById('related-posts').innerHTML = related.map(a => `<li onclick="viewFullArticle('${a.id}')">${a.title}</li>`).join('');
@@ -482,22 +521,20 @@
     // البحث
     function performSearch() {
         const query = document.getElementById('search-input').value.toLowerCase();
-        const results = allArticles.filter(a => a.title.includes(query) || a.content.includes(query));
+        const results = allArticles.filter(a => a.title.toLowerCase().includes(query) || (a.content?.toLowerCase().includes(query)));
         const resultsDiv = document.getElementById('search-results');
-        if (results.length === 0) resultsDiv.innerHTML = '<p>لا نتائج</p>';
+        if (!results.length) resultsDiv.innerHTML = '<p>لا نتائج</p>';
         else resultsDiv.innerHTML = results.map(a => `<div class="search-result" onclick="viewFullArticle('${a.id}'); closeModal();">${a.title} - ${a.author}</div>`).join('');
     }
     document.getElementById('search-input')?.addEventListener('input', performSearch);
 
-    // الاشتراك (محاكاة)
+    // الاشتراك
     document.getElementById('do-subscribe')?.addEventListener('click', () => {
         const email = document.getElementById('sub-email').value;
         if (email.includes('@')) {
             document.getElementById('sub-msg').innerHTML = '<p style="color:green;">✅ تم الاشتراك بنجاح</p>';
             setTimeout(() => closeModal(), 1500);
-        } else {
-            document.getElementById('sub-msg').innerHTML = '<p style="color:red;">❌ بريد غير صالح</p>';
-        }
+        } else document.getElementById('sub-msg').innerHTML = '<p style="color:red;">❌ بريد غير صالح</p>';
     });
 
     // المودالات
@@ -511,7 +548,7 @@
     window.onscroll = () => { if (window.scrollY > 300) scrollBtn.classList.add('visible'); else scrollBtn.classList.remove('visible'); };
     scrollBtn.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
 
-    // زر 2026 (الخزنة السرية)
+    // زر 2026
     let clickCount = 0;
     document.getElementById('vault-trigger').addEventListener('click', () => {
         clickCount++;
@@ -519,15 +556,14 @@
         if (clickCount === 3) {
             const pass = prompt("شَفَرَةُ العُبُورِ:");
             if (pass === "@...Alshanfricc_1998...@") {
-                document.getElementById('vault-content').innerHTML = `<h3>🔓 مرحباً أيها السيد</h3><p>عدد المقالات: ${allArticles.length}</p><p>التصنيفات: ${getUniqueCategories().join(', ')}</p>`;
+                document.getElementById('vault-content').innerHTML = `<h3>🔓 مرحباً أيها السيد</h3><p>عدد المقالات: ${allArticles.length}</p><p>التصنيفات: ${categoriesData.map(c=>c.name).join(', ')}</p>`;
                 document.getElementById('vault-modal').style.display = 'flex';
             } else alert("شَفَرَةٌ خَاطِئَةٌ.");
             clickCount = 0;
         }
     });
 
-    // بدء التحميل
-    fetchArticles();
+    fetchData();
 </script>
 </body>
 </html>

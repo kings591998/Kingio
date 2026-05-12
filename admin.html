@@ -22,16 +22,31 @@
         .btn-small { background: #333; color: #D4AF37; padding: 6px 15px; font-size: 0.8rem; }
         .btn-danger { background: #c62828; color: white; }
         .block {
-            background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 16px;
-            padding: 15px; margin-bottom: 15px; position: relative;
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            border-radius: 16px;
+            padding: 15px;
+            margin-bottom: 15px;
+            position: relative;
+            transition: none; /* منع التذبذب */
+            width: 100%;
         }
         .block-header {
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 10px; cursor: move;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            cursor: move;
         }
         .block-type { color: #D4AF37; font-size: 0.8rem; }
         .delete-block { background: none; border: none; color: #ff8888; cursor: pointer; font-size: 1.2rem; }
-        .image-preview { max-width: 100%; max-height: 200px; margin: 10px 0; border-radius: 12px; }
+        .image-preview {
+            max-width: 100%;
+            max-height: 200px;
+            margin: 10px 0;
+            border-radius: 12px;
+            display: block;
+        }
         .flex { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
         .message { margin-top: 15px; padding: 10px; border-radius: 12px; text-align: center; display: none; }
         .success { background: #2e7d32; display: block; }
@@ -228,37 +243,47 @@
         authorsData.forEach(a => select.innerHTML += `<option value="${a.name}">${escapeHtml(a.name)}</option>`);
     }
 
-    // محرر الكتل
+    // محرر الكتل (معالجة مستقلة للصور وثبات الحجم)
     function addBlock(type) {
-        let newBlock = { type, value: '' };
-        if (type === 'text') newBlock.value = '';
-        else if (type === 'image') newBlock.value = { url: '', caption: '' };
-        else if (type === 'code') newBlock.value = { code: '', language: 'javascript' };
-        else if (type === 'summary') newBlock.value = '';
+        let newBlock;
+        if (type === 'text') newBlock = { type, value: '' };
+        else if (type === 'image') newBlock = { type, value: { url: '', caption: '', file: null } };
+        else if (type === 'code') newBlock = { type, value: { code: '', language: 'javascript' } };
+        else if (type === 'summary') newBlock = { type, value: '' };
         blocks.push(newBlock);
         renderBlocks();
         saveBlocksToLocal();
     }
+
     function deleteBlock(index) {
         blocks.splice(index, 1);
         renderBlocks();
         saveBlocksToLocal();
     }
+
     function updateBlockValue(index, field, value) {
         if (typeof blocks[index].value === 'string') blocks[index].value = value;
         else blocks[index].value[field] = value;
         saveBlocksToLocal();
-        renderBlocks();
+        // لا نعيد renderBlocks كاملاً للحفاظ على حالة الصور، لكننا نقوم بتحديث القيم.
+        // سنقوم بتحديث العرض لاحقاً عند الحاجة.
     }
-    async function uploadImage(file, index) {
+
+    async function uploadImage(index, fileInput) {
+        const file = fileInput.files[0];
         if (!file) return;
         const storageRef = storage.ref(`article_images/${Date.now()}_${file.name}`);
         const uploadTask = await storageRef.put(file);
         const url = await uploadTask.ref.getDownloadURL();
-        blocks[index].value = { url, caption: blocks[index].value.caption || '' };
-        renderBlocks();
+        blocks[index].value.url = url;
+        // تحديث الصورة في الواجهة دون إعادة بناء كاملة
+        const previewDiv = document.getElementById(`preview-${index}`);
+        if (previewDiv) {
+            previewDiv.innerHTML = `<img src="${url}" class="image-preview"><br><input type="text" placeholder="تسمية الصورة" value="${escapeHtml(blocks[index].value.caption)}" onchange="updateBlockValue(${index}, 'caption', this.value)">`;
+        }
         saveBlocksToLocal();
     }
+
     function renderBlocks() {
         const container = document.getElementById('blocks-container');
         if (!blocks.length) { container.innerHTML = '<p>➕ أضف كتلة جديدة باستخدام الأزرار أعلاه</p>'; return; }
@@ -277,8 +302,10 @@
                 innerHtml += `<textarea rows="4" placeholder="اكتب المحتوى هنا (يدعم HTML)" onchange="updateBlockValue(${idx}, null, this.value)">${escapeHtml(block.value)}</textarea>`;
             } else if (block.type === 'image') {
                 innerHtml += `
-                    <input type="file" accept="image/*" onchange="uploadImage(this.files[0], ${idx})">
-                    ${block.value.url ? `<img src="${block.value.url}" class="image-preview"><br><input type="text" placeholder="تسمية الصورة" value="${escapeHtml(block.value.caption)}" onchange="updateBlockValue(${idx}, 'caption', this.value)">` : ''}
+                    <input type="file" accept="image/*" id="file-input-${idx}" onchange="uploadImage(${idx}, this)">
+                    <div id="preview-${idx}">
+                        ${block.value.url ? `<img src="${block.value.url}" class="image-preview"><br><input type="text" placeholder="تسمية الصورة" value="${escapeHtml(block.value.caption)}" onchange="updateBlockValue(${idx}, 'caption', this.value)">` : ''}
+                    </div>
                 `;
             } else if (block.type === 'code') {
                 innerHtml += `
@@ -297,8 +324,10 @@
             blockDiv.innerHTML = innerHtml;
             container.appendChild(blockDiv);
         });
+        // تفعيل الترتيب بالسحب مع منع الاهتزاز
         new Sortable(container, { animation: 150, onEnd: () => saveOrder() });
     }
+
     function saveOrder() {
         const newBlocks = [];
         document.querySelectorAll('.block').forEach(el => {
@@ -307,8 +336,9 @@
         });
         blocks = newBlocks;
         saveBlocksToLocal();
-        renderBlocks();
+        renderBlocks(); // إعادة عرض بعد الترتيب
     }
+
     function saveBlocksToLocal() { localStorage.setItem('temp_blocks', JSON.stringify(blocks)); }
     function loadBlocksFromLocal() {
         const saved = localStorage.getItem('temp_blocks');
@@ -316,7 +346,8 @@
         else blocks = [];
         renderBlocks();
     }
-    function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, function(m){if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
+
+    function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;'); }
 
     // نشر المقال
     window.publishArticle = async () => {
@@ -328,10 +359,17 @@
             showMsg('publish-msg', '❌ العنوان، الكاتب، التبويبة، الفرع، وكتلة واحدة على الأقل مطلوبة', 'error');
             return;
         }
+        // تنظيف الكتل: التأكد من أن كل كتلة صورة تحتوي على url صحيح
+        const cleanedBlocks = blocks.map(block => {
+            if (block.type === 'image' && block.value.url) {
+                return { type: 'image', value: { url: block.value.url, caption: block.value.caption } };
+            }
+            return block;
+        });
         try {
             await db.collection('articles').add({
                 title, author, category, subfield,
-                contentBlocks: blocks,
+                contentBlocks: cleanedBlocks,
                 views: 0,
                 date: firebase.firestore.FieldValue.serverTimestamp()
             });
@@ -344,4 +382,4 @@
     };
 </script>
 </body>
-</html>
+    </html>

@@ -4,114 +4,42 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>أوج | AWJ - القمة</title>
-    <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-    <!-- Highlight.js -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/dark.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        :root {
-            --gold: #D4AF37;
-            --gold-dim: rgba(212,175,55,0.15);
-            --dark-bg: #050505;
-            --card-bg: #0c0c0c;
-        }
-        body {
-            background: var(--dark-bg);
-            color: #eee;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            direction: rtl;
-            overflow-x: hidden;
-        }
-        /* شاشة التحميل */
-        #loading-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #000; z-index: 100000; display: flex;
-            flex-direction: column; justify-content: center; align-items: center;
-            transition: opacity 1s;
-        }
-        .walking-man {
-            width: 80px; height: 80px;
-            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="30" r="12" fill="%23D4AF37"/><rect x="45" y="42" width="10" height="25" fill="%23D4AF37"/><rect x="35" y="50" width="10" height="20" fill="%23D4AF37"/><rect x="55" y="50" width="10" height="20" fill="%23D4AF37"/></svg>') no-repeat center;
-            background-size: contain;
-            animation: walk 0.5s infinite alternate;
-        }
+        :root { --gold: #D4AF37; --dark-bg: #050505; --card-bg: #0c0c0c; }
+        body { background: var(--dark-bg); color: #eee; font-family: 'Segoe UI', sans-serif; direction: rtl; overflow-x: hidden; }
+        #loading-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 100000; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 1s; }
+        .walking-man { width: 80px; height: 80px; background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="30" r="12" fill="%23D4AF37"/><rect x="45" y="42" width="10" height="25" fill="%23D4AF37"/><rect x="35" y="50" width="10" height="20" fill="%23D4AF37"/><rect x="55" y="50" width="10" height="20" fill="%23D4AF37"/></svg>') no-repeat center; background-size: contain; animation: walk 0.5s infinite alternate; }
         @keyframes walk { 0% { transform: translateX(-10px); } 100% { transform: translateX(10px); } }
         .progress-line { width: 80%; height: 4px; background: #222; margin-top: 20px; border-radius: 4px; overflow: hidden; }
         .progress-fill { width: 0%; height: 100%; background: var(--gold); transition: width 0.1s linear; }
-
-        /* الهيدر */
-        header {
-            position: fixed; top: 0; width: 100%; background: rgba(5,5,5,0.96);
-            backdrop-filter: blur(10px); padding: 15px 5%; display: flex;
-            justify-content: space-between; align-items: center; z-index: 2000;
-            border-bottom: 1px solid rgba(212,175,55,0.2);
-        }
+        header { position: fixed; top: 0; width: 100%; background: rgba(5,5,5,0.96); backdrop-filter: blur(10px); padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; z-index: 2000; border-bottom: 1px solid rgba(212,175,55,0.2); }
         .logo { font-size: 2rem; font-weight: bold; color: var(--gold); font-family: 'Times New Roman', serif; }
         .header-icons i { font-size: 1.4rem; margin-right: 20px; cursor: pointer; transition: 0.2s; }
         .header-icons i:hover { color: var(--gold); }
-
-        /* التبويبات الرئيسية */
-        .tabs-main {
-            position: fixed; top: 70px; width: 100%; background: #0a0a0a;
-            z-index: 1999; border-bottom: 1px solid #222; overflow-x: auto;
-            white-space: nowrap; padding: 10px 5%; scrollbar-width: thin;
-        }
-        .tab-btn {
-            display: inline-block; background: transparent; border: 1px solid #333;
-            color: #aaa; padding: 8px 20px; margin-left: 10px; border-radius: 30px;
-            cursor: pointer; font-size: 0.9rem;
-        }
+        .tabs-main { position: fixed; top: 70px; width: 100%; background: #0a0a0a; z-index: 1999; border-bottom: 1px solid #222; overflow-x: auto; white-space: nowrap; padding: 10px 5%; scrollbar-width: thin; }
+        .tab-btn { display: inline-block; background: transparent; border: 1px solid #333; color: #aaa; padding: 8px 20px; margin-left: 10px; border-radius: 30px; cursor: pointer; font-size: 0.9rem; }
         .tab-btn.active { background: var(--gold); color: #000; border-color: var(--gold); }
-
-        /* الفروع الفرعية */
-        .sub-tabs {
-            position: fixed; top: 125px; width: 100%; background: #0f0f0f;
-            z-index: 1998; border-bottom: 1px solid #2a2a2a;
-            overflow-x: auto; white-space: nowrap; padding: 8px 5%;
-            display: none; scrollbar-width: thin;
-        }
+        .sub-tabs { position: fixed; top: 125px; width: 100%; background: #0f0f0f; z-index: 1998; border-bottom: 1px solid #2a2a2a; overflow-x: auto; white-space: nowrap; padding: 8px 5%; display: none; scrollbar-width: thin; }
         .sub-tabs.show { display: block; }
-        .sub-btn {
-            display: inline-block; background: transparent; border: none;
-            color: #aaa; padding: 5px 15px; margin-left: 8px; border-radius: 20px;
-            cursor: pointer; font-size: 0.8rem;
-        }
+        .sub-btn { display: inline-block; background: transparent; border: none; color: #aaa; padding: 5px 15px; margin-left: 8px; border-radius: 20px; cursor: pointer; font-size: 0.8rem; }
         .sub-btn.active { color: var(--gold); background: rgba(212,175,55,0.1); }
-
-        /* المحتوى */
-        .content-area {
-            margin-top: 180px; padding: 0 8% 50px;
-        }
-        .article-card {
-            background: var(--card-bg); border-radius: 16px; padding: 20px;
-            margin-bottom: 30px; border-right: 3px solid var(--gold);
-            position: relative;
-        }
+        .content-area { margin-top: 180px; padding: 0 8% 50px; }
+        .article-card { background: var(--card-bg); border-radius: 16px; padding: 20px; margin-bottom: 30px; border-right: 3px solid var(--gold); position: relative; }
         .article-title { font-size: 1.6rem; color: var(--gold); cursor: pointer; margin-bottom: 10px; }
         .article-meta { display: flex; gap: 20px; font-size: 0.8rem; color: #aaa; margin-bottom: 12px; flex-wrap: wrap; }
         .article-actions { position: absolute; top: 20px; left: 20px; }
         .dots-btn { background: none; border: none; color: #aaa; font-size: 1.4rem; cursor: pointer; }
-        .dropdown-menu {
-            position: absolute; left: 0; top: 30px; background: #1a1a1a;
-            border: 1px solid #333; border-radius: 12px; padding: 8px 0;
-            z-index: 100; display: none; width: 150px; flex-direction: column;
-        }
+        .dropdown-menu { position: absolute; left: 0; top: 30px; background: #1a1a1a; border: 1px solid #333; border-radius: 12px; padding: 8px 0; z-index: 100; display: none; width: 150px; flex-direction: column; }
         .dropdown-menu.show { display: flex; }
-        .dropdown-menu button {
-            background: none; border: none; color: #eee; padding: 8px 15px;
-            text-align: right; cursor: pointer; width: 100%;
-        }
+        .dropdown-menu button { background: none; border: none; color: #eee; padding: 8px 15px; text-align: right; cursor: pointer; width: 100%; }
         .dropdown-menu button:hover { background: #2a2a2a; color: var(--gold); }
-        .summary-btn {
-            background: rgba(212,175,55,0.2); border: 1px solid var(--gold);
-            color: var(--gold); padding: 6px 12px; border-radius: 20px;
-            cursor: pointer; margin-top: 10px; display: inline-block;
-        }
+        .summary-btn { background: rgba(212,175,55,0.2); border: 1px solid var(--gold); color: var(--gold); padding: 6px 12px; border-radius: 20px; cursor: pointer; margin-top: 10px; display: inline-block; }
         .image-block { margin: 15px 0; text-align: center; }
         .image-block img { max-width: 100%; border-radius: 16px; }
         .caption { color: #aaa; font-size: 0.8rem; margin-top: 5px; }
@@ -119,90 +47,36 @@
         .summary-block { background: rgba(212,175,55,0.1); padding: 15px; border-right: 4px solid var(--gold); margin: 15px 0; border-radius: 12px; }
         a { color: var(--gold); text-decoration: underline; }
         a:hover { color: #fff; }
-
-        /* الأقسام السفلية */
-        .bottom-sections {
-            display: grid; grid-template-columns: repeat(3,1fr); gap: 20px;
-            margin-top: 60px; margin-bottom: 40px;
-        }
+        .bottom-sections { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; margin-top: 60px; margin-bottom: 40px; }
         .bottom-card { background: #0a0a0a; padding: 20px; border-radius: 16px; border: 1px solid #222; }
         .bottom-card h4 { color: var(--gold); margin-bottom: 15px; }
         .bottom-card ul { list-style: none; }
         .bottom-card li { padding: 8px 0; border-bottom: 1px dashed #333; cursor: pointer; }
         .bottom-card li:hover { color: var(--gold); }
-
         footer { text-align: center; padding: 30px; border-top: 1px solid #222; color: #666; }
         #vault-trigger { cursor: pointer; }
-
-        /* مودالات */
-        .modal {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.95); z-index: 20000; justify-content: center; align-items: center;
-        }
-        .modal-content {
-            background: #111; border: 1px solid var(--gold); padding: 30px;
-            border-radius: 24px; width: 90%; max-width: 500px; max-height: 80vh; overflow-y: auto;
-        }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 20000; justify-content: center; align-items: center; }
+        .modal-content { background: #111; border: 1px solid var(--gold); padding: 30px; border-radius: 24px; width: 90%; max-width: 500px; max-height: 80vh; overflow-y: auto; }
         .search-input { width: 100%; padding: 12px; margin: 20px 0; background: #1a1a1a; border: 1px solid #333; border-radius: 30px; color: white; }
         .search-result { padding: 10px; border-bottom: 1px solid #333; cursor: pointer; }
         .search-result:hover { background: var(--gold); color: #000; }
-
-        .scroll-top {
-            position: fixed; bottom: 30px; left: 30px; background: var(--gold);
-            width: 45px; height: 45px; border-radius: 50%; display: flex;
-            align-items: center; justify-content: center; cursor: pointer;
-            opacity: 0; transition: 0.3s; z-index: 9999;
-        }
+        .scroll-top { position: fixed; bottom: 30px; left: 30px; background: var(--gold); width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; opacity: 0; transition: 0.3s; z-index: 9999; }
         .scroll-top.visible { opacity: 1; }
-
-        @media (max-width: 768px) {
-            .content-area { padding: 0 5%; }
-            .bottom-sections { grid-template-columns: 1fr; }
-            .article-title { font-size: 1.3rem; }
-        }
+        @media (max-width: 768px) { .content-area { padding: 0 5%; } .bottom-sections { grid-template-columns: 1fr; } .article-title { font-size: 1.3rem; } }
     </style>
 </head>
 <body>
-
-<div id="loading-screen">
-    <div class="walking-man"></div>
-    <div class="progress-line"><div id="load-fill" class="progress-fill"></div></div>
-    <div style="margin-top: 15px;">جاري تجهيز السيادة...</div>
-</div>
-
-<header>
-    <div class="logo">AWJ</div>
-    <div class="header-icons">
-        <i class="fas fa-search" id="search-icon"></i>
-        <i class="fas fa-envelope" id="subscribe-icon"></i>
-    </div>
-</header>
-
-<div class="tabs-main" id="tabs-main"></div>
-<div class="sub-tabs" id="sub-tabs"></div>
-
-<div class="content-area" id="content-area">
-    <div id="articles-container"></div>
-    <div class="bottom-sections">
-        <div class="bottom-card"><h4>📰 ذات صلة</h4><ul id="related-posts"></ul></div>
-        <div class="bottom-card"><h4>🕒 أحدث المقالات</h4><ul id="latest-posts"></ul></div>
-        <div class="bottom-card"><h4>👑 الأكثر مشاهدة</h4><ul id="most-viewed-posts"></ul></div>
-    </div>
-</div>
-
-<footer>
-    <p>جميع الحقوق محفوظة © <span id="vault-trigger">2026</span> | أوج</p>
-</footer>
-
+<div id="loading-screen"><div class="walking-man"></div><div class="progress-line"><div id="load-fill" class="progress-fill"></div></div><div>جاري تجهيز السيادة...</div></div>
+<header><div class="logo">AWJ</div><div class="header-icons"><i class="fas fa-search" id="search-icon"></i><i class="fas fa-envelope" id="subscribe-icon"></i></div></header>
+<div class="tabs-main" id="tabs-main"></div><div class="sub-tabs" id="sub-tabs"></div>
+<div class="content-area"><div id="articles-container"></div><div class="bottom-sections"><div class="bottom-card"><h4>📰 ذات صلة</h4><ul id="related-posts"></ul></div><div class="bottom-card"><h4>🕒 أحدث المقالات</h4><ul id="latest-posts"></ul></div><div class="bottom-card"><h4>👑 الأكثر مشاهدة</h4><ul id="most-viewed-posts"></ul></div></div></div>
+<footer><p>جميع الحقوق محفوظة © <span id="vault-trigger">2026</span> | أوج</p></footer>
 <div id="search-modal" class="modal"><div class="modal-content"><i class="fas fa-times" style="float: left; cursor: pointer;" onclick="closeModal()"></i><h3>🔍 بحث</h3><input type="text" id="search-input" class="search-input" placeholder="اكتب كلمة..."><div id="search-results"></div></div></div>
 <div id="subscribe-modal" class="modal"><div class="modal-content"><i class="fas fa-times" style="float: left; cursor: pointer;" onclick="closeModal()"></i><h3>📧 اشترك في النشرة</h3><input type="email" id="sub-email" placeholder="بريدك الإلكتروني" style="width:100%; padding:10px; margin:15px 0;"><button id="do-subscribe" style="background:var(--gold); color:#000; border:none; padding:10px; width:100%; border-radius:30px;">اشتراك</button><div id="sub-msg"></div></div></div>
 <div id="summary-modal" class="modal"><div class="modal-content"><i class="fas fa-times" style="float: left; cursor: pointer;" onclick="closeModal()"></i><h3>📖 زبدة المقال</h3><div id="summary-content"></div></div></div>
 <div id="vault-modal" class="modal"><div class="modal-content"><i class="fas fa-times" style="float: left; cursor: pointer;" onclick="closeModal()"></i><h3>🔐 الخزنة السرية</h3><div id="vault-content"></div></div></div>
-
 <div class="scroll-top" id="scroll-top"><i class="fas fa-arrow-up"></i></div>
-
 <script>
-    // إعدادات Firebase (مدمجة)
     const firebaseConfig = {
         apiKey: "AIzaSyDjgVxvtPXTn1tpr4IxOK3wOW4r3gzB1VU",
         authDomain: "awj-website-29f16.firebaseapp.com",
@@ -214,337 +88,37 @@
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
-
-    let allArticles = [];
-    let categoriesData = [];
-    let currentCategory = null;
-    let currentSub = null;
-    let activeDropdown = null;
-
-    // شاشة التحميل
+    let allArticles = [], categoriesData = [], currentCategory = null, currentSub = null, activeDropdown = null;
     let progress = 0;
-    const interval = setInterval(() => {
-        progress += Math.floor(Math.random() * 20) + 5;
-        if (progress >= 100) progress = 100;
-        document.getElementById('load-fill').style.width = progress + '%';
-        if (progress === 100) {
-            clearInterval(interval);
-            setTimeout(() => {
-                document.getElementById('loading-screen').style.opacity = '0';
-                setTimeout(() => document.getElementById('loading-screen').style.display = 'none', 1000);
-            }, 500);
-        }
-    }, 100);
-
-    // جلب البيانات
-    async function fetchData() {
-        const [articlesSnap, categoriesSnap] = await Promise.all([
-            db.collection('articles').orderBy('date', 'desc').get(),
-            db.collection('categories').orderBy('name').get()
-        ]);
-        allArticles = articlesSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        categoriesData = categoriesSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        renderTabs();
-        if (categoriesData.length) selectCategory(categoriesData[0].name);
-        else document.getElementById('articles-container').innerHTML = '<p>👈 أضف تبويبات وفروعاً من لوحة الإدارة أولاً.</p>';
-        updateBottomSections();
-    }
-
-    function renderTabs() {
-        const container = document.getElementById('tabs-main');
-        container.innerHTML = '';
-        categoriesData.forEach(cat => {
-            const btn = document.createElement('button');
-            btn.textContent = cat.name;
-            btn.classList.add('tab-btn');
-            btn.onclick = () => selectCategory(cat.name, btn);
-            container.appendChild(btn);
-        });
-        if (currentCategory) {
-            const activeBtn = Array.from(container.children).find(b => b.textContent === currentCategory);
-            if (activeBtn) activeBtn.classList.add('active');
-        }
-    }
-
-    function selectCategory(catName, btnElement) {
-        currentCategory = catName;
-        currentSub = null;
-        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-        btnElement.classList.add('active');
-        renderSubTabs(catName);
-        filterAndRenderArticles();
-    }
-
-    function renderSubTabs(catName) {
-        const subContainer = document.getElementById('sub-tabs');
-        const cat = categoriesData.find(c => c.name === catName);
-        if (!cat || !cat.subfields || !cat.subfields.length) {
-            subContainer.classList.remove('show');
-            return;
-        }
-        subContainer.classList.add('show');
-        subContainer.innerHTML = '';
-        const allBtn = document.createElement('button');
-        allBtn.textContent = 'الكل';
-        allBtn.classList.add('sub-btn');
-        if (currentSub === null) allBtn.classList.add('active');
-        allBtn.onclick = () => {
-            currentSub = null;
-            document.querySelectorAll('.sub-btn').forEach(b => b.classList.remove('active'));
-            allBtn.classList.add('active');
-            filterAndRenderArticles();
-        };
-        subContainer.appendChild(allBtn);
-        cat.subfields.forEach(sub => {
-            const btn = document.createElement('button');
-            btn.textContent = sub;
-            btn.classList.add('sub-btn');
-            if (currentSub === sub) btn.classList.add('active');
-            btn.onclick = () => {
-                currentSub = sub;
-                document.querySelectorAll('.sub-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                filterAndRenderArticles();
-            };
-            subContainer.appendChild(btn);
-        });
-    }
-
-    function filterAndRenderArticles() {
-        let filtered = allArticles.filter(art => art.category === currentCategory);
-        if (currentSub) filtered = filtered.filter(art => art.subfield === currentSub);
-        renderArticles(filtered);
-    }
-
-    function renderArticles(articles) {
-        const container = document.getElementById('articles-container');
-        if (!articles.length) {
-            container.innerHTML = '<p>لا توجد مقالات في هذا القسم.</p>';
-            return;
-        }
-        let html = '';
-        articles.forEach(art => {
-            html += `
-                <div class="article-card" data-id="${art.id}">
-                    <div class="article-actions">
-                        <button class="dots-btn" onclick="toggleDropdown(event, '${art.id}')"><i class="fas fa-ellipsis-v"></i></button>
-                        <div id="dropdown-${art.id}" class="dropdown-menu">
-                            <button onclick="copyLink('${art.id}')"><i class="fas fa-copy"></i> نسخ الرابط</button>
-                            <button onclick="shareArticle('${art.id}')"><i class="fas fa-share-alt"></i> مشاركة</button>
-                            <button onclick="focusArticle('${art.id}')"><i class="fas fa-expand"></i> وضع التركيز</button>
-                        </div>
-                    </div>
-                    <div class="article-title" onclick="viewFullArticle('${art.id}')">${escapeHtml(art.title)}</div>
-                    <div class="article-meta">
-                        <span><i class="fas fa-user"></i> ${escapeHtml(art.author)}</span>
-                        <span><i class="fas fa-calendar"></i> ${art.date ? new Date(art.date.toDate()).toLocaleDateString('ar-EG') : 'قديم'}</span>
-                        <span><i class="fas fa-eye"></i> ${art.views || 0}</span>
-                        <span><i class="fas fa-tag"></i> ${escapeHtml(art.category)} / ${escapeHtml(art.subfield)}</span>
-                    </div>
-                    <div>${getPreview(art)}...</div>
-                    <button class="summary-btn" onclick="showSummary('${art.id}')"><i class="fas fa-lightbulb"></i> زبدة المقال</button>
-                </div>
-            `;
-        });
-        container.innerHTML = html;
-    }
-
-    function getPreview(art) {
-        if (art.contentBlocks && art.contentBlocks.length) {
-            const firstText = art.contentBlocks.find(b => b.type === 'text' || b.type === 'summary');
-            if (firstText) return escapeHtml(firstText.value).substring(0, 150);
-        }
-        return (art.content || '').substring(0, 150);
-    }
-
-    // عرض المقال كاملاً
-    window.viewFullArticle = async function(id) {
-        const article = allArticles.find(a => a.id === id);
-        if (!article) return;
-        await db.collection('articles').doc(id).update({ views: firebase.firestore.FieldValue.increment(1) });
-        article.views = (article.views || 0) + 1;
-        
-        let contentHtml = '';
-        if (article.contentBlocks && article.contentBlocks.length) {
-            contentHtml = renderBlocks(article.contentBlocks);
-        } else if (article.content) {
-            contentHtml = `<div>${linkifyText(escapeHtml(article.content))}</div>`;
-        } else {
-            contentHtml = '<p>لا يوجد محتوى للمقال.</p>';
-        }
-
-        document.getElementById('articles-container').innerHTML = `
-            <div class="article-card">
-                <div class="article-title">${escapeHtml(article.title)}</div>
-                <div class="article-meta">
-                    <span><i class="fas fa-user"></i> ${escapeHtml(article.author)}</span>
-                    <span><i class="fas fa-calendar"></i> ${article.date ? new Date(article.date.toDate()).toLocaleDateString('ar-EG') : 'قديم'}</span>
-                    <span><i class="fas fa-eye"></i> ${article.views}</span>
-                </div>
-                ${contentHtml}
-                <button onclick="location.reload()" style="margin-top:20px; background:var(--gold); color:#000; border:none; padding:8px 16px; border-radius:30px;">← العودة</button>
-            </div>
-        `;
-        document.querySelectorAll('pre code').forEach(block => hljs.highlightElement(block));
-        updateBottomSections();
-    };
-
-    function renderBlocks(blocks) {
-        let html = '';
-        blocks.forEach(block => {
-            if (block.type === 'text') {
-                html += `<div class="text-block" style="margin:15px 0; line-height:1.7;">${linkifyText(escapeHtml(block.value))}</div>`;
-            } else if (block.type === 'image') {
-                html += `<div class="image-block"><img src="${block.value.url}" alt="${escapeHtml(block.value.caption)}">${block.value.caption ? `<div class="caption">${escapeHtml(block.value.caption)}</div>` : ''}</div>`;
-            } else if (block.type === 'code') {
-                html += `<pre><code class="language-${block.value.language}">${escapeHtml(block.value.code)}</code></pre>`;
-            } else if (block.type === 'summary') {
-                html += `<div class="summary-block">✨ ${linkifyText(escapeHtml(block.value))}</div>`;
-            }
-        });
-        return html;
-    }
-
-    // تحويل النص العادي الذي يحتوي على روابط إلى روابط HTML
-    function linkifyText(text) {
-        const urlRegex = /(https?:\/\/[^\s]+)/g;
-        return text.replace(urlRegex, function(url) {
-            return `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`;
-        });
-    }
-
-    function escapeHtml(str) {
-        if (!str) return '';
-        return str.replace(/[&<>]/g, function(m) {
-            if (m === '&') return '&amp;';
-            if (m === '<') return '&lt;';
-            if (m === '>') return '&gt;';
-            return m;
-        });
-    }
-
-    // زبدة المقال
-    window.showSummary = function(id) {
-        const article = allArticles.find(a => a.id === id);
-        if (!article) return;
-        let summary = '';
-        if (article.contentBlocks && article.contentBlocks.length) {
-            const summaryBlock = article.contentBlocks.find(b => b.type === 'summary');
-            if (summaryBlock) summary = summaryBlock.value;
-            else summary = article.contentBlocks[0]?.value?.substring(0, 300) || '';
-        } else {
-            summary = (article.content || '').substring(0, 300);
-        }
-        document.getElementById('summary-content').innerHTML = `<p>${escapeHtml(summary)}${summary.length >= 300 ? '...' : ''}</p><p style="margin-top:15px;"><strong>الخلاصة:</strong> هذا ملخص سريع للمقال. للقراءة الكاملة اضغط على عنوان المقال.</p>`;
-        document.getElementById('summary-modal').style.display = 'flex';
-    };
-
-    window.copyLink = function(id) {
-        const url = window.location.href.split('#')[0] + `?article=${id}`;
-        navigator.clipboard.writeText(url);
-        alert('تم نسخ رابط المقال');
-        closeDropdown();
-    };
-    window.shareArticle = function(id) {
-        const article = allArticles.find(a => a.id === id);
-        if (navigator.share) {
-            navigator.share({ title: article.title, text: article.content?.substring(0,100) || '', url: window.location.href });
-        } else alert('المشاركة غير مدعومة');
-        closeDropdown();
-    };
-    window.focusArticle = function(id) {
-        const articleDiv = document.querySelector(`.article-card[data-id="${id}"]`);
-        if (articleDiv) {
-            articleDiv.style.position = 'fixed';
-            articleDiv.style.top = '50%';
-            articleDiv.style.left = '50%';
-            articleDiv.style.transform = 'translate(-50%, -50%)';
-            articleDiv.style.width = '90%';
-            articleDiv.style.maxWidth = '800px';
-            articleDiv.style.zIndex = '30000';
-            articleDiv.style.backgroundColor = '#111';
-            articleDiv.style.maxHeight = '90vh';
-            articleDiv.style.overflow = 'auto';
-            const closeFocus = (e) => {
-                if (!articleDiv.contains(e.target)) {
-                    articleDiv.style.position = '';
-                    articleDiv.style.top = '';
-                    articleDiv.style.left = '';
-                    articleDiv.style.transform = '';
-                    articleDiv.style.width = '';
-                    articleDiv.style.zIndex = '';
-                    articleDiv.style.backgroundColor = '';
-                    articleDiv.style.maxHeight = '';
-                    articleDiv.style.overflow = '';
-                    document.removeEventListener('click', closeFocus);
-                }
-            };
-            setTimeout(() => document.addEventListener('click', closeFocus), 100);
-        }
-        closeDropdown();
-    };
-    window.toggleDropdown = function(event, id) {
-        event.stopPropagation();
-        const dropdown = document.getElementById(`dropdown-${id}`);
-        if (activeDropdown && activeDropdown !== dropdown) activeDropdown.classList.remove('show');
-        dropdown.classList.toggle('show');
-        activeDropdown = dropdown.classList.contains('show') ? dropdown : null;
-    };
+    const interval = setInterval(() => { progress += Math.floor(Math.random() * 20) + 5; if (progress >= 100) progress = 100; document.getElementById('load-fill').style.width = progress + '%'; if (progress === 100) { clearInterval(interval); setTimeout(() => { document.getElementById('loading-screen').style.opacity = '0'; setTimeout(() => document.getElementById('loading-screen').style.display = 'none', 1000); }, 500); } }, 100);
+    async function fetchData() { const [articlesSnap, categoriesSnap] = await Promise.all([db.collection('articles').orderBy('date', 'desc').get(), db.collection('categories').orderBy('name').get()]); allArticles = articlesSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })); categoriesData = categoriesSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })); renderTabs(); if (categoriesData.length) selectCategory(categoriesData[0].name); else document.getElementById('articles-container').innerHTML = '<p>👈 أضف تبويبات وفروعاً من لوحة الإدارة أولاً.</p>'; updateBottomSections(); }
+    function renderTabs() { const container = document.getElementById('tabs-main'); container.innerHTML = ''; categoriesData.forEach(cat => { const btn = document.createElement('button'); btn.textContent = cat.name; btn.classList.add('tab-btn'); btn.onclick = () => selectCategory(cat.name, btn); container.appendChild(btn); }); if (currentCategory) { const activeBtn = Array.from(container.children).find(b => b.textContent === currentCategory); if (activeBtn) activeBtn.classList.add('active'); } }
+    function selectCategory(catName, btnElement) { currentCategory = catName; currentSub = null; document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active')); btnElement.classList.add('active'); renderSubTabs(catName); filterAndRenderArticles(); }
+    function renderSubTabs(catName) { const subContainer = document.getElementById('sub-tabs'); const cat = categoriesData.find(c => c.name === catName); if (!cat || !cat.subfields || !cat.subfields.length) { subContainer.classList.remove('show'); return; } subContainer.classList.add('show'); subContainer.innerHTML = ''; const allBtn = document.createElement('button'); allBtn.textContent = 'الكل'; allBtn.classList.add('sub-btn'); if (currentSub === null) allBtn.classList.add('active'); allBtn.onclick = () => { currentSub = null; document.querySelectorAll('.sub-btn').forEach(b => b.classList.remove('active')); allBtn.classList.add('active'); filterAndRenderArticles(); }; subContainer.appendChild(allBtn); cat.subfields.forEach(sub => { const btn = document.createElement('button'); btn.textContent = sub; btn.classList.add('sub-btn'); if (currentSub === sub) btn.classList.add('active'); btn.onclick = () => { currentSub = sub; document.querySelectorAll('.sub-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); filterAndRenderArticles(); }; subContainer.appendChild(btn); }); }
+    function filterAndRenderArticles() { let filtered = allArticles.filter(art => art.category === currentCategory); if (currentSub) filtered = filtered.filter(art => art.subfield === currentSub); renderArticles(filtered); }
+    function renderArticles(articles) { const container = document.getElementById('articles-container'); if (!articles.length) { container.innerHTML = '<p>لا توجد مقالات في هذا القسم.</p>'; return; } let html = ''; articles.forEach(art => { html += `<div class="article-card" data-id="${art.id}"><div class="article-actions"><button class="dots-btn" onclick="toggleDropdown(event, '${art.id}')"><i class="fas fa-ellipsis-v"></i></button><div id="dropdown-${art.id}" class="dropdown-menu"><button onclick="copyLink('${art.id}')"><i class="fas fa-copy"></i> نسخ الرابط</button><button onclick="shareArticle('${art.id}')"><i class="fas fa-share-alt"></i> مشاركة</button><button onclick="focusArticle('${art.id}')"><i class="fas fa-expand"></i> وضع التركيز</button></div></div><div class="article-title" onclick="viewFullArticle('${art.id}')">${escapeHtml(art.title)}</div><div class="article-meta"><span><i class="fas fa-user"></i> ${escapeHtml(art.author)}</span><span><i class="fas fa-calendar"></i> ${art.date ? new Date(art.date.toDate()).toLocaleDateString('ar-EG') : 'قديم'}</span><span><i class="fas fa-eye"></i> ${art.views || 0}</span><span><i class="fas fa-tag"></i> ${escapeHtml(art.category)} / ${escapeHtml(art.subfield)}</span></div><div>${getPreview(art)}...</div><button class="summary-btn" onclick="showSummary('${art.id}')"><i class="fas fa-lightbulb"></i> زبدة المقال</button></div>`; }); container.innerHTML = html; }
+    function getPreview(art) { if (art.contentBlocks && art.contentBlocks.length) { const firstText = art.contentBlocks.find(b => b.type === 'text' || b.type === 'summary'); if (firstText) return escapeHtml(firstText.value).substring(0, 150); } return (art.content || '').substring(0, 150); }
+    window.viewFullArticle = async function(id) { const article = allArticles.find(a => a.id === id); if (!article) return; await db.collection('articles').doc(id).update({ views: firebase.firestore.FieldValue.increment(1) }); article.views = (article.views || 0) + 1; let contentHtml = ''; if (article.contentBlocks && article.contentBlocks.length) contentHtml = renderBlocks(article.contentBlocks); else if (article.content) contentHtml = `<div>${linkifyText(escapeHtml(article.content))}</div>`; else contentHtml = '<p>لا يوجد محتوى للمقال.</p>'; document.getElementById('articles-container').innerHTML = `<div class="article-card"><div class="article-title">${escapeHtml(article.title)}</div><div class="article-meta"><span><i class="fas fa-user"></i> ${escapeHtml(article.author)}</span><span><i class="fas fa-calendar"></i> ${article.date ? new Date(article.date.toDate()).toLocaleDateString('ar-EG') : 'قديم'}</span><span><i class="fas fa-eye"></i> ${article.views}</span></div>${contentHtml}<button onclick="location.reload()" style="margin-top:20px; background:var(--gold); color:#000; border:none; padding:8px 16px; border-radius:30px;">← العودة</button></div>`; document.querySelectorAll('pre code').forEach(block => hljs.highlightElement(block)); updateBottomSections(); };
+    function renderBlocks(blocks) { let html = ''; blocks.forEach(block => { if (block.type === 'text') html += `<div class="text-block" style="margin:15px 0; line-height:1.7;">${linkifyText(escapeHtml(block.value))}</div>`; else if (block.type === 'image') html += `<div class="image-block"><img src="${block.value.url}" alt="${escapeHtml(block.value.caption)}">${block.value.caption ? `<div class="caption">${escapeHtml(block.value.caption)}</div>` : ''}</div>`; else if (block.type === 'code') html += `<pre><code class="language-${block.value.language}">${escapeHtml(block.value.code)}</code></pre>`; else if (block.type === 'summary') html += `<div class="summary-block">✨ ${linkifyText(escapeHtml(block.value))}</div>`; }); return html; }
+    function linkifyText(text) { const urlRegex = /(https?:\/\/[^\s]+)/g; return text.replace(urlRegex, url => `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`); }
+    function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;'); }
+    window.showSummary = function(id) { const article = allArticles.find(a => a.id === id); if (!article) return; let summary = ''; if (article.contentBlocks && article.contentBlocks.length) { const summaryBlock = article.contentBlocks.find(b => b.type === 'summary'); if (summaryBlock) summary = summaryBlock.value; else summary = article.contentBlocks[0]?.value?.substring(0, 300) || ''; } else summary = (article.content || '').substring(0, 300); document.getElementById('summary-content').innerHTML = `<p>${escapeHtml(summary)}${summary.length >= 300 ? '...' : ''}</p><p style="margin-top:15px;"><strong>الخلاصة:</strong> هذا ملخص سريع للمقال. للقراءة الكاملة اضغط على عنوان المقال.</p>`; document.getElementById('summary-modal').style.display = 'flex'; };
+    window.copyLink = function(id) { const url = window.location.href.split('#')[0] + `?article=${id}`; navigator.clipboard.writeText(url); alert('تم نسخ رابط المقال'); closeDropdown(); };
+    window.shareArticle = function(id) { const article = allArticles.find(a => a.id === id); if (navigator.share) navigator.share({ title: article.title, text: article.content?.substring(0,100) || '', url: window.location.href }); else alert('المشاركة غير مدعومة'); closeDropdown(); };
+    window.focusArticle = function(id) { const articleDiv = document.querySelector(`.article-card[data-id="${id}"]`); if (articleDiv) { articleDiv.style.position = 'fixed'; articleDiv.style.top = '50%'; articleDiv.style.left = '50%'; articleDiv.style.transform = 'translate(-50%, -50%)'; articleDiv.style.width = '90%'; articleDiv.style.maxWidth = '800px'; articleDiv.style.zIndex = '30000'; articleDiv.style.backgroundColor = '#111'; articleDiv.style.maxHeight = '90vh'; articleDiv.style.overflow = 'auto'; const closeFocus = (e) => { if (!articleDiv.contains(e.target)) { articleDiv.style.position = ''; articleDiv.style.top = ''; articleDiv.style.left = ''; articleDiv.style.transform = ''; articleDiv.style.width = ''; articleDiv.style.zIndex = ''; articleDiv.style.backgroundColor = ''; articleDiv.style.maxHeight = ''; articleDiv.style.overflow = ''; document.removeEventListener('click', closeFocus); } }; setTimeout(() => document.addEventListener('click', closeFocus), 100); } closeDropdown(); };
+    window.toggleDropdown = function(event, id) { event.stopPropagation(); const dropdown = document.getElementById(`dropdown-${id}`); if (activeDropdown && activeDropdown !== dropdown) activeDropdown.classList.remove('show'); dropdown.classList.toggle('show'); activeDropdown = dropdown.classList.contains('show') ? dropdown : null; };
     function closeDropdown() { if (activeDropdown) activeDropdown.classList.remove('show'); activeDropdown = null; }
     document.addEventListener('click', closeDropdown);
-
-    // الأقسام السفلية
-    async function updateBottomSections() {
-        const latest = [...allArticles].sort((a,b) => (b.date?.toMillis() || 0) - (a.date?.toMillis() || 0)).slice(0,5);
-        const mostViewed = [...allArticles].sort((a,b) => (b.views||0) - (a.views||0)).slice(0,5);
-        let related = [];
-        if (currentCategory) related = allArticles.filter(a => a.category === currentCategory).slice(0,5);
-        else related = allArticles.slice(0,5);
-        document.getElementById('latest-posts').innerHTML = latest.map(a => `<li onclick="viewFullArticle('${a.id}')">${escapeHtml(a.title)}</li>`).join('');
-        document.getElementById('most-viewed-posts').innerHTML = mostViewed.map(a => `<li onclick="viewFullArticle('${a.id}')">${escapeHtml(a.title)} (${a.views||0})</li>`).join('');
-        document.getElementById('related-posts').innerHTML = related.map(a => `<li onclick="viewFullArticle('${a.id}')">${escapeHtml(a.title)}</li>`).join('');
-    }
-
-    // البحث
-    function performSearch() {
-        const query = document.getElementById('search-input').value.toLowerCase();
-        const results = allArticles.filter(a => a.title.toLowerCase().includes(query) || (a.content?.toLowerCase().includes(query)));
-        const resultsDiv = document.getElementById('search-results');
-        if (!results.length) resultsDiv.innerHTML = '<p>لا نتائج</p>';
-        else resultsDiv.innerHTML = results.map(a => `<div class="search-result" onclick="viewFullArticle('${a.id}'); closeModal();">${escapeHtml(a.title)} - ${escapeHtml(a.author)}</div>`).join('');
-    }
+    async function updateBottomSections() { const latest = [...allArticles].sort((a,b) => (b.date?.toMillis() || 0) - (a.date?.toMillis() || 0)).slice(0,5); const mostViewed = [...allArticles].sort((a,b) => (b.views||0) - (a.views||0)).slice(0,5); let related = []; if (currentCategory) related = allArticles.filter(a => a.category === currentCategory).slice(0,5); else related = allArticles.slice(0,5); document.getElementById('latest-posts').innerHTML = latest.map(a => `<li onclick="viewFullArticle('${a.id}')">${escapeHtml(a.title)}</li>`).join(''); document.getElementById('most-viewed-posts').innerHTML = mostViewed.map(a => `<li onclick="viewFullArticle('${a.id}')">${escapeHtml(a.title)} (${a.views||0})</li>`).join(''); document.getElementById('related-posts').innerHTML = related.map(a => `<li onclick="viewFullArticle('${a.id}')">${escapeHtml(a.title)}</li>`).join(''); }
+    function performSearch() { const query = document.getElementById('search-input').value.toLowerCase(); const results = allArticles.filter(a => a.title.toLowerCase().includes(query) || (a.content?.toLowerCase().includes(query))); const resultsDiv = document.getElementById('search-results'); if (!results.length) resultsDiv.innerHTML = '<p>لا نتائج</p>'; else resultsDiv.innerHTML = results.map(a => `<div class="search-result" onclick="viewFullArticle('${a.id}'); closeModal();">${escapeHtml(a.title)} - ${escapeHtml(a.author)}</div>`).join(''); }
     document.getElementById('search-input')?.addEventListener('input', performSearch);
-    document.getElementById('do-subscribe')?.addEventListener('click', () => {
-        const email = document.getElementById('sub-email').value;
-        if (email.includes('@')) {
-            document.getElementById('sub-msg').innerHTML = '<p style="color:green;">✅ تم الاشتراك بنجاح</p>';
-            setTimeout(() => closeModal(), 1500);
-        } else document.getElementById('sub-msg').innerHTML = '<p style="color:red;">❌ بريد غير صالح</p>';
-    });
-
+    document.getElementById('do-subscribe')?.addEventListener('click', () => { const email = document.getElementById('sub-email').value; if (email.includes('@')) { document.getElementById('sub-msg').innerHTML = '<p style="color:green;">✅ تم الاشتراك بنجاح</p>'; setTimeout(() => closeModal(), 1500); } else document.getElementById('sub-msg').innerHTML = '<p style="color:red;">❌ بريد غير صالح</p>'; });
     function closeModal() { document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); }
     document.getElementById('search-icon').onclick = () => { document.getElementById('search-modal').style.display = 'flex'; document.getElementById('search-input').value = ''; document.getElementById('search-results').innerHTML = ''; };
     document.getElementById('subscribe-icon').onclick = () => { document.getElementById('subscribe-modal').style.display = 'flex'; };
     window.closeModal = closeModal;
-
-    const scrollBtn = document.getElementById('scroll-top');
-    window.onscroll = () => { if (window.scrollY > 300) scrollBtn.classList.add('visible'); else scrollBtn.classList.remove('visible'); };
-    scrollBtn.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
-
-    let clickCount = 0;
-    document.getElementById('vault-trigger').addEventListener('click', () => {
-        clickCount++;
-        setTimeout(() => clickCount = 0, 1500);
-        if (clickCount === 3) {
-            const pass = prompt("شَفَرَةُ العُبُورِ:");
-            if (pass === "@...Alshanfricc_1998...@") {
-                document.getElementById('vault-content').innerHTML = `<h3>🔓 مرحباً أيها السيد</h3><p>عدد المقالات: ${allArticles.length}</p><p>التصنيفات: ${categoriesData.map(c=>c.name).join(', ')}</p>`;
-                document.getElementById('vault-modal').style.display = 'flex';
-            } else alert("شَفَرَةٌ خَاطِئَةٌ.");
-            clickCount = 0;
-        }
-    });
-
+    const scrollBtn = document.getElementById('scroll-top'); window.onscroll = () => { if (window.scrollY > 300) scrollBtn.classList.add('visible'); else scrollBtn.classList.remove('visible'); }; scrollBtn.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+    let clickCount = 0; document.getElementById('vault-trigger').addEventListener('click', () => { clickCount++; setTimeout(() => clickCount = 0, 1500); if (clickCount === 3) { const pass = prompt("شَفَرَةُ العُبُورِ:"); if (pass === "@...Alshanfricc_1998...@") { document.getElementById('vault-content').innerHTML = `<h3>🔓 مرحباً أيها السيد</h3><p>عدد المقالات: ${allArticles.length}</p><p>التصنيفات: ${categoriesData.map(c=>c.name).join(', ')}</p>`; document.getElementById('vault-modal').style.display = 'flex'; } else alert("شَفَرَةٌ خَاطِئَةٌ."); clickCount = 0; } });
     fetchData();
 </script>
 </body>

@@ -1,388 +1,533 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-
-
-    // Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyDjgVxvtPXTn1tpr4IxOK3wOW4r3gzB1VU",
-  authDomain: "awj-website-29f16.firebaseapp.com",
-  projectId: "awj-website-29f16",
-  storageBucket: "awj-website-29f16.firebasestorage.app",
-  messagingSenderId: "406747568578",
-  appId: "1:406747568578:web:741821d3c60df0011b5e5b",
-  measurementId: "G-DFB0GYH7LN"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-
-
-    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <meta name="monetization" content="$ilp.uphold.com/your-payment-pointer">
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#D4AF37">
     <title>أوج | AWJ - القمة</title>
-    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@300;600&family=Cinzel:wght@700&family=Tajawal&family=Almarai&family=Scheherazade+New:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <!-- Font Awesome للأيقونات -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        /* === جميع الأنماط السابقة محسنة === */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
             --gold: #D4AF37;
-            --gold-dim: rgba(212, 175, 55, 0.15);
             --dark-bg: #050505;
             --card-bg: #0c0c0c;
-            --danger: #ff3333;
-            --success: #2ecc71;
-            --glass: rgba(212, 175, 55, 0.08);
-            --transition: 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            --transition: 0.3s ease;
         }
         body {
-            background-color: var(--dark-bg);
-            color: #e0e0e0;
-            font-family: 'Amiri', serif;
+            background: var(--dark-bg);
+            color: #eee;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            direction: rtl;
             overflow-x: hidden;
-            overflow-y: hidden; /* منع التمرير لأسفل */
-            transition: background 0.3s, color 0.3s;
-            height: 100vh;
         }
-        body.light-mode { background: #f5f5f0; color: #1a1a1a; }
-        body.gold-mode { background: #1a1a0a; color: #ffd966; }
-        
+
         /* شاشة الانتظار */
         #loading-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #000000; z-index: 100000; display: flex;
+            background: #000; z-index: 100000; display: flex;
             flex-direction: column; justify-content: center; align-items: center;
-            transition: opacity 1.5s ease;
+            transition: opacity 1s;
         }
         .walking-man {
             width: 80px; height: 80px;
             background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="30" r="12" fill="%23D4AF37"/><rect x="45" y="42" width="10" height="25" fill="%23D4AF37"/><rect x="35" y="50" width="10" height="20" fill="%23D4AF37"/><rect x="55" y="50" width="10" height="20" fill="%23D4AF37"/></svg>') no-repeat center;
-            background-size: contain; animation: walk 0.5s infinite alternate; margin-bottom: 30px;
+            background-size: contain;
+            animation: walk 0.5s infinite alternate;
         }
         @keyframes walk { 0% { transform: translateX(-10px); } 100% { transform: translateX(10px); } }
-        .progress-line { width: 80%; height: 4px; background: #222; border-radius: 4px; overflow: hidden; margin-top: 20px; }
-        .progress-fill-line { width: 0%; height: 100%; background: var(--gold); transition: width 0.1s linear; }
-        
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #111; }
-        ::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 10px; }
-        
-        .scrollable-container {
-            height: 100vh;
-            overflow-y: auto;
-            overflow-x: hidden;
-        }
-        
+        .progress-line { width: 80%; height: 4px; background: #222; margin-top: 20px; border-radius: 4px; overflow: hidden; }
+        .progress-fill { width: 0%; height: 100%; background: var(--gold); transition: width 0.1s linear; }
+
+        /* الهيدر */
         header {
-            position: fixed; top: 0; width: 100%; height: 80px;
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 0 5%; background: rgba(5, 5, 5, 0.96); backdrop-filter: blur(16px);
-            border-bottom: 1px solid var(--glass); z-index: 2000; transition: transform 0.3s ease;
+            position: fixed; top: 0; width: 100%; background: rgba(5,5,5,0.96);
+            backdrop-filter: blur(10px); padding: 15px 5%; display: flex;
+            justify-content: space-between; align-items: center; z-index: 2000;
+            border-bottom: 1px solid rgba(212,175,55,0.2);
         }
-        body.light-mode header { background: rgba(245, 245, 240, 0.96); }
-        .logo { font-family: 'Cinzel', serif; font-size: 2.3rem; color: var(--gold); text-shadow: 0 0 12px rgba(212,175,55,0.5); letter-spacing: 4px; cursor: pointer; }
-        .search-icon, .subscribe-icon, .user-settings-icon { cursor: pointer; font-size: 1.4rem; margin-left: 15px; transition: 0.2s; }
-        .search-icon:hover, .subscribe-icon:hover, .user-settings-icon:hover { color: var(--gold); }
-        
-        .header-controls { display: flex; align-items: center; gap: 10px; margin-left: 15px; }
-        .header-controls i { cursor: pointer; font-size: 1.2rem; transition: 0.2s; padding: 5px; border-radius: 50%; }
-        .header-controls i:hover { color: var(--gold); background: var(--gold-dim); }
-        
-        .tabs-nav { position: fixed; top: 80px; width: 100%; background: rgba(8, 8, 8, 0.96); backdrop-filter: blur(8px); z-index: 1900; border-bottom: 1px solid rgba(212,175,55,0.15); }
-        .tabs-wrapper { display: flex; overflow-x: auto; white-space: nowrap; padding: 12px 5%; gap: 12px; scrollbar-width: thin; }
-        .tab-item { background: transparent; border: 1px solid #2a2a2a; color: #aaa; padding: 8px 24px; border-radius: 40px; cursor: pointer; font-family: 'Cairo', sans-serif; font-weight: 600; transition: 0.2s; flex: 0 0 auto; }
-        .tab-item.active { background: var(--gold); color: #000; border-color: var(--gold); box-shadow: 0 0 15px rgba(212,175,55,0.5); }
-        .sub-fields-bar { position: fixed; top: 145px; width: 100%; background: rgba(12,12,12,0.96); backdrop-filter: blur(12px); z-index: 1800; max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out; border-bottom: 1px solid transparent; }
-        .sub-fields-bar.active { max-height: 80px; border-bottom-color: var(--gold-dim); }
-        .fields-flex { display: flex; justify-content: center; gap: 28px; padding: 16px; flex-wrap: wrap; }
-        .field-node { font-size: 0.9rem; color: #ccc; cursor: pointer; transition: 0.2s; font-family: 'Cairo', sans-serif; border-bottom: 1px solid transparent; padding-bottom: 4px; }
-        .field-node:hover { color: var(--gold); border-bottom-color: var(--gold); }
-        .article-viewport { margin-top: 230px; padding: 0 8% 100px; animation: fadeSlideUp 0.6s ease-out; }
-        @keyframes fadeSlideUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
-        .main-article-card { border-right: 4px solid var(--gold); background: linear-gradient(135deg, var(--card-bg), rgba(0,0,0,0.7)); padding: 40px; border-radius: 24px; backdrop-filter: blur(2px); }
-        .article-item { border-bottom: 1px solid #2a2a2a; margin-bottom: 30px; padding-bottom: 20px; }
-        .article-meta { display: flex; gap: 20px; font-size: 0.8rem; color: #aaa; margin: 8px 0; flex-wrap: wrap; }
-        .article-cats { display: flex; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
-        .cat-badge-sm { background: var(--gold-dim); padding: 2px 12px; border-radius: 20px; font-size: 0.7rem; }
-        .scroll-top { position: fixed; bottom: 30px; left: 30px; background: var(--gold); color: black; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; opacity: 0; transition: 0.3s; z-index: 9999; }
-        .scroll-top.visible { opacity: 1; }
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 10001; justify-content: center; align-items: center; }
-        .modal-content { background: #0c0c0c; border: 1px solid var(--gold); padding: 30px; border-radius: 24px; width: 90%; max-width: 600px; max-height: 80vh; overflow-y: auto; }
-        .close-modal { float: right; cursor: pointer; font-size: 1.5rem; }
-        .bottom-sections { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; margin: 60px 0 40px; }
-        .bottom-card { background: #0a0a0a; padding: 20px; border-radius: 20px; border: 1px solid #1f1f1f; }
-        .bottom-card h4 { color: var(--gold); margin-bottom: 15px; font-family: 'Cairo'; }
+        .logo { font-size: 2rem; font-weight: bold; color: var(--gold); font-family: 'Times New Roman', serif; }
+        .header-icons i { font-size: 1.4rem; margin-right: 20px; cursor: pointer; transition: 0.2s; }
+        .header-icons i:hover { color: var(--gold); }
+
+        /* شريط التبويبات الرئيسي */
+        .tabs-main {
+            position: fixed; top: 70px; width: 100%; background: #0a0a0a;
+            z-index: 1999; border-bottom: 1px solid #222; overflow-x: auto;
+            white-space: nowrap; padding: 10px 5%; scrollbar-width: thin;
+        }
+        .tab-btn {
+            display: inline-block; background: transparent; border: 1px solid #333;
+            color: #aaa; padding: 8px 20px; margin-left: 10px; border-radius: 30px;
+            cursor: pointer; transition: 0.2s; font-size: 0.9rem;
+        }
+        .tab-btn.active { background: var(--gold); color: #000; border-color: var(--gold); }
+
+        /* الشريط الفرعي (الفروع) */
+        .sub-tabs {
+            position: fixed; top: 125px; width: 100%; background: #0f0f0f;
+            z-index: 1998; border-bottom: 1px solid #2a2a2a;
+            overflow-x: auto; white-space: nowrap; padding: 8px 5%;
+            display: none; scrollbar-width: thin;
+        }
+        .sub-tabs.show { display: block; }
+        .sub-btn {
+            display: inline-block; background: transparent; border: none;
+            color: #aaa; padding: 5px 15px; margin-left: 8px; border-radius: 20px;
+            cursor: pointer; font-size: 0.8rem; transition: 0.2s;
+        }
+        .sub-btn.active { color: var(--gold); background: rgba(212,175,55,0.1); }
+
+        /* منطقة المحتوى */
+        .content-area {
+            margin-top: 180px; padding: 0 8% 50px;
+        }
+        .article-card {
+            background: var(--card-bg); border-radius: 16px; padding: 20px;
+            margin-bottom: 30px; border-right: 3px solid var(--gold);
+            position: relative; transition: 0.2s;
+        }
+        .article-title { font-size: 1.6rem; color: var(--gold); cursor: pointer; margin-bottom: 10px; }
+        .article-meta { display: flex; gap: 20px; font-size: 0.8rem; color: #aaa; margin-bottom: 12px; flex-wrap: wrap; }
+        .article-actions { position: absolute; top: 20px; left: 20px; }
+        .dots-btn { background: none; border: none; color: #aaa; font-size: 1.4rem; cursor: pointer; }
+        .dropdown-menu {
+            position: absolute; left: 0; top: 30px; background: #1a1a1a;
+            border: 1px solid #333; border-radius: 12px; padding: 8px 0;
+            z-index: 100; display: none; width: 150px; flex-direction: column;
+        }
+        .dropdown-menu.show { display: flex; }
+        .dropdown-menu button {
+            background: none; border: none; color: #eee; padding: 8px 15px;
+            text-align: right; cursor: pointer; width: 100%;
+        }
+        .dropdown-menu button:hover { background: #2a2a2a; color: var(--gold); }
+        .summary-btn {
+            background: rgba(212,175,55,0.2); border: 1px solid var(--gold);
+            color: var(--gold); padding: 6px 12px; border-radius: 20px;
+            cursor: pointer; margin-top: 10px; display: inline-block;
+        }
+
+        /* الأقسام السفلية */
+        .bottom-sections {
+            display: grid; grid-template-columns: repeat(3,1fr); gap: 20px;
+            margin-top: 60px; margin-bottom: 40px;
+        }
+        .bottom-card { background: #0a0a0a; padding: 20px; border-radius: 16px; border: 1px solid #222; }
+        .bottom-card h4 { color: var(--gold); margin-bottom: 15px; }
         .bottom-card ul { list-style: none; }
-        .bottom-card li { margin-bottom: 10px; cursor: pointer; border-bottom: 1px dashed #222; padding: 5px 0; }
-        footer { text-align: center; padding: 40px; opacity: 0.8; border-top: 1px solid #1a1a1a; margin-top: 20px; }
-        .footer-links { display: flex; gap: 30px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap; }
-        .footer-links span { cursor: pointer; font-size: 0.9rem; }
-        .user-controls { position: fixed; bottom: 30px; right: 30px; background: #1a1a1a; padding: 10px 15px; border-radius: 50px; display: flex; gap: 15px; z-index: 9998; border: 1px solid var(--gold-dim); }
-        .user-controls i { cursor: pointer; font-size: 1.2rem; }
-        .toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: var(--gold); color: black; padding: 10px 20px; border-radius: 30px; z-index: 10002; animation: fadeOut 3s forwards; }
-        @keyframes fadeOut { 0% { opacity: 1; } 70% { opacity: 1; } 100% { opacity: 0; visibility: hidden; } }
-        .focus-mode-active header, .focus-mode-active .tabs-nav, .focus-mode-active .sub-fields-bar, .focus-mode-active .bottom-sections, .focus-mode-active footer, .focus-mode-active .user-controls, .focus-mode-active .scroll-top { display: none !important; }
-        .focus-mode-active .article-viewport { margin-top: 20px; }
-        .toc { background: #1a1a1a; padding: 15px; border-radius: 15px; margin-bottom: 20px; }
-        .toc a { color: var(--gold); text-decoration: none; display: block; margin: 5px 0; }
-        
-        @media (max-width: 768px) { .bottom-sections { grid-template-columns: 1fr; } .logo { font-size: 1.6rem; } }
+        .bottom-card li { padding: 8px 0; border-bottom: 1px dashed #333; cursor: pointer; }
+        .bottom-card li:hover { color: var(--gold); }
+
+        footer { text-align: center; padding: 30px; border-top: 1px solid #222; color: #666; }
+        #vault-trigger { cursor: pointer; }
+
+        /* المودالات */
+        .modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95); z-index: 20000; justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: #111; border: 1px solid var(--gold); padding: 30px;
+            border-radius: 24px; width: 90%; max-width: 500px;
+        }
+        .search-input { width: 100%; padding: 12px; margin: 20px 0; background: #1a1a1a; border: 1px solid #333; color: white; border-radius: 30px; }
+        .search-result { padding: 10px; border-bottom: 1px solid #333; cursor: pointer; }
+        .search-result:hover { background: var(--gold); color: #000; }
+
+        .scroll-top {
+            position: fixed; bottom: 30px; left: 30px; background: var(--gold);
+            width: 45px; height: 45px; border-radius: 50%; display: flex;
+            align-items: center; justify-content: center; cursor: pointer;
+            opacity: 0; transition: 0.3s; z-index: 9999;
+        }
+        .scroll-top.visible { opacity: 1; }
+
+        @media (max-width: 768px) {
+            .content-area { padding: 0 5%; }
+            .bottom-sections { grid-template-columns: 1fr; }
+            .article-title { font-size: 1.3rem; }
+        }
     </style>
 </head>
 <body>
 
+<!-- شاشة الانتظار -->
 <div id="loading-screen">
     <div class="walking-man"></div>
-    <div class="progress-line"><div id="load-progress-fill" class="progress-fill-line"></div></div>
-    <div class="loading-text" id="loading-percent">0%</div>
+    <div class="progress-line"><div id="load-fill" class="progress-fill"></div></div>
+    <div style="margin-top: 15px;">جاري تجهيز السيادة...</div>
 </div>
 
-<div class="scrollable-container" id="scrollable-container">
-    <header id="awj-header">
-        <div class="logo">AWJ</div>
-        <div style="display: flex; align-items: center;">
-            <div class="header-controls">
-                <i class="fas fa-search-plus" id="header-font-plus" title="تكبير الخط"></i>
-                <i class="fas fa-search-minus" id="header-font-minus" title="تصغير الخط"></i>
-            </div>
-            <i class="fas fa-search search-icon" id="open-search-btn"></i>
-            <i class="fas fa-envelope subscribe-icon" id="open-subscribe-btn"></i>
-            <i class="fas fa-user-cog user-settings-icon" id="open-user-panel"></i>
-            <div style="color: var(--gold); font-family: 'Cairo'; margin-right: 15px;">سِيادة المَعنى</div>
-        </div>
-    </header>
-
-    <nav class="tabs-nav"><div class="tabs-wrapper" id="main-tabs"></div></nav>
-    <div id="sub-bar" class="sub-fields-bar"><div id="fields-list" class="fields-flex"></div></div>
-
-    <main class="article-viewport">
-        <div id="content-render" class="main-article-card">
-            <h1 style="font-size: 2.8rem; color: var(--gold);">أوج | منصة المعرفة السيادية</h1>
-            <p style="font-size: 1.2rem; line-height: 1.8; margin-top: 20px;">اختر قسماً من الأعلى لاستعراض المقالات.</p>
-        </div>
-    </main>
-
-    <div class="article-viewport" style="margin-top: 0;">
-        <div class="bottom-sections">
-            <div class="bottom-card"><h4>📰 مقالات ذات صلة</h4><ul id="related-posts"></ul></div>
-            <div class="bottom-card"><h4>🕒 أحدث المقالات</h4><ul id="latest-posts"></ul></div>
-            <div class="bottom-card"><h4>👑 الأكثر مشاهدة</h4><ul id="most-viewed-posts"></ul></div>
-        </div>
+<header>
+    <div class="logo">AWJ</div>
+    <div class="header-icons">
+        <i class="fas fa-search" id="search-icon"></i>
+        <i class="fas fa-envelope" id="subscribe-icon"></i>
     </div>
+</header>
 
-    <footer>
-        <div class="footer-links">
-            <span onclick="openStaticPage('about')">من نحن</span>
-            <span onclick="openStaticPage('privacy')">الخصوصية</span>
-            <span onclick="openStaticPage('cookies')">سياسة الكوكيز</span>
-            <span onclick="openStaticPage('terms')">شروط الاستخدام</span>
-        </div>
-        <p>جميع الحقوق محفوظة © <span id="vault-trigger">2026</span> | طاقة سيادية</p>
-    </footer>
+<!-- شريط التبويبات الرئيسي -->
+<div class="tabs-main" id="tabs-main"></div>
+
+<!-- شريط الفروع الفرعي -->
+<div class="sub-tabs" id="sub-tabs"></div>
+
+<!-- منطقة عرض المحتوى -->
+<div class="content-area" id="content-area">
+    <div id="articles-container"></div>
+    <div class="bottom-sections" id="bottom-sections">
+        <div class="bottom-card"><h4>📰 ذات صلة</h4><ul id="related-posts"></ul></div>
+        <div class="bottom-card"><h4>🕒 أحدث المقالات</h4><ul id="latest-posts"></ul></div>
+        <div class="bottom-card"><h4>👑 الأكثر مشاهدة</h4><ul id="most-viewed-posts"></ul></div>
+    </div>
 </div>
 
-<div class="user-controls">
-    <i id="theme-toggle" class="fas fa-moon" title="الوضع"></i>
-    <i id="focus-mode-btn" class="fas fa-expand" title="وضع التركيز"></i>
-    <i id="copy-format-btn" class="fas fa-copy" title="نسخ بتنسيق"></i>
-    <i id="share-btn" class="fas fa-share-alt" title="مشاركة"></i>
-    <i id="lucky-read-btn" class="fas fa-dice" title="آلة الحظ"></i>
-</div>
-
-<div id="scroll-top-btn" class="scroll-top"><i class="fas fa-arrow-up"></i></div>
+<footer>
+    <p>جميع الحقوق محفوظة © <span id="vault-trigger">2026</span> | أوج</p>
+</footer>
 
 <!-- المودالات -->
-<div id="static-modal" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal()">&times;</span><div id="static-content"></div></div></div>
-<div id="subscribe-modal" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal()">&times;</span><h3>📧 اشترك في النشرة السيادية</h3><input type="email" id="sub-email" placeholder="بريدك الإلكتروني"><button id="do-subscribe" style="background:var(--gold);color:#000;padding:10px 20px;margin-top:15px;border:none;border-radius:30px;">اشتراك</button><p id="sub-message"></p></div></div>
-<div id="search-modal" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal()">&times;</span><h3>🔍 بحث</h3><input type="text" id="search-query" class="search-input" placeholder="اكتب كلمة..."><div id="search-results-list"></div></div></div>
-<div id="user-panel-modal" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal()">&times;</span><h3>👤 لوحة المستخدم</h3><div id="user-stats"></div><hr><h4>🎨 تخصيص المظهر</h4><select id="bg-select"><option value="dark">داكن</option><option value="light">فاتح</option><option value="gold">ذهبي</option></select><h4>📝 اختيار الخط</h4><select id="font-select"><option value="Amiri">أميري</option><option value="Cairo">قاهرة</option><option value="Tajawal">تجوال</option></select><button id="save-settings">حفظ</button></div></div>
-<div id="donate-modal" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal()">&times;</span><h3>💝 دعم أوج عبر PayPal</h3><button onclick="window.open('https://paypal.me/yourusername','_blank')" style="background:var(--gold);color:#000;padding:10px;">تبرع الآن</button></div></div>
-<div id="manga-modal" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal()">&times;</span><h3>📖 مانجا المعرفة</h3><div id="manga-content"><img src="https://via.placeholder.com/300x200?text=Manga+Style" style="width:100%;border-radius:15px;"></div></div></div>
-<div id="achievement-modal" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal()">&times;</span><h3>🏆 إنجاز جديد!</h3><p id="achievement-text"></p></div></div>
-<div id="2fa-modal" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal()">&times;</span><h3>🔐 التحقق بخطوتين</h3><p>رمز التحقق: 123456 (تجريبي)</p><input type="text" id="2fa-code" placeholder="أدخل الرمز"><button onclick="verify2FA()">تحقق</button></div></div>
+<div id="search-modal" class="modal"><div class="modal-content"><i class="fas fa-times" style="float: left; cursor: pointer;" onclick="closeModal()"></i><h3>🔍 بحث</h3><input type="text" id="search-input" class="search-input" placeholder="اكتب كلمة..."><div id="search-results"></div></div></div>
+<div id="subscribe-modal" class="modal"><div class="modal-content"><i class="fas fa-times" style="float: left; cursor: pointer;" onclick="closeModal()"></i><h3>📧 اشترك في النشرة</h3><input type="email" id="sub-email" placeholder="بريدك الإلكتروني" style="width:100%; padding:10px; margin:15px 0;"><button id="do-subscribe" style="background:var(--gold); color:#000; border:none; padding:10px; width:100%; border-radius:30px;">اشتراك</button><div id="sub-msg"></div></div></div>
+<div id="summary-modal" class="modal"><div class="modal-content"><i class="fas fa-times" style="float: left; cursor: pointer;" onclick="closeModal()"></i><h3>📖 زبدة المقال</h3><div id="summary-content"></div></div></div>
+<div id="vault-modal" class="modal"><div class="modal-content"><i class="fas fa-times" style="float: left; cursor: pointer;" onclick="closeModal()"></i><h3>🔐 الخزنة السرية</h3><div id="vault-content"></div></div></div>
+
+<div class="scroll-top" id="scroll-top"><i class="fas fa-arrow-up"></i></div>
 
 <script>
-    // ----------------------------- شاشة التحميل -----------------------------
-    let loadProgress = 0;
-    const loadInterval = setInterval(() => {
-        loadProgress += Math.floor(Math.random() * 15) + 5;
-        if (loadProgress >= 100) loadProgress = 100;
-        document.getElementById('load-progress-fill').style.width = loadProgress + '%';
-        document.getElementById('loading-percent').innerText = loadProgress + '%';
-        if (loadProgress === 100) {
-            clearInterval(loadInterval);
-            setTimeout(() => { document.getElementById('loading-screen').style.opacity = '0'; setTimeout(() => { document.getElementById('loading-screen').style.display = 'none'; }, 1500); }, 500);
+    // إعدادات Firebase (من المستخدم)
+    const firebaseConfig = {
+        apiKey: "AIzaSyDjgVxvtPXTn1tpr4IxOK3wOW4r3gzB1VU",
+        authDomain: "awj-website-29f16.firebaseapp.com",
+        projectId: "awj-website-29f16",
+        storageBucket: "awj-website-29f16.firebasestorage.app",
+        messagingSenderId: "406747568578",
+        appId: "1:406747568578:web:741821d3c60df0011b5e5b",
+        measurementId: "G-DFB0GYH7LN"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    let allArticles = [];
+    let currentCategory = null;
+    let currentSub = null;
+    let activeDropdown = null;
+
+    // شاشة التحميل
+    let progress = 0;
+    const interval = setInterval(() => {
+        progress += Math.floor(Math.random() * 20) + 5;
+        if (progress >= 100) progress = 100;
+        document.getElementById('load-fill').style.width = progress + '%';
+        if (progress === 100) {
+            clearInterval(interval);
+            setTimeout(() => {
+                document.getElementById('loading-screen').style.opacity = '0';
+                setTimeout(() => document.getElementById('loading-screen').style.display = 'none', 1000);
+            }, 500);
         }
     }, 100);
 
-    // ----------------------------- البيانات والتخزين -----------------------------
-    let awjData = JSON.parse(localStorage.getItem('awj_logic')) || {};
-    let articles = JSON.parse(localStorage.getItem('awj_articles')) || [];
-    let userStats = JSON.parse(localStorage.getItem('user_stats')) || { readCount: 0, totalTime: 0, achievements: [] };
-    let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
-    let securityLogs = JSON.parse(localStorage.getItem('security_logs')) || [];
-    let viewHistory = JSON.parse(localStorage.getItem('view_history')) || [];
-    let currentTab = null, subTimer = null, focusMode = false;
-    
-    // تفضيلات القارئ
-    let userPreferences = JSON.parse(localStorage.getItem('user_preferences')) || { theme: 'dark', font: 'Amiri', fontSize: 16 };
-    function savePreferences() { localStorage.setItem('user_preferences', JSON.stringify(userPreferences)); applyPreferences(); }
-    function applyPreferences() {
-        document.body.className = '';
-        if (userPreferences.theme === 'light') document.body.classList.add('light-mode');
-        else if (userPreferences.theme === 'gold') document.body.classList.add('gold-mode');
-        document.body.style.fontFamily = `'${userPreferences.font}', serif`;
-        document.body.style.fontSize = userPreferences.fontSize + 'px';
-        if (document.getElementById('bg-select')) document.getElementById('bg-select').value = userPreferences.theme;
-        if (document.getElementById('font-select')) document.getElementById('font-select').value = userPreferences.font;
-    }
-    applyPreferences();
-    
-    // أزرار التكبير والتصغير (تعمل على الهيدر فقط)
-    document.getElementById('header-font-plus')?.addEventListener('click', () => {
-        userPreferences.fontSize = Math.min(28, userPreferences.fontSize + 2);
-        savePreferences();
-        showToast(`حجم الخط: ${userPreferences.fontSize}px`);
-    });
-    document.getElementById('header-font-minus')?.addEventListener('click', () => {
-        userPreferences.fontSize = Math.max(12, userPreferences.fontSize - 2);
-        savePreferences();
-        showToast(`حجم الخط: ${userPreferences.fontSize}px`);
-    });
-    
-    // دوال عامة
-    function showToast(msg) { let toast = document.createElement('div'); toast.className = 'toast'; toast.innerText = msg; document.body.appendChild(toast); setTimeout(() => toast.remove(), 3000); }
-    function addSecurityLog(action) { securityLogs.unshift({ time: new Date().toLocaleString(), action }); localStorage.setItem('security_logs', JSON.stringify(securityLogs.slice(0, 50))); }
-    function showAchievement(achieve) { if (!userStats.achievements.includes(achieve)) { userStats.achievements.push(achieve); localStorage.setItem('user_stats', JSON.stringify(userStats)); document.getElementById('achievement-text').innerText = achieve; document.getElementById('achievement-modal').style.display = 'flex'; showToast(`🏆 ${achieve}`); } }
-    function closeModal() { document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); }
-    window.closeModal = closeModal;
-    window.onclick = (e) => { if (e.target.classList.contains('modal')) closeModal(); };
-    
-    // عرض المقالات
-    function renderContent(title, bodyHtml) { document.getElementById('content-render').innerHTML = `<h1 style="font-size:2rem;color:var(--gold);">${title}</h1><div>${bodyHtml}</div>`; }
-    function renderArticlesList(articlesArray, title) {
-        let html = `<h1 style="font-size:2.2rem;color:var(--gold);">${title}</h1>`;
-        articlesArray.forEach(art => {
-            let isFav = favorites.includes(art.id);
-            html += `<div class="article-item"><div class="article-cats"><span class="cat-badge-sm">${art.category}</span><span class="cat-badge-sm">${art.subfield}</span></div>
-            <h2 style="cursor:pointer;color:var(--gold);" onclick="viewFullArticle(${art.id})">${art.title}</h2>
-            <div class="article-meta"><span><i class="fas fa-user"></i> ${art.author}</span><span><i class="fas fa-calendar"></i> ${art.date}</span><span><i class="fas fa-eye"></i> ${art.views || 0}</span>
-            <i class="fas fa-heart ${isFav ? 'fa-solid' : 'fa-regular'}" style="color:${isFav ? 'red' : '#aaa'};cursor:pointer;" onclick="toggleFavorite(${art.id})"></i></div>
-            <div>${art.content.substring(0, 200)}...</div>
-            <button onclick="viewFullArticle(${art.id})" style="margin-top:12px;">اقرأ المزيد</button></div>`;
+    // جلب المقالات من Firebase
+    async function fetchArticles() {
+        const snapshot = await db.collection('articles').orderBy('date', 'desc').get();
+        allArticles = [];
+        snapshot.forEach(doc => {
+            allArticles.push({ id: doc.id, ...doc.data() });
         });
-        document.getElementById('content-render').innerHTML = html;
+        renderTabs();
+        renderArticles(allArticles);
+        updateBottomSections();
     }
-    window.toggleFavorite = function(id) { 
-        if (favorites.includes(id)) favorites = favorites.filter(f => f !== id); else favorites.push(id); 
-        localStorage.setItem('favorites', JSON.stringify(favorites)); 
-        if (currentTab) renderArticlesList(articles.filter(a => a.category === currentTab), currentTab); 
-        showToast(favorites.includes(id) ? "❤️ أضيف للمفضلة" : "💔 أزيل من المفضلة"); 
-    };
-    window.viewFullArticle = function(id) {
-        let art = articles.find(a => a.id === id);
-        if (art) {
-            art.views = (art.views || 0) + 1; localStorage.setItem('awj_articles', JSON.stringify(articles));
-            if (!viewHistory.includes(id)) viewHistory.unshift(id); viewHistory = viewHistory.slice(0, 10); localStorage.setItem('view_history', JSON.stringify(viewHistory));
-            userStats.readCount++; localStorage.setItem('user_stats', JSON.stringify(userStats));
-            if (userStats.readCount === 5) showAchievement("قارئ ناشئ"); if (userStats.readCount === 20) showAchievement("قارئ ذهبي");
-            renderContent(art.title, `<div class="article-cats"><span class="cat-badge-sm">${art.category}</span><span class="cat-badge-sm">${art.subfield}</span></div>
-            <div class="article-meta"><span><i class="fas fa-user"></i> ${art.author}</span><span><i class="fas fa-calendar"></i> ${art.date}</span><span><i class="fas fa-eye"></i> ${art.views}</span>
-            <i class="fas fa-heart ${favorites.includes(id) ? 'fa-solid' : 'fa-regular'}" style="cursor:pointer;" onclick="toggleFavorite(${id})"></i>
-            <i class="fas fa-share-alt" style="cursor:pointer;" onclick="shareArticle('${art.title}')"></i>
-            <i class="fas fa-copy" style="cursor:pointer;" onclick="copyFormatted('${art.title}', '${art.author}')"></i></div>
-            <div>${art.content}</div>
-            <div style="margin-top:20px;"><button onclick="window.location.reload()">العودة</button>
-            <button onclick="donateNow()">💝 دعم</button></div>`);
-            updateBottomSections(id);
+
+    // استخراج التبويبات الفريدة (categories)
+    function getUniqueCategories() {
+        const cats = new Set();
+        allArticles.forEach(art => { if (art.category) cats.add(art.category); });
+        return Array.from(cats);
+    }
+
+    // عرض شريط التبويبات الرئيسي
+    function renderTabs() {
+        const container = document.getElementById('tabs-main');
+        const cats = getUniqueCategories();
+        if (cats.length === 0) {
+            container.innerHTML = '<button class="tab-btn" disabled>لا توجد تصنيفات</button>';
+            return;
         }
+        container.innerHTML = '';
+        cats.forEach(cat => {
+            const btn = document.createElement('button');
+            btn.textContent = cat;
+            btn.classList.add('tab-btn');
+            if (currentCategory === cat) btn.classList.add('active');
+            btn.onclick = () => selectCategory(cat, btn);
+            container.appendChild(btn);
+        });
+        if (!currentCategory && cats.length) selectCategory(cats[0], container.firstChild);
+    }
+
+    // اختيار تبويب رئيسي
+    function selectCategory(cat, btnElement) {
+        currentCategory = cat;
+        currentSub = null;
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        btnElement.classList.add('active');
+        // تحديث الشريط الفرعي
+        renderSubTabs(cat);
+        // تصفية المقالات حسب التبويب
+        const filtered = allArticles.filter(art => art.category === cat);
+        renderArticles(filtered);
+    }
+
+    // عرض الفروع الفرعية (subfields) للتبويب المختار
+    function renderSubTabs(category) {
+        const subContainer = document.getElementById('sub-tabs');
+        const subfieldsSet = new Set();
+        allArticles.forEach(art => {
+            if (art.category === category && art.subfield) subfieldsSet.add(art.subfield);
+        });
+        const subfields = Array.from(subfieldsSet);
+        if (subfields.length === 0) {
+            subContainer.classList.remove('show');
+            return;
+        }
+        subContainer.classList.add('show');
+        subContainer.innerHTML = '';
+        // زر "الكل" لعرض كل المقالات في هذا التبويب
+        const allBtn = document.createElement('button');
+        allBtn.textContent = 'الكل';
+        allBtn.classList.add('sub-btn');
+        if (currentSub === null) allBtn.classList.add('active');
+        allBtn.onclick = () => {
+            document.querySelectorAll('.sub-btn').forEach(b => b.classList.remove('active'));
+            allBtn.classList.add('active');
+            currentSub = null;
+            const filtered = allArticles.filter(art => art.category === category);
+            renderArticles(filtered);
+        };
+        subContainer.appendChild(allBtn);
+        subfields.forEach(sub => {
+            const btn = document.createElement('button');
+            btn.textContent = sub;
+            btn.classList.add('sub-btn');
+            if (currentSub === sub) btn.classList.add('active');
+            btn.onclick = () => {
+                document.querySelectorAll('.sub-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentSub = sub;
+                const filtered = allArticles.filter(art => art.category === category && art.subfield === sub);
+                renderArticles(filtered);
+            };
+            subContainer.appendChild(btn);
+        });
+    }
+
+    // عرض المقالات في الصفحة
+    function renderArticles(articles) {
+        const container = document.getElementById('articles-container');
+        if (!articles.length) {
+            container.innerHTML = '<p>لا توجد مقالات في هذا القسم.</p>';
+            return;
+        }
+        let html = '';
+        articles.forEach(art => {
+            html += `
+                <div class="article-card" data-id="${art.id}">
+                    <div class="article-actions">
+                        <button class="dots-btn" onclick="toggleDropdown(event, '${art.id}')"><i class="fas fa-ellipsis-v"></i></button>
+                        <div id="dropdown-${art.id}" class="dropdown-menu">
+                            <button onclick="copyLink('${art.id}')"><i class="fas fa-copy"></i> نسخ الرابط</button>
+                            <button onclick="shareArticle('${art.id}')"><i class="fas fa-share-alt"></i> مشاركة</button>
+                            <button onclick="focusArticle('${art.id}')"><i class="fas fa-expand"></i> وضع التركيز</button>
+                        </div>
+                    </div>
+                    <div class="article-title" onclick="viewFullArticle('${art.id}')">${art.title}</div>
+                    <div class="article-meta">
+                        <span><i class="fas fa-user"></i> ${art.author}</span>
+                        <span><i class="fas fa-calendar"></i> ${art.date ? new Date(art.date.toDate()).toLocaleDateString('ar-EG') : 'قديم'}</span>
+                        <span><i class="fas fa-eye"></i> ${art.views || 0}</span>
+                        <span><i class="fas fa-tag"></i> ${art.category} / ${art.subfield}</span>
+                    </div>
+                    <div>${art.content.substring(0, 200)}...</div>
+                    <button class="summary-btn" onclick="showSummary('${art.id}')"><i class="fas fa-lightbulb"></i> زبدة المقال</button>
+                </div>
+            `;
+        });
+        container.innerHTML = html;
+    }
+
+    // عرض المقال كاملًا وزيادة المشاهدات
+    window.viewFullArticle = async function(id) {
+        const article = allArticles.find(a => a.id === id);
+        if (!article) return;
+        // زيادة المشاهدات
+        await db.collection('articles').doc(id).update({
+            views: firebase.firestore.FieldValue.increment(1)
+        });
+        article.views = (article.views || 0) + 1;
+        // عرض المقال كاملاً في نفس المنطقة
+        document.getElementById('articles-container').innerHTML = `
+            <div class="article-card">
+                <div class="article-title">${article.title}</div>
+                <div class="article-meta">
+                    <span><i class="fas fa-user"></i> ${article.author}</span>
+                    <span><i class="fas fa-calendar"></i> ${article.date ? new Date(article.date.toDate()).toLocaleDateString('ar-EG') : 'قديم'}</span>
+                    <span><i class="fas fa-eye"></i> ${article.views}</span>
+                </div>
+                <div style="line-height: 1.8;">${article.content}</div>
+                <button onclick="location.reload()" style="margin-top:20px; background:var(--gold); color:#000; border:none; padding:8px 16px; border-radius:30px;">← العودة</button>
+            </div>
+        `;
+        updateBottomSections();
     };
-    function shareArticle(title) { if (navigator.share) navigator.share({ title, text: "اقرأ هذا المقال على أوج", url: location.href }); else showToast("المشاركة غير مدعومة"); }
-    function copyFormatted(title, author) { let text = `"${title}" - ${author}\nالمصدر: أوج\n${location.href}`; navigator.clipboard.writeText(text); showToast("تم نسخ النص مع المصدر"); }
-    function donateNow() { document.getElementById('donate-modal').style.display = 'flex'; }
-    
-    // وضع التركيز
-    document.getElementById('focus-mode-btn').onclick = () => { focusMode = !focusMode; document.body.classList.toggle('focus-mode-active', focusMode); showToast(focusMode ? "وضع التركيز مفعل" : "تم الخروج"); };
-    // الوضع الليلي
-    document.getElementById('theme-toggle').onclick = () => { let themes = ['dark', 'light', 'gold']; let idx = themes.indexOf(userPreferences.theme); userPreferences.theme = themes[(idx+1)%3]; savePreferences(); };
-    // آلة الحظ
-    document.getElementById('lucky-read-btn')?.addEventListener('click', () => { if (articles.length) { let r = articles[Math.floor(Math.random() * articles.length)]; viewFullArticle(r.id); showToast(`🎲 ${r.title}`); } else showToast("لا توجد مقالات"); });
-    // لوحة المستخدم
-    function updateUserPanel() { document.getElementById('user-stats').innerHTML = `<p>📚 مقروءة: ${userStats.readCount}</p><p>⭐ الإنجازات: ${userStats.achievements.join(', ') || 'لا يوجد'}</p><p>❤️ المفضلة: ${favorites.length}</p><p>👁️ سجل: ${viewHistory.length}</p>`; }
-    document.getElementById('open-user-panel').onclick = () => { updateUserPanel(); document.getElementById('user-panel-modal').style.display = 'flex'; };
-    document.getElementById('save-settings')?.addEventListener('click', () => { userPreferences.theme = document.getElementById('bg-select').value; userPreferences.font = document.getElementById('font-select').value; savePreferences(); closeModal(); showToast("تم حفظ التفضيلات"); });
-    
-    // الصفحات الثابتة
-    window.openStaticPage = function(page) {
-        let html = { about: '<h2>من نحن</h2><p>أوج منصة سيادية...</p>', privacy: '<h2>الخصوصية</h2><p>بياناتك مخزنة محلياً...</p>', cookies: '<h2>سياسة الكوكيز</h2><p>نستخدم localStorage...</p>', terms: '<h2>شروط الاستخدام</h2><p>النسخ محظور...</p>' }[page];
-        document.getElementById('static-content').innerHTML = html;
-        document.getElementById('static-modal').style.display = 'flex';
+
+    // زبدة المقال (مختصر)
+    window.showSummary = function(id) {
+        const article = allArticles.find(a => a.id === id);
+        if (!article) return;
+        const summary = article.content.substring(0, 300) + (article.content.length > 300 ? '...' : '');
+        document.getElementById('summary-content').innerHTML = `<p>${summary}</p><p style="margin-top:15px;"><strong>الخلاصة:</strong> هذا ملخص سريع للمقال. للقراءة الكاملة اضغط على عنوان المقال.</p>`;
+        document.getElementById('summary-modal').style.display = 'flex';
     };
-    
+
+    // نسخ الرابط
+    window.copyLink = function(id) {
+        const url = window.location.href.split('#')[0] + `?article=${id}`;
+        navigator.clipboard.writeText(url);
+        alert('تم نسخ رابط المقال');
+        closeDropdown();
+    };
+
+    // مشاركة
+    window.shareArticle = function(id) {
+        const article = allArticles.find(a => a.id === id);
+        if (navigator.share) {
+            navigator.share({ title: article.title, text: article.content.substring(0, 100), url: window.location.href });
+        } else {
+            alert('المشاركة غير مدعومة في هذا المتصفح، يمكنك نسخ الرابط');
+        }
+        closeDropdown();
+    };
+
+    // وضع التركيز (تكبير المقال)
+    window.focusArticle = function(id) {
+        const articleDiv = document.querySelector(`.article-card[data-id="${id}"]`);
+        if (articleDiv) {
+            articleDiv.style.position = 'fixed';
+            articleDiv.style.top = '50%';
+            articleDiv.style.left = '50%';
+            articleDiv.style.transform = 'translate(-50%, -50%)';
+            articleDiv.style.width = '90%';
+            articleDiv.style.maxWidth = '800px';
+            articleDiv.style.zIndex = '30000';
+            articleDiv.style.backgroundColor = '#111';
+            articleDiv.style.overflow = 'auto';
+            articleDiv.style.maxHeight = '90vh';
+            // إغلاق عند النقر خارجاً
+            const closeFocus = (e) => {
+                if (!articleDiv.contains(e.target)) {
+                    articleDiv.style.position = '';
+                    articleDiv.style.top = '';
+                    articleDiv.style.left = '';
+                    articleDiv.style.transform = '';
+                    articleDiv.style.width = '';
+                    articleDiv.style.zIndex = '';
+                    articleDiv.style.backgroundColor = '';
+                    document.removeEventListener('click', closeFocus);
+                }
+            };
+            setTimeout(() => document.addEventListener('click', closeFocus), 100);
+        }
+        closeDropdown();
+    };
+
+    // قائمة ثلاث نقاط
+    window.toggleDropdown = function(event, id) {
+        event.stopPropagation();
+        const dropdown = document.getElementById(`dropdown-${id}`);
+        if (activeDropdown && activeDropdown !== dropdown) activeDropdown.classList.remove('show');
+        dropdown.classList.toggle('show');
+        activeDropdown = dropdown.classList.contains('show') ? dropdown : null;
+    };
+    function closeDropdown() {
+        if (activeDropdown) activeDropdown.classList.remove('show');
+        activeDropdown = null;
+    }
+    document.addEventListener('click', closeDropdown);
+
+    // تحديث الأقسام السفلية (ذات صلة، أحدث، الأكثر مشاهدة)
+    async function updateBottomSections() {
+        // أحدث المقالات (حسب id أو date)
+        const latest = [...allArticles].sort((a,b) => b.date?.toMillis() - a.date?.toMillis()).slice(0,5);
+        // الأكثر مشاهدة
+        const mostViewed = [...allArticles].sort((a,b) => (b.views||0) - (a.views||0)).slice(0,5);
+        // ذات صلة (نأخذ آخر 5 مقالات من نفس التصنيف الحالي أو عشوائي)
+        let related = [];
+        if (currentCategory) {
+            related = allArticles.filter(a => a.category === currentCategory).slice(0,5);
+        } else {
+            related = allArticles.slice(0,5);
+        }
+        document.getElementById('latest-posts').innerHTML = latest.map(a => `<li onclick="viewFullArticle('${a.id}')">${a.title}</li>`).join('');
+        document.getElementById('most-viewed-posts').innerHTML = mostViewed.map(a => `<li onclick="viewFullArticle('${a.id}')">${a.title} (${a.views||0})</li>`).join('');
+        document.getElementById('related-posts').innerHTML = related.map(a => `<li onclick="viewFullArticle('${a.id}')">${a.title}</li>`).join('');
+    }
+
     // البحث
-    function performSearch() { let q = document.getElementById('search-query').value.toLowerCase(); let res = articles.filter(a => a.title.includes(q) || a.content.includes(q)); document.getElementById('search-results-list').innerHTML = res.length ? res.map(a => `<div class="search-result" onclick="viewFullArticle(${a.id}); closeModal();">${a.title}</div>`).join('') : '<p>لا نتائج</p>'; }
-    document.getElementById('search-query')?.addEventListener('input', performSearch);
-    document.getElementById('open-search-btn').onclick = () => document.getElementById('search-modal').style.display = 'flex';
-    document.getElementById('open-subscribe-btn').onclick = () => document.getElementById('subscribe-modal').style.display = 'flex';
-    document.getElementById('do-subscribe').onclick = () => { let email = document.getElementById('sub-email').value; if(email) { localStorage.setItem('subscriber_email', email); showToast("تم الاشتراك!"); closeModal(); } };
-    
-    // منع التصيد والشاشة المتصدعة
-    function crackedScreen() { let div = document.createElement('div'); div.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:radial-gradient(circle,#000 2%,transparent 3%);background-size:30px 30px;z-index:99999;pointer-events:none'; document.body.appendChild(div); setTimeout(() => div.remove(), 2000); addSecurityLog("تم تفعيل الشاشة المتصدعة"); }
-    document.addEventListener('keydown', (e) => { if (e.key === 'F12') { e.preventDefault(); crackedScreen(); } });
-    
-    // التحقق بخطوتين للخزنة (المستخدمة لفتح admin)
-    let vaultUnlocked = false;
-    window.verify2FA = function() { let code = document.getElementById('2fa-code')?.value; if (code === '123456') { vaultUnlocked = true; closeModal(); showToast("🔓 تم فتح الخزنة"); } else alert("رمز خاطئ"); };
-    
-    // زر 2026: فتح admin.html بعد التحقق
-    let clickCount2026 = 0;
-    document.getElementById('vault-trigger').onclick = () => {
-        clickCount2026++;
-        setTimeout(() => clickCount2026 = 0, 1500);
-        if (clickCount2026 === 3) {
-            if (!vaultUnlocked) {
-                document.getElementById('2fa-modal').style.display = 'flex';
-                addSecurityLog("محاولة فتح الخزنة - طلب 2FA");
-            } else {
-                let pass = prompt("شَفَرَةُ العُبُورِ:");
-                if (pass === "@...Alshanfricc_1998...@") {
-                    // فتح admin.html في نفس التبويب
-                    window.location.href = 'admin.html';
-                } else alert("شَفَرَةٌ خَاطِئَةٌ");
-            }
-            clickCount2026 = 0;
+    function performSearch() {
+        const query = document.getElementById('search-input').value.toLowerCase();
+        const results = allArticles.filter(a => a.title.includes(query) || a.content.includes(query));
+        const resultsDiv = document.getElementById('search-results');
+        if (results.length === 0) resultsDiv.innerHTML = '<p>لا نتائج</p>';
+        else resultsDiv.innerHTML = results.map(a => `<div class="search-result" onclick="viewFullArticle('${a.id}'); closeModal();">${a.title} - ${a.author}</div>`).join('');
+    }
+    document.getElementById('search-input')?.addEventListener('input', performSearch);
+
+    // الاشتراك (محاكاة)
+    document.getElementById('do-subscribe')?.addEventListener('click', () => {
+        const email = document.getElementById('sub-email').value;
+        if (email.includes('@')) {
+            document.getElementById('sub-msg').innerHTML = '<p style="color:green;">✅ تم الاشتراك بنجاح</p>';
+            setTimeout(() => closeModal(), 1500);
+        } else {
+            document.getElementById('sub-msg').innerHTML = '<p style="color:red;">❌ بريد غير صالح</p>';
         }
-    };
-    
-    // أزرار التنقل والتبويبات
-    function switchTab(tabId, btn) { currentTab = tabId; document.querySelectorAll('.tab-item').forEach(b => b.classList.remove('active')); btn.classList.add('active'); renderArticlesList(articles.filter(a => a.category === tabId), tabId); }
-    function renderTabs() { let container = document.getElementById('main-tabs'); let tabs = Object.keys(awjData); if (!tabs.length) awjData = { "الحكمة": ["فلسفة"], "الاستراتيجية": ["جيوسياسة"] }; localStorage.setItem('awj_logic', JSON.stringify(awjData)); container.innerHTML = tabs.map(t => `<button class="tab-item" data-tab="${t}" onclick="switchTab('${t}', this)">${t}</button>`).join(''); if (tabs.length) switchTab(tabs[0], document.querySelector('.tab-item')); }
-    function updateBottomSections(currentId = null) { let latest = [...articles].sort((a,b) => b.id - a.id).slice(0,5); let most = [...articles].sort((a,b) => (b.views||0)-(a.views||0)).slice(0,5); let related = currentId ? articles.filter(a => a.id !== currentId && a.category === articles.find(x=>x.id===currentId)?.category).slice(0,5) : articles.slice(0,5); document.getElementById('related-posts').innerHTML = related.map(a => `<li onclick="viewFullArticle(${a.id})">${a.title}</li>`).join(''); document.getElementById('latest-posts').innerHTML = latest.map(a => `<li onclick="viewFullArticle(${a.id})">${a.title}</li>`).join(''); document.getElementById('most-viewed-posts').innerHTML = most.map(a => `<li onclick="viewFullArticle(${a.id})">${a.title} (${a.views||0})</li>`).join(''); }
-    
+    });
+
+    // المودالات
+    function closeModal() { document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); }
+    document.getElementById('search-icon').onclick = () => { document.getElementById('search-modal').style.display = 'flex'; document.getElementById('search-input').value = ''; document.getElementById('search-results').innerHTML = ''; };
+    document.getElementById('subscribe-icon').onclick = () => { document.getElementById('subscribe-modal').style.display = 'flex'; };
+    window.closeModal = closeModal;
+
     // زر الرجوع للأعلى
-    const scrollContainer = document.getElementById('scrollable-container');
-    const scrollBtn = document.getElementById('scroll-top-btn');
-    scrollContainer?.addEventListener('scroll', () => { if (scrollContainer.scrollTop > 300) scrollBtn.classList.add('visible'); else scrollBtn.classList.remove('visible'); });
-    scrollBtn.onclick = () => scrollContainer?.scrollTo({ top: 0, behavior: 'smooth' });
-    
-    // بدء التشغيل
-    renderTabs();
-    updateBottomSections();
-    addSecurityLog("تم تحميل الموقع الرئيسي");
-    showToast("مرحباً في أوج");
+    const scrollBtn = document.getElementById('scroll-top');
+    window.onscroll = () => { if (window.scrollY > 300) scrollBtn.classList.add('visible'); else scrollBtn.classList.remove('visible'); };
+    scrollBtn.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    // زر 2026 (الخزنة السرية)
+    let clickCount = 0;
+    document.getElementById('vault-trigger').addEventListener('click', () => {
+        clickCount++;
+        setTimeout(() => clickCount = 0, 1500);
+        if (clickCount === 3) {
+            const pass = prompt("شَفَرَةُ العُبُورِ:");
+            if (pass === "@...Alshanfricc_1998...@") {
+                document.getElementById('vault-content').innerHTML = `<h3>🔓 مرحباً أيها السيد</h3><p>عدد المقالات: ${allArticles.length}</p><p>التصنيفات: ${getUniqueCategories().join(', ')}</p>`;
+                document.getElementById('vault-modal').style.display = 'flex';
+            } else alert("شَفَرَةٌ خَاطِئَةٌ.");
+            clickCount = 0;
+        }
+    });
+
+    // بدء التحميل
+    fetchArticles();
 </script>
 </body>
 </html>

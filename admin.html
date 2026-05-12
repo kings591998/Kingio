@@ -2,13 +2,13 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>لوحة تحكم أوج - متكاملة</title>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/dark.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -42,7 +42,6 @@
 </head>
 <body>
 <div class="container">
-    <!-- قسم تسجيل الدخول -->
     <div id="login-section" class="card">
         <h2>🔐 دخول الإدارة</h2>
         <input type="email" id="login-email" placeholder="البريد الإلكتروني">
@@ -51,9 +50,7 @@
         <div id="login-msg" class="message"></div>
     </div>
 
-    <!-- قسم الإدارة (يظهر بعد الدخول) -->
     <div id="admin-section" style="display: none;">
-        <!-- إدارة التبويبات والفروع -->
         <div class="card">
             <h2><i class="fas fa-folder-tree"></i> إدارة التبويبات والفروع</h2>
             <div class="flex">
@@ -63,7 +60,6 @@
             <div id="categories-list"></div>
         </div>
 
-        <!-- إدارة الكتّاب -->
         <div class="card">
             <h2><i class="fas fa-users"></i> إدارة الكتّاب</h2>
             <div class="flex">
@@ -73,26 +69,16 @@
             <div id="authors-list"></div>
         </div>
 
-        <!-- محرر الكتل المتقدم -->
         <div class="card">
             <h2><i class="fas fa-feather-alt"></i> محرر المقال المتقدم</h2>
             <label>عنوان المقال</label>
             <input type="text" id="article-title" placeholder="العنوان الرئيسي">
-            
             <label>اختر الكاتب</label>
             <select id="author-select"></select>
-            
             <div class="flex">
-                <div style="flex:1;">
-                    <label>اختر التبويبة</label>
-                    <select id="category-select"></select>
-                </div>
-                <div style="flex:1;">
-                    <label>اختر الفرع</label>
-                    <select id="subfield-select"></select>
-                </div>
+                <div style="flex:1;"><label>اختر التبويبة</label><select id="category-select"></select></div>
+                <div style="flex:1;"><label>اختر الفرع</label><select id="subfield-select"></select></div>
             </div>
-            
             <div id="blocks-container"></div>
             <div class="flex">
                 <button onclick="addBlock('text')"><i class="fas fa-paragraph"></i> نص</button>
@@ -127,7 +113,6 @@
     let authorsData = [];
     let blocks = [];
 
-    // ------------------- المصادقة -------------------
     auth.onAuthStateChanged(user => {
         if (user) {
             document.getElementById('login-section').style.display = 'none';
@@ -156,7 +141,7 @@
         setTimeout(() => el.className = 'message', 3000);
     }
 
-    // ------------------- إدارة التبويبات -------------------
+    // التبويبات
     async function loadCategories() {
         const snap = await db.collection('categories').orderBy('name').get();
         categoriesData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -171,10 +156,10 @@
             container.innerHTML += `
                 <div style="background:#1a1a1a; padding:15px; border-radius:16px; margin-bottom:15px;">
                     <div class="flex" style="justify-content:space-between;">
-                        <h3>📁 ${cat.name}</h3>
+                        <h3>📁 ${escapeHtml(cat.name)}</h3>
                         <button class="btn-small" onclick="deleteCategory('${cat.id}')">حذف التبويبة</button>
                     </div>
-                    <div>${cat.subfields.map(sub => `<span class="sub-item">${sub} <i class="fas fa-times-circle" style="cursor:pointer;" onclick="removeSubfield('${cat.id}', '${sub}')"></i></span>`).join('')}</div>
+                    <div>${cat.subfields.map(sub => `<span class="sub-item">${escapeHtml(sub)} <i class="fas fa-times-circle" style="cursor:pointer;" onclick="removeSubfield('${cat.id}', '${sub}')"></i></span>`).join('')}</div>
                     <div class="flex"><input type="text" id="new-sub-${cat.id}" placeholder="فرع جديد"><button class="btn-small" onclick="addSubfield('${cat.id}')">إضافة فرع</button></div>
                 </div>
             `;
@@ -208,16 +193,16 @@
         const catSelect = document.getElementById('category-select');
         const subSelect = document.getElementById('subfield-select');
         catSelect.innerHTML = '<option value="">اختر التبويبة</option>';
-        categoriesData.forEach(cat => catSelect.innerHTML += `<option value="${cat.name}">${cat.name}</option>`);
+        categoriesData.forEach(cat => catSelect.innerHTML += `<option value="${cat.name}">${escapeHtml(cat.name)}</option>`);
         catSelect.onchange = () => {
             const selectedCat = catSelect.value;
             const cat = categoriesData.find(c=>c.name === selectedCat);
             subSelect.innerHTML = '<option value="">اختر الفرع</option>';
-            if(cat && cat.subfields) cat.subfields.forEach(sub => subSelect.innerHTML += `<option value="${sub}">${sub}</option>`);
+            if(cat && cat.subfields) cat.subfields.forEach(sub => subSelect.innerHTML += `<option value="${sub}">${escapeHtml(sub)}</option>`);
         };
     }
 
-    // ------------------- إدارة الكتّاب -------------------
+    // الكتّاب
     async function loadAuthors() {
         const snap = await db.collection('authors').orderBy('name').get();
         authorsData = snap.docs.map(d => ({ id: d.id, name: d.data().name }));
@@ -227,7 +212,7 @@
     function renderAuthorsList() {
         const container = document.getElementById('authors-list');
         if (!authorsData.length) { container.innerHTML = '<p>لا يوجد كتاب. أضف كاتباً.</p>'; return; }
-        container.innerHTML = authorsData.map(a => `<div class="flex" style="justify-content:space-between; margin:5px 0;"><span>✍️ ${a.name}</span><button class="btn-small btn-danger" onclick="deleteAuthor('${a.id}')">حذف</button></div>`).join('');
+        container.innerHTML = authorsData.map(a => `<div class="flex" style="justify-content:space-between; margin:5px 0;"><span>✍️ ${escapeHtml(a.name)}</span><button class="btn-small btn-danger" onclick="deleteAuthor('${a.id}')">حذف</button></div>`).join('');
     }
     window.addAuthor = async () => {
         const name = document.getElementById('new-author-name').value.trim();
@@ -240,10 +225,10 @@
     function updateAuthorSelect() {
         const select = document.getElementById('author-select');
         select.innerHTML = '<option value="">اختر الكاتب</option>';
-        authorsData.forEach(a => select.innerHTML += `<option value="${a.name}">${a.name}</option>`);
+        authorsData.forEach(a => select.innerHTML += `<option value="${a.name}">${escapeHtml(a.name)}</option>`);
     }
 
-    // ------------------- محرر الكتل -------------------
+    // محرر الكتل
     function addBlock(type) {
         let newBlock = { type, value: '' };
         if (type === 'text') newBlock.value = '';
@@ -263,7 +248,7 @@
         if (typeof blocks[index].value === 'string') blocks[index].value = value;
         else blocks[index].value[field] = value;
         saveBlocksToLocal();
-        renderBlocks(); // لإعادة عرض المعاينة
+        renderBlocks();
     }
     async function uploadImage(file, index) {
         if (!file) return;
@@ -333,13 +318,12 @@
     }
     function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, function(m){if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
 
-    // ------------------- نشر المقال -------------------
+    // نشر المقال
     window.publishArticle = async () => {
         const title = document.getElementById('article-title').value.trim();
         const author = document.getElementById('author-select').value;
         const category = document.getElementById('category-select').value;
         const subfield = document.getElementById('subfield-select').value;
-
         if (!title || !author || !category || !subfield || blocks.length === 0) {
             showMsg('publish-msg', '❌ العنوان، الكاتب، التبويبة، الفرع، وكتلة واحدة على الأقل مطلوبة', 'error');
             return;

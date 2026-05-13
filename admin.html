@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة تحكم أوج - متكاملة</title>
+    <title>أوج | لوحة القيادة</title>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
@@ -13,101 +13,245 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: #0a0a0a; color: #eee; font-family: 'Segoe UI', sans-serif; padding: 20px; direction: rtl; }
-        .container { max-width: 1100px; margin: auto; }
-        .card { background: #111; border: 1px solid #D4AF37; border-radius: 24px; padding: 25px; margin-bottom: 30px; }
-        h2, h3 { color: #D4AF37; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px; }
-        label { display: block; margin-top: 15px; font-weight: bold; }
-        input, select, textarea { width: 100%; padding: 12px; margin: 8px 0 15px; background: #1a1a1a; border: 1px solid #333; color: white; border-radius: 12px; }
-        button { background: #D4AF37; color: #000; padding: 10px 20px; border: none; border-radius: 30px; cursor: pointer; font-weight: bold; margin: 5px; }
-        .btn-small { background: #333; color: #D4AF37; padding: 6px 15px; font-size: 0.8rem; }
-        .btn-danger { background: #c62828; color: white; }
-        .block {
-            background: #1a1a1a;
-            border: 1px solid #2a2a2a;
-            border-radius: 16px;
-            padding: 15px;
-            margin-bottom: 15px;
-            position: relative;
-            width: 100%;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
+
+        body {
+            background: #0a0a0a;
+            color: #e0e0e0;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            padding: 30px 20px;
+            direction: rtl;
+        }
+
+        .dashboard {
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: #111;
+            border-radius: 28px;
+            border: 1px solid #D4AF37;
+            padding: 28px;
+            margin-bottom: 32px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+        }
+
+        .card h2, .card h3 {
+            color: #D4AF37;
+            border-bottom: 1px solid #2a2a2a;
+            padding-bottom: 10px;
+            margin-bottom: 22px;
+            font-weight: 600;
+        }
+
+        .grid-2col {
+            display: flex;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+
+        .grid-2col > div {
+            flex: 1;
+            min-width: 240px;
+        }
+
+        label {
+            display: block;
+            margin-top: 18px;
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: #bbb;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 14px;
+            background: #1e1e1e;
+            border: 1px solid #333;
+            border-radius: 16px;
+            color: white;
+            font-size: 0.95rem;
+            transition: 0.2s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: #D4AF37;
+            outline: none;
+        }
+
+        button {
+            background: #D4AF37;
+            color: #000;
+            border: none;
+            padding: 10px 22px;
+            border-radius: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+            margin: 5px 0;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(212,175,55,0.3);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #D4AF37;
+            color: #D4AF37;
+        }
+
+        .block-editor {
+            background: #0f0f0f;
+            border: 1px solid #2a2a2a;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
         .block-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
             cursor: move;
         }
-        .block-type { color: #D4AF37; font-size: 0.8rem; }
-        .delete-block { background: none; border: none; color: #ff8888; cursor: pointer; font-size: 1.2rem; }
-        .image-preview { max-width: 100%; max-height: 200px; margin: 10px 0; border-radius: 12px; display: block; }
-        .flex { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
-        .message { margin-top: 15px; padding: 10px; border-radius: 12px; text-align: center; display: none; }
-        .success { background: #2e7d32; display: block; }
-        .error { background: #c62828; display: block; }
-        hr { margin: 20px 0; border-color: #333; }
-        .sub-item { background: #2a2a2a; display: inline-block; padding: 4px 12px; border-radius: 20px; margin: 3px; }
-        pre { background: #2d2d2d; padding: 12px; border-radius: 8px; overflow-x: auto; position: relative; }
-        pre code { font-family: monospace; }
-        .code-copy-btn { position: absolute; top: 5px; left: 10px; background: #D4AF37; color: black; border: none; border-radius: 5px; padding: 2px 8px; font-size: 0.7rem; cursor: pointer; }
+
+        .block-type {
+            background: #2a2a2a;
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            color: #D4AF37;
+        }
+
+        .delete-block {
+            background: none;
+            border: none;
+            color: #ff7777;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+
+        .image-preview {
+            max-width: 100%;
+            max-height: 200px;
+            margin: 12px 0;
+            border-radius: 16px;
+        }
+
+        .flex-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+            margin: 10px 0;
+        }
+
+        .message {
+            padding: 12px;
+            border-radius: 40px;
+            text-align: center;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .success {
+            background: #2e7d32;
+            display: block;
+        }
+
+        .error {
+            background: #c62828;
+            display: block;
+        }
+
+        .sub-item {
+            background: #2a2a2a;
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 30px;
+            margin: 3px;
+            font-size: 0.8rem;
+        }
+
+        pre {
+            background: #1e1e1e;
+            padding: 10px;
+            border-radius: 14px;
+            overflow-x: auto;
+            margin-top: 10px;
+        }
+
+        hr {
+            border-color: #2a2a2a;
+            margin: 20px 0;
+        }
     </style>
 </head>
 <body>
-<div class="container">
-    <div id="login-section" class="card">
-        <h2>🔐 دخول الإدارة</h2>
-        <input type="email" id="login-email" placeholder="البريد الإلكتروني">
-        <input type="password" id="login-password" placeholder="كلمة المرور">
-        <button onclick="login()">تسجيل الدخول</button>
+<div class="dashboard">
+    <!-- قسم تسجيل الدخول -->
+    <div id="login-box" class="card" style="max-width: 500px; margin: 50px auto;">
+        <h2>🔐 الدخول إلى القيادة</h2>
+        <input type="email" id="admin-email" placeholder="البريد الإلكتروني">
+        <input type="password" id="admin-pwd" placeholder="كلمة المرور">
+        <button onclick="adminLogin()" style="width:100%;">تسجيل الدخول</button>
         <div id="login-msg" class="message"></div>
     </div>
 
-    <div id="admin-section" style="display: none;">
+    <!-- لوحة التحكم المخفية حتى تسجيل الدخول -->
+    <div id="admin-panel" style="display: none;">
         <div class="card">
-            <h2><i class="fas fa-folder-tree"></i> إدارة التبويبات والفروع</h2>
-            <div class="flex">
-                <input type="text" id="new-cat-name" placeholder="اسم التبويبة الجديدة" style="flex:2;">
-                <button onclick="addCategory()">➕ إضافة تبويبة</button>
+            <h2><i class="fas fa-folder-open"></i> إدارة التبويبات والفروع</h2>
+            <div class="flex-row">
+                <input type="text" id="new-cat" placeholder="اسم تبويبة جديدة" style="flex:2;">
+                <button onclick="addCategory()">➕ إضافة</button>
             </div>
-            <div id="categories-list"></div>
+            <div id="categories-container"></div>
         </div>
 
         <div class="card">
             <h2><i class="fas fa-users"></i> إدارة الكتّاب</h2>
-            <div class="flex">
-                <input type="text" id="new-author-name" placeholder="اسم كاتب جديد" style="flex:2;">
+            <div class="flex-row">
+                <input type="text" id="new-author" placeholder="اسم كاتب جديد" style="flex:2;">
                 <button onclick="addAuthor()">➕ إضافة كاتب</button>
             </div>
-            <div id="authors-list"></div>
+            <div id="authors-container"></div>
         </div>
 
         <div class="card">
             <h2><i class="fas fa-feather-alt"></i> محرر المقال المتقدم</h2>
             <label>عنوان المقال</label>
-            <input type="text" id="article-title" placeholder="العنوان الرئيسي">
-            <label>اختر الكاتب</label>
-            <select id="author-select"></select>
-            <div class="flex">
-                <div style="flex:1;"><label>اختر التبويبة</label><select id="category-select"></select></div>
-                <div style="flex:1;"><label>اختر الفرع</label><select id="subfield-select"></select></div>
+            <input type="text" id="post-title" placeholder="العنوان الرئيسي">
+            <div class="grid-2col">
+                <div><label>اختر الكاتب</label><select id="post-author"></select></div>
+                <div><label>التبويبة</label><select id="post-category"></select></div>
+                <div><label>المجال الفرعي</label><select id="post-subfield"></select></div>
             </div>
             <div id="blocks-container"></div>
-            <div class="flex">
-                <button onclick="addBlock('text')"><i class="fas fa-paragraph"></i> نص</button>
+            <div class="flex-row">
+                <button onclick="addBlock('text')"><i class="fas fa-paragraph"></i> نص (HTML)</button>
                 <button onclick="addBlock('image')"><i class="fas fa-image"></i> صورة</button>
-                <button onclick="addBlock('code')"><i class="fas fa-code"></i> كود</button>
+                <button onclick="addBlock('code')"><i class="fas fa-code"></i> كود (10+ لغة)</button>
                 <button onclick="addBlock('summary')"><i class="fas fa-lightbulb"></i> مختصر المقال</button>
             </div>
             <hr>
-            <button onclick="publishArticle()" style="width: 100%;">🚀 نشر المقال</button>
-            <div id="publish-msg" class="message"></div>
+            <button onclick="publishNewArticle()" style="width:100%;">🚀 نشر المقال</button>
+            <div id="publish-status" class="message"></div>
         </div>
-        <button onclick="logout()" style="background:#333;">تسجيل الخروج</button>
+        <button onclick="adminLogout()" class="btn-outline" style="background:transparent;">تسجيل الخروج</button>
     </div>
 </div>
 
 <script>
+    // Firebase config (نفس البيانات)
     const firebaseConfig = {
         apiKey: "AIzaSyDjgVxvtPXTn1tpr4IxOK3wOW4r3gzB1VU",
         authDomain: "awj-website-29f16.firebaseapp.com",
@@ -122,272 +266,235 @@
     const auth = firebase.auth();
     const storage = firebase.storage();
 
-    let categoriesData = [];
-    let authorsData = [];
-    let blocks = [];
+    let categoriesList = [];
+    let authorsList = [];
+    let contentBlocks = [];
 
+    // مراقبة تسجيل الدخول
     auth.onAuthStateChanged(user => {
         if (user) {
-            document.getElementById('login-section').style.display = 'none';
-            document.getElementById('admin-section').style.display = 'block';
+            document.getElementById('login-box').style.display = 'none';
+            document.getElementById('admin-panel').style.display = 'block';
             loadCategories();
             loadAuthors();
-            loadBlocksFromLocal();
+            loadLocalBlocks();
         } else {
-            document.getElementById('login-section').style.display = 'block';
-            document.getElementById('admin-section').style.display = 'none';
+            document.getElementById('login-box').style.display = 'block';
+            document.getElementById('admin-panel').style.display = 'none';
         }
     });
 
-    window.login = async () => {
-        const email = document.getElementById('login-email').value;
-        const pwd = document.getElementById('login-password').value;
+    window.adminLogin = async () => {
+        const email = document.getElementById('admin-email').value;
+        const pwd = document.getElementById('admin-pwd').value;
         try {
             await auth.signInWithEmailAndPassword(email, pwd);
-        } catch (e) { showMsg('login-msg', '❌ '+e.message, 'error'); }
+        } catch (e) {
+            showMsg('login-msg', '❌ فشل الدخول: ' + e.message, 'error');
+        }
     };
-    window.logout = () => auth.signOut();
-
-    function showMsg(id, text, type) {
-        const el = document.getElementById(id);
-        el.textContent = text; el.className = `message ${type}`;
-        setTimeout(() => el.className = 'message', 3000);
+    window.adminLogout = () => auth.signOut();
+    function showMsg(elId, text, type) {
+        const el = document.getElementById(elId);
+        el.textContent = text;
+        el.className = `message ${type}`;
+        setTimeout(() => el.className = 'message', 3500);
     }
 
-    // التبويبات
+    // ---------- إدارة التبويبات ----------
     async function loadCategories() {
         const snap = await db.collection('categories').orderBy('name').get();
-        categoriesData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-        renderCategoriesList();
+        categoriesList = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        renderCategoriesUI();
         updateCategorySelects();
     }
-    function renderCategoriesList() {
-        const container = document.getElementById('categories-list');
-        if (!categoriesData.length) { container.innerHTML = '<p>لا توجد تبويبات. أضف تبويبة أولاً.</p>'; return; }
+    function renderCategoriesUI() {
+        const container = document.getElementById('categories-container');
+        if (!categoriesList.length) { container.innerHTML = '<p>لا توجد تبويبات. أضف الأولى.</p>'; return; }
         container.innerHTML = '';
-        categoriesData.forEach(cat => {
+        categoriesList.forEach(cat => {
             container.innerHTML += `
-                <div style="background:#1a1a1a; padding:15px; border-radius:16px; margin-bottom:15px;">
-                    <div class="flex" style="justify-content:space-between;">
+                <div style="background:#1a1a1a; border-radius:18px; padding:15px; margin-bottom:15px;">
+                    <div class="flex-row" style="justify-content:space-between;">
                         <h3>📁 ${escapeHtml(cat.name)}</h3>
-                        <button class="btn-small" onclick="deleteCategory('${cat.id}')">حذف التبويبة</button>
+                        <button class="btn-outline" onclick="deleteCategory('${cat.id}')">حذف التبويبة</button>
                     </div>
-                    <div>${cat.subfields.map(sub => `<span class="sub-item">${escapeHtml(sub)} <i class="fas fa-times-circle" style="cursor:pointer;" onclick="removeSubfield('${cat.id}', '${sub}')"></i></span>`).join('')}</div>
-                    <div class="flex"><input type="text" id="new-sub-${cat.id}" placeholder="فرع جديد"><button class="btn-small" onclick="addSubfield('${cat.id}')">إضافة فرع</button></div>
+                    <div>${cat.subfields.map(sub => `<span class="sub-item">${escapeHtml(sub)} <i class="fas fa-times-circle" style="cursor:pointer; margin-right:5px;" onclick="removeSubfield('${cat.id}', '${sub}')"></i></span>`).join('')}</div>
+                    <div class="flex-row"><input type="text" id="new-sub-${cat.id}" placeholder="فرع جديد"><button onclick="addSubfield('${cat.id}')">إضافة فرع</button></div>
                 </div>
             `;
         });
     }
     window.addCategory = async () => {
-        const name = document.getElementById('new-cat-name').value.trim();
+        const name = document.getElementById('new-cat').value.trim();
         if (!name) return;
         await db.collection('categories').add({ name, subfields: [] });
-        document.getElementById('new-cat-name').value = '';
+        document.getElementById('new-cat').value = '';
         loadCategories();
     };
     window.deleteCategory = async (id) => { if(confirm('حذف التبويبة سيحذف فروعها')) await db.collection('categories').doc(id).delete(); loadCategories(); };
     window.addSubfield = async (catId) => {
         const input = document.getElementById(`new-sub-${catId}`);
-        const subName = input.value.trim();
-        if(!subName) return;
-        const cat = categoriesData.find(c=>c.id===catId);
-        if(cat.subfields.includes(subName)) return;
-        await db.collection('categories').doc(catId).update({ subfields: [...cat.subfields, subName] });
+        const sub = input.value.trim();
+        if (!sub) return;
+        const cat = categoriesList.find(c => c.id === catId);
+        if (cat.subfields.includes(sub)) return;
+        await db.collection('categories').doc(catId).update({ subfields: [...cat.subfields, sub] });
         input.value = '';
         loadCategories();
     };
-    window.removeSubfield = async (catId, subName) => {
-        const cat = categoriesData.find(c=>c.id===catId);
-        const newSubs = cat.subfields.filter(s=>s!==subName);
+    window.removeSubfield = async (catId, sub) => {
+        const cat = categoriesList.find(c => c.id === catId);
+        const newSubs = cat.subfields.filter(s => s !== sub);
         await db.collection('categories').doc(catId).update({ subfields: newSubs });
         loadCategories();
     };
     function updateCategorySelects() {
-        const catSelect = document.getElementById('category-select');
-        const subSelect = document.getElementById('subfield-select');
+        const catSelect = document.getElementById('post-category');
+        const subSelect = document.getElementById('post-subfield');
         catSelect.innerHTML = '<option value="">اختر التبويبة</option>';
-        categoriesData.forEach(cat => catSelect.innerHTML += `<option value="${cat.name}">${escapeHtml(cat.name)}</option>`);
+        categoriesList.forEach(c => catSelect.innerHTML += `<option value="${c.name}">${c.name}</option>`);
         catSelect.onchange = () => {
             const selectedCat = catSelect.value;
-            const cat = categoriesData.find(c=>c.name === selectedCat);
+            const cat = categoriesList.find(c => c.name === selectedCat);
             subSelect.innerHTML = '<option value="">اختر الفرع</option>';
-            if(cat && cat.subfields) cat.subfields.forEach(sub => subSelect.innerHTML += `<option value="${sub}">${escapeHtml(sub)}</option>`);
+            if (cat) cat.subfields.forEach(s => subSelect.innerHTML += `<option value="${s}">${s}</option>`);
         };
     }
 
-    // الكتّاب
+    // ---------- إدارة الكتّاب ----------
     async function loadAuthors() {
         const snap = await db.collection('authors').orderBy('name').get();
-        authorsData = snap.docs.map(d => ({ id: d.id, name: d.data().name }));
-        renderAuthorsList();
+        authorsList = snap.docs.map(d => ({ id: d.id, name: d.data().name }));
+        renderAuthorsUI();
         updateAuthorSelect();
     }
-    function renderAuthorsList() {
-        const container = document.getElementById('authors-list');
-        if (!authorsData.length) { container.innerHTML = '<p>لا يوجد كتاب. أضف كاتباً.</p>'; return; }
-        container.innerHTML = authorsData.map(a => `<div class="flex" style="justify-content:space-between; margin:5px 0;"><span>✍️ ${escapeHtml(a.name)}</span><button class="btn-small btn-danger" onclick="deleteAuthor('${a.id}')">حذف</button></div>`).join('');
+    function renderAuthorsUI() {
+        const container = document.getElementById('authors-container');
+        if (!authorsList.length) { container.innerHTML = '<p>لا يوجد كتاب. أضف كاتباً.</p>'; return; }
+        container.innerHTML = authorsList.map(a => `<div class="flex-row" style="justify-content:space-between;"><span>✍️ ${escapeHtml(a.name)}</span><button class="btn-outline" onclick="deleteAuthor('${a.id}')">حذف</button></div>`).join('');
     }
     window.addAuthor = async () => {
-        const name = document.getElementById('new-author-name').value.trim();
+        const name = document.getElementById('new-author').value.trim();
         if (!name) return;
         await db.collection('authors').add({ name });
-        document.getElementById('new-author-name').value = '';
+        document.getElementById('new-author').value = '';
         loadAuthors();
     };
-    window.deleteAuthor = async (id) => { if(confirm('حذف الكاتب سيؤثر على المقالات المرتبطة')) await db.collection('authors').doc(id).delete(); loadAuthors(); };
+    window.deleteAuthor = async (id) => { if(confirm('حذف الكاتب سيؤثر على المقالات')) await db.collection('authors').doc(id).delete(); loadAuthors(); };
     function updateAuthorSelect() {
-        const select = document.getElementById('author-select');
+        const select = document.getElementById('post-author');
         select.innerHTML = '<option value="">اختر الكاتب</option>';
-        authorsData.forEach(a => select.innerHTML += `<option value="${a.name}">${escapeHtml(a.name)}</option>`);
+        authorsList.forEach(a => select.innerHTML += `<option value="${a.name}">${a.name}</option>`);
     }
 
-    // ------------------- محرر الكتل (يدعم HTML و 10 لغات برمجة مع نسخ) -------------------
-    const languages = [
-        "javascript", "python", "html", "css", "php",
-        "java", "csharp", "go", "ruby", "bash"
-    ];
+    // ---------- محرر الكتل (ثابت، HTML، صور، 10 لغات) ----------
+    const availableLanguages = ["javascript", "python", "html", "css", "php", "java", "csharp", "go", "ruby", "bash"];
     function addBlock(type) {
-        let newBlock;
-        if (type === 'text') newBlock = { type, value: '<p>نص جديد يمكنك كتابة HTML هنا مثل <strong>غامق</strong>.</p>' };
-        else if (type === 'image') newBlock = { type, value: { url: '', caption: '' } };
-        else if (type === 'code') newBlock = { type, value: { code: '// اكتب كودك هنا', language: 'javascript' } };
-        else if (type === 'summary') newBlock = { type, value: 'ملخص المقال... يمكنك كتابة HTML هنا.' };
-        blocks.push(newBlock);
+        let block;
+        if (type === 'text') block = { type, value: '<p>اكتب المحتوى هنا (HTML مسموح).</p>' };
+        else if (type === 'image') block = { type, value: { url: '', caption: '' } };
+        else if (type === 'code') block = { type, value: { code: '// اكتب كودك هنا', language: 'javascript' } };
+        else if (type === 'summary') block = { type, value: 'ملخص المقال... يدعم HTML.' };
+        contentBlocks.push(block);
         renderBlocks();
-        saveBlocksToLocal();
+        saveLocalBlocks();
     }
-
-    function deleteBlock(index) {
-        blocks.splice(index, 1);
+    function deleteBlock(idx) {
+        contentBlocks.splice(idx, 1);
         renderBlocks();
-        saveBlocksToLocal();
+        saveLocalBlocks();
     }
-
-    function updateBlockValue(index, field, value) {
-        if (typeof blocks[index].value === 'string') blocks[index].value = value;
-        else blocks[index].value[field] = value;
-        saveBlocksToLocal();
+    function updateBlockValue(idx, field, val) {
+        if (typeof contentBlocks[idx].value === 'string') contentBlocks[idx].value = val;
+        else contentBlocks[idx].value[field] = val;
+        saveLocalBlocks();
     }
-
-    async function uploadImage(index, fileInput) {
+    async function uploadImageForBlock(idx, fileInput) {
         const file = fileInput.files[0];
         if (!file) return;
-        const storageRef = storage.ref(`article_images/${Date.now()}_${file.name}`);
-        const uploadTask = await storageRef.put(file);
-        const url = await uploadTask.ref.getDownloadURL();
-        blocks[index].value.url = url;
-        const previewDiv = document.getElementById(`preview-${index}`);
-        if (previewDiv) {
-            previewDiv.innerHTML = `<img src="${url}" class="image-preview"><br><input type="text" placeholder="تسمية الصورة" value="${escapeHtml(blocks[index].value.caption)}" onchange="updateBlockValue(${index}, 'caption', this.value)">`;
-        }
-        saveBlocksToLocal();
+        const ref = storage.ref(`article_imgs/${Date.now()}_${file.name}`);
+        await ref.put(file);
+        const url = await ref.getDownloadURL();
+        contentBlocks[idx].value.url = url;
+        document.getElementById(`img-preview-${idx}`).innerHTML = `<img src="${url}" class="image-preview"><br><input type="text" placeholder="تسمية الصورة" value="${escapeHtml(contentBlocks[idx].value.caption)}" onchange="updateBlockValue(${idx}, 'caption', this.value)">`;
+        saveLocalBlocks();
     }
-
-    function copyCodeFromBlock(index) {
-        const code = blocks[index].value.code;
-        navigator.clipboard.writeText(code);
+    function copyCodeFromBlock(idx) {
+        navigator.clipboard.writeText(contentBlocks[idx].value.code);
         alert('تم نسخ الكود');
     }
-
     function renderBlocks() {
         const container = document.getElementById('blocks-container');
-        if (!blocks.length) { container.innerHTML = '<p>➕ أضف كتلة جديدة باستخدام الأزرار أعلاه</p>'; return; }
+        if (!contentBlocks.length) { container.innerHTML = '<p style="text-align:center;">➕ أضف كتلة جديدة باستخدام الأزرار أعلاه</p>'; return; }
         container.innerHTML = '';
-        blocks.forEach((block, idx) => {
+        contentBlocks.forEach((block, idx) => {
             const blockDiv = document.createElement('div');
-            blockDiv.className = 'block';
-            blockDiv.setAttribute('data-index', idx);
-            let innerHtml = `
-                <div class="block-header">
-                    <span class="block-type">${block.type === 'text' ? '📝 نص' : block.type === 'image' ? '🖼️ صورة' : block.type === 'code' ? '💻 كود' : '✨ مختصر'}</span>
-                    <button class="delete-block" onclick="deleteBlock(${idx})"><i class="fas fa-trash"></i></button>
-                </div>
-            `;
+            blockDiv.className = 'block-editor';
+            blockDiv.setAttribute('data-idx', idx);
+            let inner = `<div class="block-header"><span class="block-type">${block.type === 'text' ? '📝 نص' : block.type === 'image' ? '🖼️ صورة' : block.type === 'code' ? '💻 كود' : '✨ مختصر'}</span><button class="delete-block" onclick="deleteBlock(${idx})"><i class="fas fa-trash"></i></button></div>`;
             if (block.type === 'text') {
-                innerHtml += `<textarea rows="5" placeholder="اكتب المحتوى هنا (يدعم HTML)" onchange="updateBlockValue(${idx}, null, this.value)">${escapeHtml(block.value)}</textarea>`;
+                inner += `<textarea rows="5" onchange="updateBlockValue(${idx}, null, this.value)">${escapeHtml(block.value)}</textarea>`;
             } else if (block.type === 'image') {
-                innerHtml += `
-                    <input type="file" accept="image/*" id="file-input-${idx}" onchange="uploadImage(${idx}, this)">
-                    <div id="preview-${idx}">
-                        ${block.value.url ? `<img src="${block.value.url}" class="image-preview"><br><input type="text" placeholder="تسمية الصورة" value="${escapeHtml(block.value.caption)}" onchange="updateBlockValue(${idx}, 'caption', this.value)">` : ''}
-                    </div>
-                `;
+                inner += `<input type="file" accept="image/*" onchange="uploadImageForBlock(${idx}, this)"><div id="img-preview-${idx}">${block.value.url ? `<img src="${block.value.url}" class="image-preview"><br><input type="text" placeholder="تسمية الصورة" value="${escapeHtml(block.value.caption)}" onchange="updateBlockValue(${idx}, 'caption', this.value)">` : ''}</div>`;
             } else if (block.type === 'code') {
-                innerHtml += `
-                    <select onchange="updateBlockValue(${idx}, 'language', this.value)">
-                        ${languages.map(lang => `<option value="${lang}" ${block.value.language === lang ? 'selected' : ''}>${lang}</option>`).join('')}
-                    </select>
-                    <textarea rows="6" placeholder="اكتب الكود هنا" onchange="updateBlockValue(${idx}, 'code', this.value)">${escapeHtml(block.value.code)}</textarea>
-                    <div class="flex" style="justify-content: flex-start; margin-top: 5px;">
-                        <button onclick="copyCodeFromBlock(${idx})" class="btn-small"><i class="fas fa-copy"></i> نسخ الكود من هذه الكتلة</button>
-                    </div>
-                    <div style="margin-top: 10px;">
-                        <strong>معاينة الكود:</strong>
-                        <pre><code class="language-${block.value.language}">${escapeHtml(block.value.code)}</code></pre>
-                    </div>
-                `;
+                inner += `<select onchange="updateBlockValue(${idx}, 'language', this.value)">${availableLanguages.map(l => `<option value="${l}" ${block.value.language === l ? 'selected' : ''}>${l}</option>`).join('')}</select>`;
+                inner += `<textarea rows="6" onchange="updateBlockValue(${idx}, 'code', this.value)">${escapeHtml(block.value.code)}</textarea>`;
+                inner += `<button onclick="copyCodeFromBlock(${idx})" class="btn-outline" style="margin-top:8px;"><i class="fas fa-copy"></i> نسخ الكود من هذه الكتلة</button>`;
+                inner += `<pre><code class="language-${block.value.language}">${escapeHtml(block.value.code)}</code></pre>`;
             } else if (block.type === 'summary') {
-                innerHtml += `<textarea rows="3" placeholder="مختصر المقال (يدعم HTML)" onchange="updateBlockValue(${idx}, null, this.value)">${escapeHtml(block.value)}</textarea>`;
+                inner += `<textarea rows="3" onchange="updateBlockValue(${idx}, null, this.value)">${escapeHtml(block.value)}</textarea>`;
             }
-            blockDiv.innerHTML = innerHtml;
+            blockDiv.innerHTML = inner;
             container.appendChild(blockDiv);
-            if (block.type === 'code') {
-                const codeBlock = blockDiv.querySelector('pre code');
-                if (codeBlock) hljs.highlightElement(codeBlock);
-            }
+            if (block.type === 'code') hljs.highlightElement(blockDiv.querySelector('pre code'));
         });
-        new Sortable(container, { animation: 150, onEnd: () => saveOrder() });
+        new Sortable(container, { animation: 200, handle: '.block-header', onEnd: () => reorderBlocks() });
     }
-
-    function saveOrder() {
-        const newBlocks = [];
-        document.querySelectorAll('.block').forEach(el => {
-            const idx = parseInt(el.getAttribute('data-index'));
-            newBlocks.push(blocks[idx]);
+    function reorderBlocks() {
+        const newOrder = [];
+        document.querySelectorAll('.block-editor').forEach(el => {
+            const idx = parseInt(el.getAttribute('data-idx'));
+            newOrder.push(contentBlocks[idx]);
         });
-        blocks = newBlocks;
-        saveBlocksToLocal();
+        contentBlocks = newOrder;
+        saveLocalBlocks();
         renderBlocks();
     }
+    function saveLocalBlocks() { localStorage.setItem('awj_temp_blocks', JSON.stringify(contentBlocks)); }
+    function loadLocalBlocks() { const saved = localStorage.getItem('awj_temp_blocks'); if (saved) contentBlocks = JSON.parse(saved); else contentBlocks = []; renderBlocks(); }
 
-    function saveBlocksToLocal() { localStorage.setItem('temp_blocks', JSON.stringify(blocks)); }
-    function loadBlocksFromLocal() {
-        const saved = localStorage.getItem('temp_blocks');
-        if (saved) blocks = JSON.parse(saved);
-        else blocks = [];
-        renderBlocks();
-    }
-
-    function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;'); }
-
-    // نشر المقال
-    window.publishArticle = async () => {
-        const title = document.getElementById('article-title').value.trim();
-        const author = document.getElementById('author-select').value;
-        const category = document.getElementById('category-select').value;
-        const subfield = document.getElementById('subfield-select').value;
-        if (!title || !author || !category || !subfield || blocks.length === 0) {
-            showMsg('publish-msg', '❌ العنوان، الكاتب، التبويبة، الفرع، وكتلة واحدة على الأقل مطلوبة', 'error');
+    // ---------- نشر المقال ----------
+    window.publishNewArticle = async () => {
+        const title = document.getElementById('post-title').value.trim();
+        const author = document.getElementById('post-author').value;
+        const category = document.getElementById('post-category').value;
+        const subfield = document.getElementById('post-subfield').value;
+        if (!title || !author || !category || !subfield || contentBlocks.length === 0) {
+            showMsg('publish-status', '❌ جميع الحقول مطلوبة وكتلة واحدة على الأقل', 'error');
             return;
         }
-        const cleanedBlocks = blocks.map(block => {
-            if (block.type === 'image') return { type: 'image', value: { url: block.value.url, caption: block.value.caption } };
-            return block;
+        const cleanBlocks = contentBlocks.map(b => {
+            if (b.type === 'image') return { type: 'image', value: { url: b.value.url, caption: b.value.caption } };
+            return b;
         });
         try {
             await db.collection('articles').add({
                 title, author, category, subfield,
-                contentBlocks: cleanedBlocks,
+                contentBlocks: cleanBlocks,
                 views: 0,
                 date: firebase.firestore.FieldValue.serverTimestamp()
             });
-            showMsg('publish-msg', '✅ تم نشر المقال بنجاح!', 'success');
-            blocks = [];
-            localStorage.removeItem('temp_blocks');
-            document.getElementById('article-title').value = '';
+            showMsg('publish-status', '✅ تم نشر المقال بنجاح!', 'success');
+            contentBlocks = [];
+            localStorage.removeItem('awj_temp_blocks');
+            document.getElementById('post-title').value = '';
             renderBlocks();
-        } catch (e) { showMsg('publish-msg', '❌ خطأ: '+e.message, 'error'); }
+        } catch (e) { showMsg('publish-status', '❌ خطأ: ' + e.message, 'error'); }
     };
+
+    function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;'); }
+    loadLocalBlocks();
 </script>
 </body>
 </html>

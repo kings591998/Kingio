@@ -3,192 +3,325 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>شنفر | Admin Pro</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>أوج | لوحة التحكم السيادية</title>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        :root{--bg:#0A0B10;--bg-sec:#0C0F17;--card:#12141E;--border:#2a2a35;--text:#eee;--text-m:#aaa;--acc:#D4AF37;--rad:1rem}
-        *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',system-ui}
-        body{background:var(--bg);color:var(--text);direction:rtl;padding:1.5rem;min-height:100vh}
-        .container{max-width:1400px;margin:auto}
-        .header{display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem;border-bottom:1px solid var(--border);padding-bottom:1rem;flex-wrap:wrap;gap:1rem}
-        .logo{display:flex;align-items:center;gap:1rem} .logo-icon{width:60px;height:60px;position:relative}
-        .logo-icon .ring{position:absolute;inset:0;border:2px dashed var(--acc);border-radius:50%;animation:spin 20s linear infinite}
-        .logo-icon .ring::before{content:"✦✧✦✧";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--acc);font-size:0.8rem;letter-spacing:4px}
-        .logo-icon svg{width:100%;filter:drop-shadow(0 0 10px rgba(212,175,55,0.4))}
-        @keyframes spin{to{transform:rotate(360deg)}}
-        .tabs{display:flex;gap:0.25rem;border-bottom:1px solid var(--border);margin-bottom:1.5rem;flex-wrap:wrap}
-        .tab-btn{padding:0.75rem 1.25rem;background:transparent;border:none;color:var(--text-m);font-weight:500;cursor:pointer;border-radius:var(--rad) var(--rad) 0 0}
-        .tab-btn.active{color:var(--acc);background:var(--bg-sec);border-bottom:2px solid var(--acc)}
-        .page{display:none} .page.active{display:block}
-        .grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:1.5rem;margin-bottom:2rem}
-        .card{background:var(--card);border:1px solid var(--border);border-radius:var(--rad);padding:1.5rem;margin-bottom:1.5rem}
-        .card h2{color:var(--acc);margin-bottom:1rem;border-right:3px solid var(--acc);padding-right:0.8rem;font-size:1.3rem}
-        .flex{display:flex;gap:1rem;flex-wrap:wrap;align-items:center;margin-bottom:1rem}
-        input,select,textarea{background:var(--bg-sec);border:1px solid var(--border);padding:0.7rem 1rem;border-radius:var(--rad);color:var(--text);width:100%;margin-bottom:0.8rem}
-        button{background:var(--acc);color:#000;border:none;padding:0.6rem 1.2rem;border-radius:2rem;cursor:pointer;font-weight:bold;transition:0.2s}
-        button:hover{opacity:0.85;transform:scale(0.98)} .btn-sec{background:transparent;border:1px solid var(--acc);color:var(--acc)}
-        .block-item{background:var(--bg-sec);border:1px solid var(--border);border-radius:0.8rem;padding:1rem;margin-bottom:1rem;cursor:move}
-        .block-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem}
-        .toast{position:fixed;bottom:1rem;left:1rem;padding:0.8rem 1.2rem;background:var(--acc);color:#000;border-radius:var(--rad);font-weight:500;transform:translateY(150%);transition:0.3s;z-index:2000}
-        .toast.show{transform:translateY(0)}
-        .badge{padding:0.2rem 0.6rem;background:rgba(212,175,55,0.2);color:var(--acc);border-radius:40px;font-size:0.75rem}
-        table{width:100%;border-collapse:collapse} th,td{padding:1rem;border-bottom:1px solid var(--border);text-align:right}
-        th{background:var(--bg-sec);color:var(--text-m);font-size:0.9rem}
-        .spinner{width:1rem;height:1rem;border:2px solid var(--acc);border-top-color:transparent;border-radius:50%;animation:spin 0.8s linear infinite;display:inline-block}
-        @media(max-width:800px){.grid-2{grid-template-columns:1fr}.header{flex-direction:column;text-align:center}}
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui; }
+        body { background: #0A0B10; color: #eee; direction: rtl; padding: 1.5rem; }
+        .container { max-width: 1400px; margin: auto; }
+        .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; border-bottom: 1px solid #2a2a35; padding-bottom: 1rem; }
+        .logo { font-size: 2rem; color: #D4AF37; font-weight: bold; }
+        .stats-badge { background: #1e1e2a; padding: 0.4rem 1rem; border-radius: 40px; font-size: 0.8rem; }
+        .grid-2col { display: grid; grid-template-columns: repeat(2,1fr); gap: 1.5rem; margin-bottom: 2rem; }
+        .card { background: #0C0F17; border: 1px solid #2a2a35; border-radius: 1.5rem; padding: 1.5rem; margin-bottom: 1.5rem; }
+        .card h2 { color: #D4AF37; margin-bottom: 1rem; border-right: 3px solid #D4AF37; padding-right: 0.8rem; }
+        .flex-row { display: flex; gap: 1rem; flex-wrap: wrap; align-items: center; margin-bottom: 1rem; }
+        input, select, textarea { background: #1a1c25; border: 1px solid #2a2a35; padding: 0.7rem 1rem; border-radius: 1rem; color: white; width: 100%; margin-bottom: 0.8rem; }
+        button { background: #D4AF37; color: #000; border: none; padding: 0.6rem 1.2rem; border-radius: 2rem; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        button:hover { opacity: 0.85; transform: scale(0.98); }
+        .btn-outline { background: transparent; border: 1px solid #D4AF37; color: #D4AF37; }
+        .block {
+            background: #12141E;
+            border-radius: 1rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        .block-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; cursor: move; }
+        .delete-block { background: none; border: none; color: #ff7777; font-size: 1.2rem; cursor: pointer; }
+        .image-preview { max-width: 100%; max-height: 180px; margin-top: 0.5rem; border-radius: 0.8rem; }
+        .code-preview { background: #0D0F14; padding: 0.8rem; border-radius: 0.8rem; margin-top: 0.5rem; }
+        .message { padding: 0.8rem; border-radius: 1rem; margin-top: 1rem; text-align: center; display: none; }
+        .success { background: #1e4620; display: block; }
+        .error { background: #8b2c2c; display: block; }
+        .sub-item { background: #2a2a35; display: inline-block; padding: 0.2rem 0.8rem; border-radius: 40px; margin-left: 0.5rem; margin-bottom: 0.3rem; }
+        @media (max-width: 800px) { .grid-2col { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
 <div class="container">
-    <div id="login" class="card" style="max-width:450px;margin:4rem auto;text-align:center">
-        <div class="logo" style="justify-content:center;margin-bottom:1.5rem"><div class="logo-icon"><div class="ring"></div><svg viewBox="0 0 100 100"><path d="M50 10 L65 40 L90 45 L70 60 L75 90 L50 75 L25 90 L30 60 L10 45 L35 40 Z" fill="#D4AF37"/><circle cx="45" cy="35" r="3" fill="#0A0B10"/><circle cx="55" cy="35" r="3" fill="#0A0B10"/></svg></div></div>
-        <h2 style="color:var(--acc);margin-bottom:1rem">🔐 دخول الإدارة</h2>
-        <input type="email" id="em" placeholder="البريد">
-        <input type="password" id="pw" placeholder="كلمة المرور">
-        <button onclick="login()" style="width:100%">دخول</button>
-        <div id="msg" style="margin-top:1rem;color:#ef4444;font-size:0.9rem"></div>
+    <!-- لوحة تسجيل الدخول -->
+    <div id="loginPanel" class="card" style="max-width: 500px; margin: 5rem auto;">
+        <h2>🔐 دخول الإدارة</h2>
+        <input type="email" id="loginEmail" placeholder="البريد الإلكتروني">
+        <input type="password" id="loginPassword" placeholder="كلمة المرور">
+        <button id="doLoginBtn">تسجيل الدخول</button>
+        <div id="loginMsg" class="message"></div>
     </div>
 
-    <div id="admin" style="display:none">
-        <header class="header">
-            <div class="logo"><div class="logo-icon" style="width:50px;height:50px"><div class="ring"></div><svg viewBox="0 0 100 100"><path d="M50 10 L65 40 L90 45 L70 60 L75 90 L50 75 L25 90 L30 60 L10 45 L35 40 Z" fill="#D4AF37"/><circle cx="45" cy="35" r="3" fill="#0A0B10"/><circle cx="55" cy="35" r="3" fill="#0A0B10"/></svg></div><span style="font-size:1.5rem;color:var(--acc);font-weight:bold">شنفر | Admin</span></div>
-            <div class="flex" style="margin:0"><span class="badge" id="stats">📊 0</span> <button class="btn-sec" onclick="logout()">خروج</button></div>
-        </header>
+    <!-- لوحة الإدارة (تظهر بعد تسجيل الدخول) -->
+    <div id="adminPanel" style="display: none;">
+        <div class="admin-header">
+            <div class="logo">AWJ Admin</div>
+            <div><span class="stats-badge" id="statsInfo"></span> <button id="logoutBtn" style="background:#333; color:#eee;">تسجيل الخروج</button></div>
+        </div>
 
-        <nav class="tabs" id="nav">
-            <button class="tab-btn active" data-p="dash">🏠 الرئيسية</button>
-            <button class="tab-btn" data-p="ai">🤖 الذكاء الاصطناعي</button>
-            <button class="tab-btn" data-p="pub">🔄 النشر التلقائي</button>
-            <button class="tab-btn" data-p="mon">💰 الربحية</button>
-            <button class="tab-btn" data-p="art">📰 المقالات</button>
-        </nav>
+        <div class="grid-2col">
+            <!-- إدارة التبويبات والفروع -->
+            <div class="card">
+                <h2><i class="fas fa-folder-tree"></i> التبويبات والفروع</h2>
+                <div class="flex-row"><input type="text" id="newCatName" placeholder="اسم التبويبة الجديدة"><button id="addCatBtn">➕ إضافة تبويبة</button></div>
+                <div id="catsList"></div>
+            </div>
+            <!-- إدارة الكتّاب -->
+            <div class="card">
+                <h2><i class="fas fa-users"></i> الكتّاب</h2>
+                <div class="flex-row"><input type="text" id="newAuthorName" placeholder="اسم الكاتب الجديد"><button id="addAuthorBtn">➕ إضافة كاتب</button></div>
+                <div id="authorsList"></div>
+            </div>
+        </div>
 
-        <main>
-            <section id="dash" class="page active">
-                <div class="grid-2">
-                    <div class="card"><h2>📈 إحصائيات سريعة</h2><div id="statsGrid" class="flex" style="justify-content:space-around"></div></div>
-                    <div class="card"><h2>📊 النشاط الأخير</h2><canvas id="chart" style="max-height:250px"></canvas></div>
-                </div>
-            </section>
-            <section id="ai" class="page"><div id="ai-ui"></div></section>
-            <section id="pub" class="page"><div id="pub-ui"></div></section>
-            <section id="mon" class="page"><div id="mon-ui"></div></section>
-            <section id="art" class="page">
-                <div class="card">
-                    <h2>📰 إدارة المقالات</h2>
-                    <div class="flex"><input type="text" id="search" placeholder="بحث..." style="max-width:300px"><button onclick="loadArticles()">🔄 تحديث</button></div>
-                    <div id="artList" style="overflow-x:auto"></div>
-                </div>
-            </section>
-        </main>
+        <!-- محرر المقال المتقدم (كتل) -->
+        <div class="card">
+            <h2><i class="fas fa-feather-alt"></i> محرر المقال المتقدم</h2>
+            <input type="text" id="articleTitle" placeholder="عنوان المقال">
+            <select id="authorSelect"></select>
+            <div class="flex-row">
+                <select id="catSelect" style="flex:1"></select>
+                <select id="subSelect" style="flex:1"></select>
+            </div>
+            <div id="blocksEditor"></div>
+            <div class="flex-row">
+                <button id="addTextBtn"><i class="fas fa-paragraph"></i> نص (HTML)</button>
+                <button id="addImageBtn"><i class="fas fa-image"></i> صورة</button>
+                <button id="addCodeBtn"><i class="fas fa-code"></i> كود</button>
+                <button id="addSummaryBtn"><i class="fas fa-lightbulb"></i> مختصر</button>
+            </div>
+            <hr style="margin: 1rem 0; border-color:#2a2a35;">
+            <button id="publishBtn" style="width:100%;">🚀 نشر المقال</button>
+            <div id="publishMsg" class="message"></div>
+        </div>
     </div>
 </div>
-<div class="toast" id="toast"></div>
 
 <script>
-const C = {apiKey:"AIzaSyDjgVxvtPXTn1tpr4IxOK3wOW4r3gzB1VU",authDomain:"awj-website-29f16.firebaseapp.com",projectId:"awj-website-29f16",storageBucket:"awj-website-29f16.firebasestorage.app",messagingSenderId:"406747568578",appId:"1:406747568578:web:741821d3c60df0011b5e5b"};
-if(!firebase.apps.length) firebase.initializeApp(C);
-const db = firebase.firestore(), auth = firebase.auth(), st = firebase.storage();
-let articles=[], cats=[], authors=[];
+    // ==================== إعدادات Firebase ====================
+    const firebaseConfig = {
+        apiKey: "AIzaSyDjgVxvtPXTn1tpr4IxOK3wOW4r3gzB1VU",
+        authDomain: "awj-website-29f16.firebaseapp.com",
+        projectId: "awj-website-29f16",
+        storageBucket: "awj-website-29f16.firebasestorage.app",
+        messagingSenderId: "406747568578",
+        appId: "1:406747568578:web:741821d3c60df0011b5e5b",
+        measurementId: "G-DFB0GYH7LN"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const auth = firebase.auth();
+    const storage = firebase.storage();
 
-// 🛡️ حماية
-document.addEventListener('contextmenu',e=>e.preventDefault());
-document.addEventListener('keydown',e=>{if(e.ctrlKey&&['u','s','shift'].includes(e.key)||e.key==='F12')e.preventDefault();});
+    let categories = [];
+    let authors = [];
+    let blocks = [];
+    const languages = ["javascript","python","html","css","php","java","csharp","go","ruby","bash","typescript","swift","kotlin"];
 
-// 🔐 دخول
-window.login = async () => {
-    try{ await auth.signInWithEmailAndPassword(document.getElementById('em').value, document.getElementById('pw').value); }
-    catch(e){ document.getElementById('msg').textContent = '❌ '+e.message; }
-};
-window.logout = () => auth.signOut();
+    // ==================== المصادقة ====================
+    document.getElementById('doLoginBtn').onclick = async () => {
+        const email = document.getElementById('loginEmail').value;
+        const pass = document.getElementById('loginPassword').value;
+        try { await auth.signInWithEmailAndPassword(email, pass); } 
+        catch(e) { showMsg('loginMsg', '❌ '+e.message, 'error'); }
+    };
+    auth.onAuthStateChanged(user => {
+        if (user) {
+            document.getElementById('loginPanel').style.display = 'none';
+            document.getElementById('adminPanel').style.display = 'block';
+            loadCategories(); loadAuthors(); loadBlocksFromLocal();
+            updateStats();
+        } else {
+            document.getElementById('loginPanel').style.display = 'block';
+            document.getElementById('adminPanel').style.display = 'none';
+        }
+    });
+    document.getElementById('logoutBtn').onclick = () => auth.signOut();
+    function showMsg(elId, text, type) { const d = document.getElementById(elId); d.innerHTML = text; d.className = `message ${type}`; setTimeout(() => d.className = 'message', 3000); }
+    async function updateStats() { const snap = await db.collection('articles').get(); document.getElementById('statsInfo').innerHTML = `📄 ${snap.size} مقال | ✍️ ${authors.length} كاتب | 🗂️ ${categories.length} تبويبة`; }
 
-auth.onAuthStateChanged(async u => {
-    if(u) { document.getElementById('login').style.display='none'; document.getElementById('admin').style.display='block'; await initDB(); await loadAll(); }
-    else { document.getElementById('login').style.display='block'; document.getElementById('admin').style.display='none'; }
-});
-
-// 🧭 تنقل
-document.querySelectorAll('#nav .tab-btn').forEach(b=>b.onclick=()=>{
-    document.querySelectorAll('#nav .tab-btn').forEach(x=>x.classList.remove('active'));
-    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-    b.classList.add('active'); document.getElementById(b.dataset.p).classList.add('active');
-    if(b.dataset.p==='ai' && !document.getElementById('ai-ui').children.length) renderAI();
-    if(b.dataset.p==='pub' && !document.getElementById('pub-ui').children.length) renderPub();
-    if(b.dataset.p==='mon' && !document.getElementById('mon-ui').children.length) renderMon();
-    if(b.dataset.p==='art') loadArticles();
-});
-
-// 📦 تهيئة ذاتية + تحميل
-async function initDB() {
-    const ref = db.collection('system').doc('setup');
-    const d = await ref.get();
-    if(!d.exists) {
-        await db.collection('categories').doc('shanfar').set({name:'شنفر',subfields:['توليد ذكي','تقني']},{merge:true});
-        await db.collection('ai_configs').doc('instructions').set({prompt:'أنت كاتب محترف في شنفر. أسلوب رسمي دقيق، تجنب الحشو، أدرج أمثلة.',tone:'professional'},{merge:true});
-        await db.collection('auto_schedules').doc('main').set({freq:2,category:'شنفر',topics:'تقنية, أعمال, تسويق',active:false},{merge:true});
-        await ref.set({ver:1,at:new Date()});
+    // ==================== إدارة التبويبات ====================
+    async function loadCategories() {
+        const snap = await db.collection('categories').orderBy('name').get();
+        categories = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        renderCatsList(); updateCatSelects();
     }
-}
+    function renderCatsList() {
+        const div = document.getElementById('catsList');
+        if (!categories.length) { div.innerHTML = '<p>لا توجد تبويبات</p>'; return; }
+        div.innerHTML = '';
+        categories.forEach(cat => {
+            div.innerHTML += `
+                <div style="background:#12141E; border-radius:1rem; padding:0.8rem; margin-bottom:0.8rem;">
+                    <div class="flex-row" style="justify-content:space-between;"><b>📁 ${escapeHtml(cat.name)}</b> <button class="btn-outline" onclick="deleteCat('${cat.id}')">حذف</button></div>
+                    <div>${cat.subfields.map(s => `<span class="sub-item">${escapeHtml(s)} <i class="fas fa-times-circle" style="cursor:pointer;" onclick="removeSub('${cat.id}','${s}')"></i></span>`).join('')}</div>
+                    <div class="flex-row"><input type="text" id="sub-${cat.id}" placeholder="فرع جديد"><button class="btn-outline" onclick="addSub('${cat.id}')">إضافة فرع</button></div>
+                </div>
+            `;
+        });
+    }
+    window.deleteCat = async (id) => { if(confirm('سيتم حذف التبويبة وجميع فروعها')) { await db.collection('categories').doc(id).delete(); loadCategories(); } };
+    window.addSub = async (catId) => {
+        const input = document.getElementById(`sub-${catId}`);
+        const val = input.value.trim();
+        if(!val) return;
+        const cat = categories.find(c=>c.id===catId);
+        const newSubs = [...cat.subfields, val];
+        await db.collection('categories').doc(catId).update({ subfields: newSubs });
+        input.value = '';
+        loadCategories();
+    };
+    window.removeSub = async (catId, subName) => {
+        const cat = categories.find(c=>c.id===catId);
+        const newSubs = cat.subfields.filter(s=>s!==subName);
+        await db.collection('categories').doc(catId).update({ subfields: newSubs });
+        loadCategories();
+    };
+    document.getElementById('addCatBtn').onclick = async () => {
+        const name = document.getElementById('newCatName').value.trim();
+        if(!name) return;
+        await db.collection('categories').add({ name, subfields: [] });
+        document.getElementById('newCatName').value = '';
+        loadCategories();
+    };
+    function updateCatSelects() {
+        const catSel = document.getElementById('catSelect');
+        const subSel = document.getElementById('subSelect');
+        catSel.innerHTML = '<option value="">اختر التبويبة</option>';
+        categories.forEach(c => catSel.innerHTML += `<option value="${c.name}">${c.name}</option>`);
+        catSel.onchange = () => {
+            const catName = catSel.value;
+            const cat = categories.find(c=>c.name===catName);
+            subSel.innerHTML = '<option value="">اختر الفرع</option>';
+            if(cat) cat.subfields.forEach(s => subSel.innerHTML += `<option value="${s}">${s}</option>`);
+        };
+    }
 
-async function loadAll() {
-    [cats, authors, articles] = await Promise.all([db.collection('categories').orderBy('name').get(), db.collection('authors').orderBy('name').get(), db.collection('articles').orderBy('date','desc').limit(20).get()]);
-    cats = cats.docs.map(d=>({id:d.id,...d.data()})); authors = authors.docs.map(d=>({id:d.id,...d.data()})); articles = articles.docs.map(d=>({id:d.id,...d.data()}));
-    document.getElementById('stats').textContent = `📄 ${articles.length} مقال | ✍️ ${authors.length} كاتب`;
-    renderDash();
-}
+    // ==================== إدارة الكتّاب ====================
+    async function loadAuthors() {
+        const snap = await db.collection('authors').orderBy('name').get();
+        authors = snap.docs.map(d => ({ id: d.id, name: d.data().name }));
+        renderAuthorsList(); updateAuthorSelect(); updateStats();
+    }
+    function renderAuthorsList() {
+        const div = document.getElementById('authorsList');
+        if(!authors.length) { div.innerHTML = '<p>لا يوجد كتاب</p>'; return; }
+        div.innerHTML = authors.map(a => `<div class="flex-row" style="justify-content:space-between;"><span>✍️ ${escapeHtml(a.name)}</span><button class="btn-outline" onclick="deleteAuthor('${a.id}')">حذف</button></div>`).join('');
+    }
+    window.deleteAuthor = async (id) => { await db.collection('authors').doc(id).delete(); loadAuthors(); };
+    document.getElementById('addAuthorBtn').onclick = async () => {
+        const name = document.getElementById('newAuthorName').value.trim();
+        if(!name) return;
+        await db.collection('authors').add({ name });
+        document.getElementById('newAuthorName').value = '';
+        loadAuthors();
+    };
+    function updateAuthorSelect() { 
+        const sel = document.getElementById('authorSelect');
+        sel.innerHTML = '<option value="">اختر الكاتب</option>';
+        authors.forEach(a => sel.innerHTML += `<option value="${a.name}">${a.name}</option>`);
+    }
 
-function renderDash() {
-    const tot = articles.reduce((s,a)=>s+(a.views||0),0);
-    document.getElementById('statsGrid').innerHTML = `<div><div style="font-size:2rem;font-weight:bold">${articles.length}</div><small>مقالات</small></div><div><div style="font-size:2rem;font-weight:bold">${tot}</div><small>مشاهدات</small></div><div><div style="font-size:2rem;font-weight:bold">${authors.length}</div><small>كتّاب</small></div>`;
-    new Chart(document.getElementById('chart'), {type:'line', data:{labels:articles.slice(-5).map(a=>a.title?.slice(0,8)+'...'), datasets:[{label:'مشاهدات', data:articles.slice(-5).map(a=>a.views||0), borderColor:'#D4AF37', fill:false}]}, options:{responsive:true, plugins:{legend:{display:false}}}});
-}
+    // ==================== محرر الكتل (المنشئ المتقدم) ====================
+    function addBlock(type) {
+        if(type === 'text') blocks.push({ type, value: '<p>نص جديد <strong>غامق</strong> أو <em>مائل</em></p>' });
+        else if(type === 'image') blocks.push({ type, value: { url: '', caption: '' } });
+        else if(type === 'code') blocks.push({ type, value: { code: '// اكتب كودك', language: 'javascript' } });
+        else if(type === 'summary') blocks.push({ type, value: 'ملخص المقال هنا...' });
+        renderBlocks(); saveBlocksToLocal();
+    }
+    function deleteBlock(idx) { blocks.splice(idx,1); renderBlocks(); saveBlocksToLocal(); }
+    function updateBlockValue(idx, field, val) {
+        if(typeof blocks[idx].value === 'string') blocks[idx].value = val;
+        else blocks[idx].value[field] = val;
+        saveBlocksToLocal();
+        renderBlocks(); // إعادة العرض لتحديث المعاينة
+    }
+    async function uploadImage(idx, fileInput) {
+        const file = fileInput.files[0];
+        if(!file) return;
+        const ref = storage.ref(`articles/${Date.now()}_${file.name}`);
+        await ref.put(file);
+        const url = await ref.getDownloadURL();
+        blocks[idx].value.url = url;
+        saveBlocksToLocal();
+        renderBlocks();
+    }
+    function renderBlocks() {
+        const container = document.getElementById('blocksEditor');
+        if(!blocks.length) { container.innerHTML = '<div style="text-align:center; color:#aaa;">➕ أضف كتلة جديدة باستخدام الأزرار أعلاه</div>'; return; }
+        container.innerHTML = '';
+        blocks.forEach((block, idx) => {
+            const div = document.createElement('div');
+            div.className = 'block';
+            div.setAttribute('data-idx', idx);
+            let inner = `<div class="block-header"><span>${block.type==='text'?'📝 نص':block.type==='image'?'🖼️ صورة':block.type==='code'?'💻 كود':'✨ مختصر'}</span><button class="delete-block" onclick="deleteBlock(${idx})"><i class="fas fa-trash"></i></button></div>`;
+            if(block.type === 'text') inner += `<textarea rows="4" onchange="updateBlockValue(${idx}, null, this.value)">${escapeHtml(block.value)}</textarea>`;
+            else if(block.type === 'image') {
+                inner += `<input type="file" accept="image/*" onchange="uploadImage(${idx}, this)">`;
+                if(block.value.url) inner += `<div><img src="${block.value.url}" class="image-preview"><br><input type="text" placeholder="التسمية" value="${escapeHtml(block.value.caption)}" onchange="updateBlockValue(${idx},'caption',this.value)"></div>`;
+            }
+            else if(block.type === 'code') {
+                inner += `<select onchange="updateBlockValue(${idx}, 'language', this.value)">${languages.map(l=>`<option value="${l}" ${block.value.language===l?'selected':''}>${l}</option>`).join('')}</select>`;
+                inner += `<textarea rows="6" onchange="updateBlockValue(${idx}, 'code', this.value)">${escapeHtml(block.value.code)}</textarea>`;
+                inner += `<div class="code-preview"><pre><code class="language-${block.value.language}">${escapeHtml(block.value.code)}</code></pre></div>`;
+            }
+            else if(block.type === 'summary') inner += `<textarea rows="3" onchange="updateBlockValue(${idx}, null, this.value)">${escapeHtml(block.value)}</textarea>`;
+            div.innerHTML = inner;
+            container.appendChild(div);
+            if(block.type === 'code') {
+                const codeBlock = div.querySelector('pre code');
+                if(codeBlock) hljs.highlightElement(codeBlock);
+            }
+        });
+        new Sortable(container, { animation: 200, onEnd: () => { syncBlocksOrder(); } });
+    }
+    function syncBlocksOrder() {
+        const newBlocks = [];
+        document.querySelectorAll('.block').forEach(el => {
+            const idx = parseInt(el.getAttribute('data-idx'));
+            newBlocks.push(blocks[idx]);
+        });
+        blocks = newBlocks;
+        saveBlocksToLocal();
+        renderBlocks();
+    }
+    function saveBlocksToLocal() { localStorage.setItem('admin_blocks', JSON.stringify(blocks)); }
+    function loadBlocksFromLocal() { const saved = localStorage.getItem('admin_blocks'); if(saved) blocks = JSON.parse(saved); else blocks = []; renderBlocks(); }
+    function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, m=> m==='&'?'&amp;':m==='<'?'&lt;':'&gt;'); }
 
-window.loadArticles = () => {
-    const q = document.getElementById('search').value.toLowerCase();
-    const f = articles.filter(a => !q || (a.title||'').toLowerCase().includes(q));
-    document.getElementById('artList').innerHTML = `<table><thead><tr><th>العنوان</th><th>الكاتب</th><th>القسم</th><th>مشاهدات</th><th>إجراءات</th></tr></thead><tbody>${f.map(a=>`<tr><td>${a.title}</td><td>${a.author}</td><td>${a.category}</td><td>${a.views||0}</td><td><button class="btn-sec" onclick="editArt('${a.id}')">تعديل</button></td></tr>`).join('')}</tbody></table>`;
-};
-window.editArt = id => toast(`تعديل المقال: ${id} (سيتم تفعيل المحرر الكامل قريباً)`);
-
-// 🤖 AI UI
-function renderAI() {
-    document.getElementById('ai-ui').innerHTML = `<div class="card"><h2>🤖 إدارة الذكاء الاصطناعي</h2>
-    <div class="flex"><select id="m"><option value="openai">OpenAI</option></select><input type="password" id="k" placeholder="مفتاح API (يُخزن مشفر)"><button onclick="saveKey()">💾 حفظ</button></div>
-    <textarea id="p" rows="4" placeholder="التعليمات الافتراضية..."></textarea>
-    <button onclick="savePrompt()" style="margin-top:0.5rem">💾 حفظ التعليمات</button></div>`;
-    db.collection('ai_configs').doc('instructions').get().then(d=>{if(d.exists){document.getElementById('p').value=d.data().prompt||'';}});
-}
-window.saveKey = () => { db.collection('ai_configs').add({model:document.getElementById('m').value,active:true}); toast('✅ تم حفظ المفتاح'); };
-window.savePrompt = () => { db.collection('ai_configs').doc('instructions').set({prompt:document.getElementById('p').value},{merge:true}); toast('✅ تم حفظ التعليمات'); };
-
-// 🔄 Auto Pub
-function renderPub() {
-    document.getElementById('pub-ui').innerHTML = `<div class="card"><h2>🔄 النشر التلقائي</h2>
-    <div class="grid-2"><div><label>المرات/يوم</label><input type="number" id="f" value="2"><label>الأقسام</label><select id="c"><option>شنفر</option>${cats.map(x=>`<option>${x.name}</option>`).join('')}</select><button onclick="savePub()" style="margin-top:0.5rem">💾 حفظ</button></div>
-    <div><label>المواضيع (فاصلة)</label><input type="text" id="t" placeholder="تقنية, أعمال"><label><input type="checkbox" id="i" checked> صور Unsplash</label></div></div></div>`;
-    db.collection('auto_schedules').doc('main').get().then(d=>{if(d.exists){document.getElementById('f').value=d.data().freq||2;document.getElementById('t').value=d.data().topics||'';}});
-}
-window.savePub = () => { db.collection('auto_schedules').doc('main').set({freq:parseInt(document.getElementById('f').value),topics:document.getElementById('t').value,category:document.getElementById('c').value,active:true},{merge:true}); toast('✅ تم حفظ الجدولة'); };
-
-// 💰 Monetization
-function renderMon() {
-    document.getElementById('mon-ui').innerHTML = `<div class="card"><h2>💰 الربحية والدفع</h2>
-    <div class="flex"><select id="plat"><option>Binance</option><option>PayPal</option><option>Bitcoin</option></select><input type="text" id="addr" placeholder="العنوان/الرابط"><button onclick="addPay()">➕ إضافة</button></div><div id="pays"></div></div>`;
-    loadPays();
-}
-window.addPay = () => { db.collection('payment_methods').add({platform:document.getElementById('plat').value,address:document.getElementById('addr').value}); document.getElementById('addr').value=''; loadPays(); toast('✅ تمت الإضافة'); };
-async function loadPays() { const s=await db.collection('payment_methods').get(); document.getElementById('pays').innerHTML = s.docs.map(d=>`<div class="flex" style="justify-content:space-between"><span>🔹 ${d.data().platform} <code>${d.data().address.slice(0,8)}...</code></span><button class="btn-sec" onclick="db.collection('payment_methods').doc('${d.id}').delete();loadPays();toast('تم الحذف')">✕</button></div>`).join(''); }
-
-function toast(m,t=3000){const e=document.getElementById('toast');e.textContent=m;e.className='toast show';setTimeout(()=>e.classList.remove('show'),t);}
+    // ==================== نشر المقال ====================
+    document.getElementById('publishBtn').onclick = async () => {
+        const title = document.getElementById('articleTitle').value.trim();
+        const author = document.getElementById('authorSelect').value;
+        const cat = document.getElementById('catSelect').value;
+        const sub = document.getElementById('subSelect').value;
+        if(!title || !author || !cat || !sub || blocks.length===0) {
+            showMsg('publishMsg','❌ جميع الحقول مطلوبة وكتلة واحدة على الأقل','error'); return;
+        }
+        const cleanBlocks = blocks.map(b => {
+            if(b.type === 'image') return { type:'image', value:{ url:b.value.url, caption:b.value.caption } };
+            return b;
+        });
+        try {
+            await db.collection('articles').add({
+                title, author, category: cat, subfield: sub,
+                contentBlocks: cleanBlocks, views: 0,
+                date: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            showMsg('publishMsg','✅ نشر المقال بنجاح','success');
+            blocks = []; localStorage.removeItem('admin_blocks');
+            document.getElementById('articleTitle').value = '';
+            renderBlocks();
+        } catch(e) { showMsg('publishMsg','❌ '+e.message,'error'); }
+    };
+    document.getElementById('addTextBtn').onclick = () => addBlock('text');
+    document.getElementById('addImageBtn').onclick = () => addBlock('image');
+    document.getElementById('addCodeBtn').onclick = () => addBlock('code');
+    document.getElementById('addSummaryBtn').onclick = () => addBlock('summary');
 </script>
 </body>
 </html>

@@ -232,6 +232,35 @@
             letter-spacing: 1px;
         }
         
+        /* Articles List */
+        .articles-list {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #1e1e2a;
+            border-radius: 1rem;
+            padding: 1rem;
+        }
+        .article-list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem;
+            border-bottom: 1px solid #1e1e2a;
+            transition: background 0.2s;
+        }
+        .article-list-item:hover { background: rgba(212,175,55,0.05); }
+        .article-list-title {
+            color: #eee;
+            font-size: 0.9rem;
+            cursor: pointer;
+            flex: 1;
+        }
+        .article-list-title:hover { color: #D4AF37; }
+        .article-list-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
         /* Preview Modal */
         .preview-overlay {
             display: none;
@@ -341,6 +370,12 @@
             </div>
         </div>
 
+        <!-- Articles Management -->
+        <div class="card">
+            <h2><i class="fas fa-newspaper"></i> إدارة المقالات</h2>
+            <div id="articlesListContainer" class="articles-list"></div>
+        </div>
+
         <!-- AI Settings -->
         <div class="card ai-panel">
             <h4><i class="fas fa-robot"></i> إعدادات الذكاء الاصطناعي (اختياري)</h4>
@@ -356,6 +391,7 @@
         <!-- Article Editor -->
         <div class="card">
             <h2><i class="fas fa-feather-alt"></i> محرر المقال المتقدم</h2>
+            <input type="hidden" id="editingArticleId" value="">
             
             <div class="flex-row">
                 <input type="text" id="articleTitle" placeholder="عنوان المقال" style="flex:2;">
@@ -384,6 +420,7 @@
             <div class="flex-row">
                 <button id="saveDraftBtn" class="btn-outline"><i class="fas fa-save"></i> حفظ مسودة</button>
                 <button id="previewBtn" class="btn-outline"><i class="fas fa-eye"></i> معاينة</button>
+                <button id="clearEditorBtn" class="btn-outline btn-danger"><i class="fas fa-eraser"></i> مسح</button>
                 <button id="publishBtn" style="flex:1;"><i class="fas fa-paper-plane"></i> نشر المقال</button>
             </div>
             
@@ -427,6 +464,7 @@
     var blocks = [];
     var sortableInstance = null;
     var apiKey = localStorage.getItem('shnfr_openai_key') || '';
+    var editingArticleId = '';
     
     var languages = [
         "javascript", "python", "html", "css", "php", "java", "csharp", 
@@ -484,6 +522,7 @@
             loadCategories(); 
             loadAuthors(); 
             loadBlocksFromLocal();
+            loadArticlesList();
             updateStats();
             if (apiKey) document.getElementById('aiApiKey').value = apiKey;
         } else {
@@ -505,6 +544,105 @@
         } catch(e) {
             console.error('Stats error:', e);
         }
+    };
+
+    // ==========================================
+    // Articles List (Edit/Delete)
+    // ==========================================
+    window.loadArticlesList = async function() {
+        try {
+            var snap = await db.collection('articles').orderBy('date', 'desc').get();
+            var articles = snap.docs.map(function(d) { return { id: d.id, ...d.data() }; });
+            renderArticlesList(articles);
+        } catch(e) {
+            console.error('Load articles error:', e);
+        }
+    };
+    
+    window.renderArticlesList = function(articles) {
+        var container = document.getElementById('articlesListContainer');
+        if(!articles.length) {
+            container.innerHTML = '<p style="color:#888; text-align:center;">لا توجد مقالات</p>';
+            return;
+        }
+        
+        container.innerHTML = articles.map(function(a) {
+            var dateStr = a.date ? new Date(a.date.toDate()).toLocaleDateString('ar-EG') : 'قديم';
+            return '<div class="article-list-item">' +
+                '<span class="article-list-title" onclick="editArticle(\'' + a.id + '\')">' +
+                    '<i class="fas fa-file-alt" style="color:#D4AF37; margin-left:0.5rem;"></i>' +
+                    escapeHtml(a.title) +
+                    '<span style="color:#666; font-size:0.75rem; margin-right:0.5rem;">(' + dateStr + ')</span>' +
+                '</span>' +
+                '<div class="article-list-actions">' +
+                    '<button class="btn-outline btn-sm" onclick="editArticle(\'' + a.id + '\')"><i class="fas fa-edit"></i> تعديل</button>' +
+                    '<button class="btn-danger btn-sm" onclick="deleteArticle(\'' + a.id + '\')"><i class="fas fa-trash"></i> حذف</button>' +
+                '</div>' +
+            '</div>';
+        }).join('');
+    };
+    
+    window.editArticle = async function(id) {
+        try {
+            var doc = await db.collection('articles').doc(id).get();
+            if(!doc.exists) {
+                showMsg('publishMsg', '❌ المقال غير موجود', 'error');
+                return;
+            }
+            
+            var data = doc.data();
+            editingArticleId = id;
+            
+            // Fill form
+            document.getElementById('articleTitle').value = data.title || '';
+            document.getElementById('authorSelect').value = data.author || '';
+            document.getElementById('catSelect').value = data.category || '';
+            
+            // Trigger change to populate subSelect
+            document.getElementById('catSelect').onchange();
+            setTimeout(function() {
+                document.getElementById('subSelect').value = data.subfield || '';
+            }, 100);
+            
+            // Load blocks
+            blocks = data.contentBlocks ? JSON.parse(JSON.stringify(data.contentBlocks)) : [];
+            renderBlocks();
+            
+            // Update UI
+            document.getElementById('editingArticleId').value = id;
+            document.getElementById('publishBtn').innerHTML = '<i class="fas fa-save"></i> تحديث المقال';
+            
+            showMsg('publishMsg', '✅ تم تحميل المقال للتعديل', 'success');
+            window.scrollTo({ top: document.querySelector('.card:last-of-type').offsetTop, behavior: 'smooth' });
+        } catch(e) {
+            showMsg('publishMsg', '❌ فشل تحميل المقال: ' + e.message, 'error');
+        }
+    };
+    
+    window.deleteArticle = async function(id) {
+        if(!confirm('هل أنت متأكد من حذف هذا المقال؟ لا يمكن التراجع.')) return;
+        try {
+            await db.collection('articles').doc(id).delete();
+            showMsg('publishMsg', '✅ تم حذف المقال', 'success');
+            loadArticlesList();
+            updateStats();
+        } catch(e) {
+            showMsg('publishMsg', '❌ فشل الحذف: ' + e.message, 'error');
+        }
+    };
+    
+    window.clearEditor = function() {
+        editingArticleId = '';
+        document.getElementById('editingArticleId').value = '';
+        document.getElementById('articleTitle').value = '';
+        document.getElementById('authorSelect').value = '';
+        document.getElementById('catSelect').value = '';
+        document.getElementById('subSelect').value = '';
+        blocks = [];
+        renderBlocks();
+        localStorage.removeItem('shnfr_admin_blocks');
+        document.getElementById('publishBtn').innerHTML = '<i class="fas fa-paper-plane"></i> نشر المقال';
+        showMsg('publishMsg', '✅ تم مسح المحرر', 'info');
     };
 
     // ==========================================
@@ -996,7 +1134,7 @@
     };
 
     // ==========================================
-    // Publish
+    // Publish / Update
     // ==========================================
     document.getElementById('publishBtn').onclick = async function() {
         if(document.activeElement && document.activeElement.blur) {
@@ -1015,7 +1153,8 @@
         
         var btn = document.getElementById('publishBtn');
         btn.classList.add('btn-loading');
-        btn.innerHTML = '<span class="spinner"></span> جاري النشر...';
+        var isEditing = editingArticleId !== '';
+        btn.innerHTML = '<span class="spinner"></span> ' + (isEditing ? 'جاري التحديث...' : 'جاري النشر...');
         
         var cleanBlocks = blocks.map(function(b) {
             if(b.type === 'image') return { type:'image', value:{ url: b.value.url, caption: b.value.caption || '' } };
@@ -1023,22 +1162,40 @@
         });
         
         try {
-            await db.collection('articles').add({
-                title: title, author: author, category: cat, subfield: sub || '',
-                contentBlocks: cleanBlocks, views: 0,
-                date: firebase.firestore.FieldValue.serverTimestamp()
-            });
-            showMsg('publishMsg', '✅ نشر المقال بنجاح', 'success');
+            if(isEditing) {
+                // Update existing
+                await db.collection('articles').doc(editingArticleId).update({
+                    title: title, author: author, category: cat, subfield: sub || '',
+                    contentBlocks: cleanBlocks
+                });
+                showMsg('publishMsg', '✅ تم تحديث المقال بنجاح', 'success');
+            } else {
+                // Create new
+                await db.collection('articles').add({
+                    title: title, author: author, category: cat, subfield: sub || '',
+                    contentBlocks: cleanBlocks, views: 0,
+                    date: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                showMsg('publishMsg', '✅ نشر المقال بنجاح', 'success');
+            }
+            
+            // Clear editor
+            editingArticleId = '';
+            document.getElementById('editingArticleId').value = '';
             blocks = []; 
             localStorage.removeItem('shnfr_admin_blocks');
             document.getElementById('articleTitle').value = '';
+            document.getElementById('authorSelect').value = '';
+            document.getElementById('catSelect').value = '';
+            document.getElementById('subSelect').value = '';
             renderBlocks();
+            loadArticlesList();
             updateStats();
+            document.getElementById('publishBtn').innerHTML = '<i class="fas fa-paper-plane"></i> نشر المقال';
         } catch(e) { 
             showMsg('publishMsg', '❌ ' + e.message, 'error'); 
-        } finally {
             btn.classList.remove('btn-loading');
-            btn.innerHTML = '<i class="fas fa-paper-plane"></i> نشر المقال';
+            btn.innerHTML = isEditing ? '<i class="fas fa-save"></i> تحديث المقال' : '<i class="fas fa-paper-plane"></i> نشر المقال';
         }
     };
     
@@ -1046,6 +1203,8 @@
         saveBlocksToLocal();
         showMsg('publishMsg', '💾 تم حفظ المسودة محلياً', 'info');
     };
+    
+    document.getElementById('clearEditorBtn').onclick = clearEditor;
     
     // Block buttons
     document.getElementById('addTextBtn').onclick = function() { addBlock('text'); };
@@ -1076,4 +1235,4 @@
     });
 </script>
 </body>
-    </html>
+</html>

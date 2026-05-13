@@ -15,8 +15,8 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui; }
         body { background: #0A0B10; color: #eee; direction: rtl; padding: 1.5rem; }
-        .container { max-width: 1300px; margin: auto; }
-        .dashboard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; border-bottom: 1px solid #2a2a35; padding-bottom: 1rem; }
+        .container { max-width: 1400px; margin: auto; }
+        .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; border-bottom: 1px solid #2a2a35; padding-bottom: 1rem; }
         .logo { font-size: 2rem; color: #D4AF37; font-weight: bold; }
         .stats-badge { background: #1e1e2a; padding: 0.4rem 1rem; border-radius: 40px; font-size: 0.8rem; }
         .grid-2col { display: grid; grid-template-columns: repeat(2,1fr); gap: 1.5rem; margin-bottom: 2rem; }
@@ -50,24 +50,24 @@
         <h2>🔐 دخول الإدارة</h2>
         <input type="email" id="loginEmail" placeholder="البريد الإلكتروني">
         <input type="password" id="loginPassword" placeholder="كلمة المرور">
-        <button id="doLogin">تسجيل الدخول</button>
+        <button id="doLoginBtn">تسجيل الدخول</button>
         <div id="loginMsg" class="message"></div>
     </div>
 
     <div id="adminPanel" style="display: none;">
-        <div class="dashboard-header">
+        <div class="admin-header">
             <div class="logo">AWJ Admin</div>
             <div><span class="stats-badge" id="statsInfo"></span> <button id="logoutBtn" style="background:#333; color:#eee;">تسجيل الخروج</button></div>
         </div>
 
         <div class="grid-2col">
-            <!-- قسم التبويبات -->
+            <!-- التبويبات والفروع -->
             <div class="card">
                 <h2><i class="fas fa-folder-tree"></i> التبويبات والفروع</h2>
                 <div class="flex-row"><input type="text" id="newCatName" placeholder="اسم التبويبة الجديدة"><button id="addCatBtn">➕ إضافة تبويبة</button></div>
                 <div id="catsList"></div>
             </div>
-            <!-- قسم الكتّاب -->
+            <!-- الكتّاب -->
             <div class="card">
                 <h2><i class="fas fa-users"></i> الكتّاب</h2>
                 <div class="flex-row"><input type="text" id="newAuthorName" placeholder="اسم الكاتب الجديد"><button id="addAuthorBtn">➕ إضافة كاتب</button></div>
@@ -75,7 +75,7 @@
             </div>
         </div>
 
-        <!-- محرر المقال -->
+        <!-- محرر المقال المتقدم -->
         <div class="card">
             <h2><i class="fas fa-feather-alt"></i> محرر المقال المتقدم</h2>
             <input type="text" id="articleTitle" placeholder="عنوان المقال">
@@ -116,20 +116,16 @@
     let categories = [];
     let authors = [];
     let blocks = [];
-    let currentUser = null;
-
     const languages = ["javascript","python","html","css","php","java","csharp","go","ruby","bash","typescript","swift","kotlin"];
 
-    // auth
-    document.getElementById('doLogin').onclick = async () => {
+    // Auth
+    document.getElementById('doLoginBtn').onclick = async () => {
         const email = document.getElementById('loginEmail').value;
         const pass = document.getElementById('loginPassword').value;
-        try {
-            await auth.signInWithEmailAndPassword(email, pass);
-        } catch(e) { showMsg('loginMsg', '❌ '+e.message, 'error'); }
+        try { await auth.signInWithEmailAndPassword(email, pass); } 
+        catch(e) { showMsg('loginMsg', '❌ '+e.message, 'error'); }
     };
     auth.onAuthStateChanged(user => {
-        currentUser = user;
         if (user) {
             document.getElementById('loginPanel').style.display = 'none';
             document.getElementById('adminPanel').style.display = 'block';
@@ -141,17 +137,10 @@
         }
     });
     document.getElementById('logoutBtn').onclick = () => auth.signOut();
+    function showMsg(elId, text, type) { const d = document.getElementById(elId); d.innerHTML = text; d.className = `message ${type}`; setTimeout(() => d.className = 'message', 3000); }
+    async function updateStats() { const snap = await db.collection('articles').get(); document.getElementById('statsInfo').innerHTML = `📄 ${snap.size} مقال | ✍️ ${authors.length} كاتب | 🗂️ ${categories.length} تبويبة`; }
 
-    function showMsg(elId, text, type) {
-        const div = document.getElementById(elId);
-        div.innerHTML = text; div.className = `message ${type}`;
-        setTimeout(() => div.className = 'message', 3000);
-    }
-    async function updateStats() {
-        const articlesSnap = await db.collection('articles').get();
-        document.getElementById('statsInfo').innerHTML = `📄 ${articlesSnap.size} مقال | ✍️ ${authors.length} كاتب | 🗂️ ${categories.length} تبويبة`;
-    }
-    // categories
+    // Categories
     async function loadCategories() {
         const snap = await db.collection('categories').orderBy('name').get();
         categories = snap.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -207,7 +196,8 @@
             if(cat) cat.subfields.forEach(s => subSel.innerHTML += `<option value="${s}">${s}</option>`);
         };
     }
-    // authors
+
+    // Authors
     async function loadAuthors() {
         const snap = await db.collection('authors').orderBy('name').get();
         authors = snap.docs.map(d => ({ id: d.id, name: d.data().name }));
@@ -231,9 +221,10 @@
         sel.innerHTML = '<option value="">اختر الكاتب</option>';
         authors.forEach(a => sel.innerHTML += `<option value="${a.name}">${a.name}</option>`);
     }
-    // editor blocks
+
+    // Editor blocks
     function addBlock(type) {
-        if(type === 'text') blocks.push({ type, value: '<p>نص جديد مكتوب <strong>HTML</strong></p>' });
+        if(type === 'text') blocks.push({ type, value: '<p>نص جديد <strong>غامق</strong> أو <em>مائل</em></p>' });
         else if(type === 'image') blocks.push({ type, value: { url: '', caption: '' } });
         else if(type === 'code') blocks.push({ type, value: { code: '// اكتب كودك', language: 'javascript' } });
         else if(type === 'summary') blocks.push({ type, value: 'ملخص المقال هنا...' });
@@ -244,7 +235,7 @@
         if(typeof blocks[idx].value === 'string') blocks[idx].value = val;
         else blocks[idx].value[field] = val;
         saveBlocksToLocal();
-        renderBlocks(); // refresh preview
+        renderBlocks();
     }
     async function uploadImage(idx, fileInput) {
         const file = fileInput.files[0];
@@ -298,7 +289,8 @@
     function saveBlocksToLocal() { localStorage.setItem('admin_blocks', JSON.stringify(blocks)); }
     function loadBlocksFromLocal() { const saved = localStorage.getItem('admin_blocks'); if(saved) blocks = JSON.parse(saved); else blocks = []; renderBlocks(); }
     function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, m=> m==='&'?'&amp;':m==='<'?'&lt;':'&gt;'); }
-    // publish
+
+    // Publish
     document.getElementById('publishBtn').onclick = async () => {
         const title = document.getElementById('articleTitle').value.trim();
         const author = document.getElementById('authorSelect').value;

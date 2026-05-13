@@ -3,255 +3,102 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>أوج | لوحة القيادة</title>
+    <title>أوج | لوحة التحكم السيادية</title>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/dark.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui; }
+        body { background: #0A0B10; color: #eee; direction: rtl; padding: 1.5rem; }
+        .container { max-width: 1300px; margin: auto; }
+        .dashboard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; border-bottom: 1px solid #2a2a35; padding-bottom: 1rem; }
+        .logo { font-size: 2rem; color: #D4AF37; font-weight: bold; }
+        .stats-badge { background: #1e1e2a; padding: 0.4rem 1rem; border-radius: 40px; font-size: 0.8rem; }
+        .grid-2col { display: grid; grid-template-columns: repeat(2,1fr); gap: 1.5rem; margin-bottom: 2rem; }
+        .card { background: #0C0F17; border: 1px solid #2a2a35; border-radius: 1.5rem; padding: 1.5rem; margin-bottom: 1.5rem; }
+        .card h2 { color: #D4AF37; margin-bottom: 1rem; border-right: 3px solid #D4AF37; padding-right: 0.8rem; }
+        .flex-row { display: flex; gap: 1rem; flex-wrap: wrap; align-items: center; margin-bottom: 1rem; }
+        input, select, textarea { background: #1a1c25; border: 1px solid #2a2a35; padding: 0.7rem 1rem; border-radius: 1rem; color: white; width: 100%; margin-bottom: 0.8rem; }
+        button { background: #D4AF37; color: #000; border: none; padding: 0.6rem 1.2rem; border-radius: 2rem; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        button:hover { opacity: 0.85; transform: scale(0.98); }
+        .btn-outline { background: transparent; border: 1px solid #D4AF37; color: #D4AF37; }
+        .block {
+            background: #12141E;
+            border-radius: 1rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
         }
-
-        body {
-            background: #0a0a0a;
-            color: #e0e0e0;
-            font-family: 'Segoe UI', Tahoma, sans-serif;
-            padding: 30px 20px;
-            direction: rtl;
-        }
-
-        .dashboard {
-            max-width: 1300px;
-            margin: 0 auto;
-        }
-
-        .card {
-            background: #111;
-            border-radius: 28px;
-            border: 1px solid #D4AF37;
-            padding: 28px;
-            margin-bottom: 32px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
-        }
-
-        .card h2, .card h3 {
-            color: #D4AF37;
-            border-bottom: 1px solid #2a2a2a;
-            padding-bottom: 10px;
-            margin-bottom: 22px;
-            font-weight: 600;
-        }
-
-        .grid-2col {
-            display: flex;
-            gap: 24px;
-            flex-wrap: wrap;
-        }
-
-        .grid-2col > div {
-            flex: 1;
-            min-width: 240px;
-        }
-
-        label {
-            display: block;
-            margin-top: 18px;
-            margin-bottom: 6px;
-            font-weight: 500;
-            color: #bbb;
-        }
-
-        input, select, textarea {
-            width: 100%;
-            padding: 12px 14px;
-            background: #1e1e1e;
-            border: 1px solid #333;
-            border-radius: 16px;
-            color: white;
-            font-size: 0.95rem;
-            transition: 0.2s;
-        }
-
-        input:focus, select:focus, textarea:focus {
-            border-color: #D4AF37;
-            outline: none;
-        }
-
-        button {
-            background: #D4AF37;
-            color: #000;
-            border: none;
-            padding: 10px 22px;
-            border-radius: 40px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.2s;
-            margin: 5px 0;
-        }
-
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(212,175,55,0.3);
-        }
-
-        .btn-outline {
-            background: transparent;
-            border: 1px solid #D4AF37;
-            color: #D4AF37;
-        }
-
-        .block-editor {
-            background: #0f0f0f;
-            border: 1px solid #2a2a2a;
-            border-radius: 20px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-
-        .block-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            cursor: move;
-        }
-
-        .block-type {
-            background: #2a2a2a;
-            padding: 4px 12px;
-            border-radius: 30px;
-            font-size: 0.75rem;
-            color: #D4AF37;
-        }
-
-        .delete-block {
-            background: none;
-            border: none;
-            color: #ff7777;
-            font-size: 1.2rem;
-            cursor: pointer;
-        }
-
-        .image-preview {
-            max-width: 100%;
-            max-height: 200px;
-            margin: 12px 0;
-            border-radius: 16px;
-        }
-
-        .flex-row {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-            align-items: center;
-            margin: 10px 0;
-        }
-
-        .message {
-            padding: 12px;
-            border-radius: 40px;
-            text-align: center;
-            margin-top: 20px;
-            display: none;
-        }
-
-        .success {
-            background: #2e7d32;
-            display: block;
-        }
-
-        .error {
-            background: #c62828;
-            display: block;
-        }
-
-        .sub-item {
-            background: #2a2a2a;
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 30px;
-            margin: 3px;
-            font-size: 0.8rem;
-        }
-
-        pre {
-            background: #1e1e1e;
-            padding: 10px;
-            border-radius: 14px;
-            overflow-x: auto;
-            margin-top: 10px;
-        }
-
-        hr {
-            border-color: #2a2a2a;
-            margin: 20px 0;
-        }
+        .block-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; cursor: move; }
+        .delete-block { background: none; border: none; color: #ff7777; font-size: 1.2rem; cursor: pointer; }
+        .image-preview { max-width: 100%; max-height: 180px; margin-top: 0.5rem; border-radius: 0.8rem; }
+        .code-preview { background: #0D0F14; padding: 0.8rem; border-radius: 0.8rem; margin-top: 0.5rem; }
+        .message { padding: 0.8rem; border-radius: 1rem; margin-top: 1rem; text-align: center; display: none; }
+        .success { background: #1e4620; display: block; }
+        .error { background: #8b2c2c; display: block; }
+        .sub-item { background: #2a2a35; display: inline-block; padding: 0.2rem 0.8rem; border-radius: 40px; margin-left: 0.5rem; margin-bottom: 0.3rem; }
+        @media (max-width: 800px) { .grid-2col { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
-<div class="dashboard">
-    <!-- قسم تسجيل الدخول -->
-    <div id="login-box" class="card" style="max-width: 500px; margin: 50px auto;">
-        <h2>🔐 الدخول إلى القيادة</h2>
-        <input type="email" id="admin-email" placeholder="البريد الإلكتروني">
-        <input type="password" id="admin-pwd" placeholder="كلمة المرور">
-        <button onclick="adminLogin()" style="width:100%;">تسجيل الدخول</button>
-        <div id="login-msg" class="message"></div>
+<div class="container">
+    <div id="loginPanel" class="card" style="max-width: 500px; margin: 5rem auto;">
+        <h2>🔐 دخول الإدارة</h2>
+        <input type="email" id="loginEmail" placeholder="البريد الإلكتروني">
+        <input type="password" id="loginPassword" placeholder="كلمة المرور">
+        <button id="doLogin">تسجيل الدخول</button>
+        <div id="loginMsg" class="message"></div>
     </div>
 
-    <!-- لوحة التحكم المخفية حتى تسجيل الدخول -->
-    <div id="admin-panel" style="display: none;">
-        <div class="card">
-            <h2><i class="fas fa-folder-open"></i> إدارة التبويبات والفروع</h2>
-            <div class="flex-row">
-                <input type="text" id="new-cat" placeholder="اسم تبويبة جديدة" style="flex:2;">
-                <button onclick="addCategory()">➕ إضافة</button>
-            </div>
-            <div id="categories-container"></div>
+    <div id="adminPanel" style="display: none;">
+        <div class="dashboard-header">
+            <div class="logo">AWJ Admin</div>
+            <div><span class="stats-badge" id="statsInfo"></span> <button id="logoutBtn" style="background:#333; color:#eee;">تسجيل الخروج</button></div>
         </div>
 
-        <div class="card">
-            <h2><i class="fas fa-users"></i> إدارة الكتّاب</h2>
-            <div class="flex-row">
-                <input type="text" id="new-author" placeholder="اسم كاتب جديد" style="flex:2;">
-                <button onclick="addAuthor()">➕ إضافة كاتب</button>
+        <div class="grid-2col">
+            <!-- قسم التبويبات -->
+            <div class="card">
+                <h2><i class="fas fa-folder-tree"></i> التبويبات والفروع</h2>
+                <div class="flex-row"><input type="text" id="newCatName" placeholder="اسم التبويبة الجديدة"><button id="addCatBtn">➕ إضافة تبويبة</button></div>
+                <div id="catsList"></div>
             </div>
-            <div id="authors-container"></div>
+            <!-- قسم الكتّاب -->
+            <div class="card">
+                <h2><i class="fas fa-users"></i> الكتّاب</h2>
+                <div class="flex-row"><input type="text" id="newAuthorName" placeholder="اسم الكاتب الجديد"><button id="addAuthorBtn">➕ إضافة كاتب</button></div>
+                <div id="authorsList"></div>
+            </div>
         </div>
 
+        <!-- محرر المقال -->
         <div class="card">
             <h2><i class="fas fa-feather-alt"></i> محرر المقال المتقدم</h2>
-            <label>عنوان المقال</label>
-            <input type="text" id="post-title" placeholder="العنوان الرئيسي">
-            <div class="grid-2col">
-                <div><label>اختر الكاتب</label><select id="post-author"></select></div>
-                <div><label>التبويبة</label><select id="post-category"></select></div>
-                <div><label>المجال الفرعي</label><select id="post-subfield"></select></div>
-            </div>
-            <div id="blocks-container"></div>
+            <input type="text" id="articleTitle" placeholder="عنوان المقال">
+            <select id="authorSelect"></select>
             <div class="flex-row">
-                <button onclick="addBlock('text')"><i class="fas fa-paragraph"></i> نص (HTML)</button>
-                <button onclick="addBlock('image')"><i class="fas fa-image"></i> صورة</button>
-                <button onclick="addBlock('code')"><i class="fas fa-code"></i> كود (10+ لغة)</button>
-                <button onclick="addBlock('summary')"><i class="fas fa-lightbulb"></i> مختصر المقال</button>
+                <select id="catSelect" style="flex:1"></select>
+                <select id="subSelect" style="flex:1"></select>
             </div>
-            <hr>
-            <button onclick="publishNewArticle()" style="width:100%;">🚀 نشر المقال</button>
-            <div id="publish-status" class="message"></div>
+            <div id="blocksEditor"></div>
+            <div class="flex-row">
+                <button id="addTextBtn"><i class="fas fa-paragraph"></i> نص (HTML)</button>
+                <button id="addImageBtn"><i class="fas fa-image"></i> صورة</button>
+                <button id="addCodeBtn"><i class="fas fa-code"></i> كود</button>
+                <button id="addSummaryBtn"><i class="fas fa-lightbulb"></i> مختصر</button>
+            </div>
+            <hr style="margin: 1rem 0; border-color:#2a2a35;">
+            <button id="publishBtn" style="width:100%;">🚀 نشر المقال</button>
+            <div id="publishMsg" class="message"></div>
         </div>
-        <button onclick="adminLogout()" class="btn-outline" style="background:transparent;">تسجيل الخروج</button>
     </div>
 </div>
 
 <script>
-    // Firebase config (نفس البيانات)
     const firebaseConfig = {
         apiKey: "AIzaSyDjgVxvtPXTn1tpr4IxOK3wOW4r3gzB1VU",
         authDomain: "awj-website-29f16.firebaseapp.com",
@@ -266,235 +113,220 @@
     const auth = firebase.auth();
     const storage = firebase.storage();
 
-    let categoriesList = [];
-    let authorsList = [];
-    let contentBlocks = [];
+    let categories = [];
+    let authors = [];
+    let blocks = [];
+    let currentUser = null;
 
-    // مراقبة تسجيل الدخول
+    const languages = ["javascript","python","html","css","php","java","csharp","go","ruby","bash","typescript","swift","kotlin"];
+
+    // auth
+    document.getElementById('doLogin').onclick = async () => {
+        const email = document.getElementById('loginEmail').value;
+        const pass = document.getElementById('loginPassword').value;
+        try {
+            await auth.signInWithEmailAndPassword(email, pass);
+        } catch(e) { showMsg('loginMsg', '❌ '+e.message, 'error'); }
+    };
     auth.onAuthStateChanged(user => {
+        currentUser = user;
         if (user) {
-            document.getElementById('login-box').style.display = 'none';
-            document.getElementById('admin-panel').style.display = 'block';
-            loadCategories();
-            loadAuthors();
-            loadLocalBlocks();
+            document.getElementById('loginPanel').style.display = 'none';
+            document.getElementById('adminPanel').style.display = 'block';
+            loadCategories(); loadAuthors(); loadBlocksFromLocal();
+            updateStats();
         } else {
-            document.getElementById('login-box').style.display = 'block';
-            document.getElementById('admin-panel').style.display = 'none';
+            document.getElementById('loginPanel').style.display = 'block';
+            document.getElementById('adminPanel').style.display = 'none';
         }
     });
+    document.getElementById('logoutBtn').onclick = () => auth.signOut();
 
-    window.adminLogin = async () => {
-        const email = document.getElementById('admin-email').value;
-        const pwd = document.getElementById('admin-pwd').value;
-        try {
-            await auth.signInWithEmailAndPassword(email, pwd);
-        } catch (e) {
-            showMsg('login-msg', '❌ فشل الدخول: ' + e.message, 'error');
-        }
-    };
-    window.adminLogout = () => auth.signOut();
     function showMsg(elId, text, type) {
-        const el = document.getElementById(elId);
-        el.textContent = text;
-        el.className = `message ${type}`;
-        setTimeout(() => el.className = 'message', 3500);
+        const div = document.getElementById(elId);
+        div.innerHTML = text; div.className = `message ${type}`;
+        setTimeout(() => div.className = 'message', 3000);
     }
-
-    // ---------- إدارة التبويبات ----------
+    async function updateStats() {
+        const articlesSnap = await db.collection('articles').get();
+        document.getElementById('statsInfo').innerHTML = `📄 ${articlesSnap.size} مقال | ✍️ ${authors.length} كاتب | 🗂️ ${categories.length} تبويبة`;
+    }
+    // categories
     async function loadCategories() {
         const snap = await db.collection('categories').orderBy('name').get();
-        categoriesList = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-        renderCategoriesUI();
-        updateCategorySelects();
+        categories = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        renderCatsList(); updateCatSelects();
     }
-    function renderCategoriesUI() {
-        const container = document.getElementById('categories-container');
-        if (!categoriesList.length) { container.innerHTML = '<p>لا توجد تبويبات. أضف الأولى.</p>'; return; }
-        container.innerHTML = '';
-        categoriesList.forEach(cat => {
-            container.innerHTML += `
-                <div style="background:#1a1a1a; border-radius:18px; padding:15px; margin-bottom:15px;">
-                    <div class="flex-row" style="justify-content:space-between;">
-                        <h3>📁 ${escapeHtml(cat.name)}</h3>
-                        <button class="btn-outline" onclick="deleteCategory('${cat.id}')">حذف التبويبة</button>
-                    </div>
-                    <div>${cat.subfields.map(sub => `<span class="sub-item">${escapeHtml(sub)} <i class="fas fa-times-circle" style="cursor:pointer; margin-right:5px;" onclick="removeSubfield('${cat.id}', '${sub}')"></i></span>`).join('')}</div>
-                    <div class="flex-row"><input type="text" id="new-sub-${cat.id}" placeholder="فرع جديد"><button onclick="addSubfield('${cat.id}')">إضافة فرع</button></div>
+    function renderCatsList() {
+        const div = document.getElementById('catsList');
+        if (!categories.length) { div.innerHTML = '<p>لا توجد تبويبات</p>'; return; }
+        div.innerHTML = '';
+        categories.forEach(cat => {
+            div.innerHTML += `
+                <div style="background:#12141E; border-radius:1rem; padding:0.8rem; margin-bottom:0.8rem;">
+                    <div class="flex-row" style="justify-content:space-between;"><b>📁 ${escapeHtml(cat.name)}</b> <button class="btn-outline" onclick="deleteCat('${cat.id}')">حذف</button></div>
+                    <div>${cat.subfields.map(s => `<span class="sub-item">${escapeHtml(s)} <i class="fas fa-times-circle" style="cursor:pointer;" onclick="removeSub('${cat.id}','${s}')"></i></span>`).join('')}</div>
+                    <div class="flex-row"><input type="text" id="sub-${cat.id}" placeholder="فرع جديد"><button class="btn-outline" onclick="addSub('${cat.id}')">إضافة فرع</button></div>
                 </div>
             `;
         });
     }
-    window.addCategory = async () => {
-        const name = document.getElementById('new-cat').value.trim();
-        if (!name) return;
-        await db.collection('categories').add({ name, subfields: [] });
-        document.getElementById('new-cat').value = '';
-        loadCategories();
-    };
-    window.deleteCategory = async (id) => { if(confirm('حذف التبويبة سيحذف فروعها')) await db.collection('categories').doc(id).delete(); loadCategories(); };
-    window.addSubfield = async (catId) => {
-        const input = document.getElementById(`new-sub-${catId}`);
-        const sub = input.value.trim();
-        if (!sub) return;
-        const cat = categoriesList.find(c => c.id === catId);
-        if (cat.subfields.includes(sub)) return;
-        await db.collection('categories').doc(catId).update({ subfields: [...cat.subfields, sub] });
+    window.deleteCat = async (id) => { if(confirm('سيتم حذف التبويبة وجميع فروعها')) { await db.collection('categories').doc(id).delete(); loadCategories(); } };
+    window.addSub = async (catId) => {
+        const input = document.getElementById(`sub-${catId}`);
+        const val = input.value.trim();
+        if(!val) return;
+        const cat = categories.find(c=>c.id===catId);
+        const newSubs = [...cat.subfields, val];
+        await db.collection('categories').doc(catId).update({ subfields: newSubs });
         input.value = '';
         loadCategories();
     };
-    window.removeSubfield = async (catId, sub) => {
-        const cat = categoriesList.find(c => c.id === catId);
-        const newSubs = cat.subfields.filter(s => s !== sub);
+    window.removeSub = async (catId, subName) => {
+        const cat = categories.find(c=>c.id===catId);
+        const newSubs = cat.subfields.filter(s=>s!==subName);
         await db.collection('categories').doc(catId).update({ subfields: newSubs });
         loadCategories();
     };
-    function updateCategorySelects() {
-        const catSelect = document.getElementById('post-category');
-        const subSelect = document.getElementById('post-subfield');
-        catSelect.innerHTML = '<option value="">اختر التبويبة</option>';
-        categoriesList.forEach(c => catSelect.innerHTML += `<option value="${c.name}">${c.name}</option>`);
-        catSelect.onchange = () => {
-            const selectedCat = catSelect.value;
-            const cat = categoriesList.find(c => c.name === selectedCat);
-            subSelect.innerHTML = '<option value="">اختر الفرع</option>';
-            if (cat) cat.subfields.forEach(s => subSelect.innerHTML += `<option value="${s}">${s}</option>`);
+    document.getElementById('addCatBtn').onclick = async () => {
+        const name = document.getElementById('newCatName').value.trim();
+        if(!name) return;
+        await db.collection('categories').add({ name, subfields: [] });
+        document.getElementById('newCatName').value = '';
+        loadCategories();
+    };
+    function updateCatSelects() {
+        const catSel = document.getElementById('catSelect');
+        const subSel = document.getElementById('subSelect');
+        catSel.innerHTML = '<option value="">اختر التبويبة</option>';
+        categories.forEach(c => catSel.innerHTML += `<option value="${c.name}">${c.name}</option>`);
+        catSel.onchange = () => {
+            const catName = catSel.value;
+            const cat = categories.find(c=>c.name===catName);
+            subSel.innerHTML = '<option value="">اختر الفرع</option>';
+            if(cat) cat.subfields.forEach(s => subSel.innerHTML += `<option value="${s}">${s}</option>`);
         };
     }
-
-    // ---------- إدارة الكتّاب ----------
+    // authors
     async function loadAuthors() {
         const snap = await db.collection('authors').orderBy('name').get();
-        authorsList = snap.docs.map(d => ({ id: d.id, name: d.data().name }));
-        renderAuthorsUI();
-        updateAuthorSelect();
+        authors = snap.docs.map(d => ({ id: d.id, name: d.data().name }));
+        renderAuthorsList(); updateAuthorSelect(); updateStats();
     }
-    function renderAuthorsUI() {
-        const container = document.getElementById('authors-container');
-        if (!authorsList.length) { container.innerHTML = '<p>لا يوجد كتاب. أضف كاتباً.</p>'; return; }
-        container.innerHTML = authorsList.map(a => `<div class="flex-row" style="justify-content:space-between;"><span>✍️ ${escapeHtml(a.name)}</span><button class="btn-outline" onclick="deleteAuthor('${a.id}')">حذف</button></div>`).join('');
+    function renderAuthorsList() {
+        const div = document.getElementById('authorsList');
+        if(!authors.length) { div.innerHTML = '<p>لا يوجد كتاب</p>'; return; }
+        div.innerHTML = authors.map(a => `<div class="flex-row" style="justify-content:space-between;"><span>✍️ ${escapeHtml(a.name)}</span><button class="btn-outline" onclick="deleteAuthor('${a.id}')">حذف</button></div>`).join('');
     }
-    window.addAuthor = async () => {
-        const name = document.getElementById('new-author').value.trim();
-        if (!name) return;
+    window.deleteAuthor = async (id) => { await db.collection('authors').doc(id).delete(); loadAuthors(); };
+    document.getElementById('addAuthorBtn').onclick = async () => {
+        const name = document.getElementById('newAuthorName').value.trim();
+        if(!name) return;
         await db.collection('authors').add({ name });
-        document.getElementById('new-author').value = '';
+        document.getElementById('newAuthorName').value = '';
         loadAuthors();
     };
-    window.deleteAuthor = async (id) => { if(confirm('حذف الكاتب سيؤثر على المقالات')) await db.collection('authors').doc(id).delete(); loadAuthors(); };
-    function updateAuthorSelect() {
-        const select = document.getElementById('post-author');
-        select.innerHTML = '<option value="">اختر الكاتب</option>';
-        authorsList.forEach(a => select.innerHTML += `<option value="${a.name}">${a.name}</option>`);
+    function updateAuthorSelect() { 
+        const sel = document.getElementById('authorSelect');
+        sel.innerHTML = '<option value="">اختر الكاتب</option>';
+        authors.forEach(a => sel.innerHTML += `<option value="${a.name}">${a.name}</option>`);
     }
-
-    // ---------- محرر الكتل (ثابت، HTML، صور، 10 لغات) ----------
-    const availableLanguages = ["javascript", "python", "html", "css", "php", "java", "csharp", "go", "ruby", "bash"];
+    // editor blocks
     function addBlock(type) {
-        let block;
-        if (type === 'text') block = { type, value: '<p>اكتب المحتوى هنا (HTML مسموح).</p>' };
-        else if (type === 'image') block = { type, value: { url: '', caption: '' } };
-        else if (type === 'code') block = { type, value: { code: '// اكتب كودك هنا', language: 'javascript' } };
-        else if (type === 'summary') block = { type, value: 'ملخص المقال... يدعم HTML.' };
-        contentBlocks.push(block);
-        renderBlocks();
-        saveLocalBlocks();
+        if(type === 'text') blocks.push({ type, value: '<p>نص جديد مكتوب <strong>HTML</strong></p>' });
+        else if(type === 'image') blocks.push({ type, value: { url: '', caption: '' } });
+        else if(type === 'code') blocks.push({ type, value: { code: '// اكتب كودك', language: 'javascript' } });
+        else if(type === 'summary') blocks.push({ type, value: 'ملخص المقال هنا...' });
+        renderBlocks(); saveBlocksToLocal();
     }
-    function deleteBlock(idx) {
-        contentBlocks.splice(idx, 1);
-        renderBlocks();
-        saveLocalBlocks();
-    }
+    function deleteBlock(idx) { blocks.splice(idx,1); renderBlocks(); saveBlocksToLocal(); }
     function updateBlockValue(idx, field, val) {
-        if (typeof contentBlocks[idx].value === 'string') contentBlocks[idx].value = val;
-        else contentBlocks[idx].value[field] = val;
-        saveLocalBlocks();
+        if(typeof blocks[idx].value === 'string') blocks[idx].value = val;
+        else blocks[idx].value[field] = val;
+        saveBlocksToLocal();
+        renderBlocks(); // refresh preview
     }
-    async function uploadImageForBlock(idx, fileInput) {
+    async function uploadImage(idx, fileInput) {
         const file = fileInput.files[0];
-        if (!file) return;
-        const ref = storage.ref(`article_imgs/${Date.now()}_${file.name}`);
+        if(!file) return;
+        const ref = storage.ref(`articles/${Date.now()}_${file.name}`);
         await ref.put(file);
         const url = await ref.getDownloadURL();
-        contentBlocks[idx].value.url = url;
-        document.getElementById(`img-preview-${idx}`).innerHTML = `<img src="${url}" class="image-preview"><br><input type="text" placeholder="تسمية الصورة" value="${escapeHtml(contentBlocks[idx].value.caption)}" onchange="updateBlockValue(${idx}, 'caption', this.value)">`;
-        saveLocalBlocks();
-    }
-    function copyCodeFromBlock(idx) {
-        navigator.clipboard.writeText(contentBlocks[idx].value.code);
-        alert('تم نسخ الكود');
-    }
-    function renderBlocks() {
-        const container = document.getElementById('blocks-container');
-        if (!contentBlocks.length) { container.innerHTML = '<p style="text-align:center;">➕ أضف كتلة جديدة باستخدام الأزرار أعلاه</p>'; return; }
-        container.innerHTML = '';
-        contentBlocks.forEach((block, idx) => {
-            const blockDiv = document.createElement('div');
-            blockDiv.className = 'block-editor';
-            blockDiv.setAttribute('data-idx', idx);
-            let inner = `<div class="block-header"><span class="block-type">${block.type === 'text' ? '📝 نص' : block.type === 'image' ? '🖼️ صورة' : block.type === 'code' ? '💻 كود' : '✨ مختصر'}</span><button class="delete-block" onclick="deleteBlock(${idx})"><i class="fas fa-trash"></i></button></div>`;
-            if (block.type === 'text') {
-                inner += `<textarea rows="5" onchange="updateBlockValue(${idx}, null, this.value)">${escapeHtml(block.value)}</textarea>`;
-            } else if (block.type === 'image') {
-                inner += `<input type="file" accept="image/*" onchange="uploadImageForBlock(${idx}, this)"><div id="img-preview-${idx}">${block.value.url ? `<img src="${block.value.url}" class="image-preview"><br><input type="text" placeholder="تسمية الصورة" value="${escapeHtml(block.value.caption)}" onchange="updateBlockValue(${idx}, 'caption', this.value)">` : ''}</div>`;
-            } else if (block.type === 'code') {
-                inner += `<select onchange="updateBlockValue(${idx}, 'language', this.value)">${availableLanguages.map(l => `<option value="${l}" ${block.value.language === l ? 'selected' : ''}>${l}</option>`).join('')}</select>`;
-                inner += `<textarea rows="6" onchange="updateBlockValue(${idx}, 'code', this.value)">${escapeHtml(block.value.code)}</textarea>`;
-                inner += `<button onclick="copyCodeFromBlock(${idx})" class="btn-outline" style="margin-top:8px;"><i class="fas fa-copy"></i> نسخ الكود من هذه الكتلة</button>`;
-                inner += `<pre><code class="language-${block.value.language}">${escapeHtml(block.value.code)}</code></pre>`;
-            } else if (block.type === 'summary') {
-                inner += `<textarea rows="3" onchange="updateBlockValue(${idx}, null, this.value)">${escapeHtml(block.value)}</textarea>`;
-            }
-            blockDiv.innerHTML = inner;
-            container.appendChild(blockDiv);
-            if (block.type === 'code') hljs.highlightElement(blockDiv.querySelector('pre code'));
-        });
-        new Sortable(container, { animation: 200, handle: '.block-header', onEnd: () => reorderBlocks() });
-    }
-    function reorderBlocks() {
-        const newOrder = [];
-        document.querySelectorAll('.block-editor').forEach(el => {
-            const idx = parseInt(el.getAttribute('data-idx'));
-            newOrder.push(contentBlocks[idx]);
-        });
-        contentBlocks = newOrder;
-        saveLocalBlocks();
+        blocks[idx].value.url = url;
+        saveBlocksToLocal();
         renderBlocks();
     }
-    function saveLocalBlocks() { localStorage.setItem('awj_temp_blocks', JSON.stringify(contentBlocks)); }
-    function loadLocalBlocks() { const saved = localStorage.getItem('awj_temp_blocks'); if (saved) contentBlocks = JSON.parse(saved); else contentBlocks = []; renderBlocks(); }
-
-    // ---------- نشر المقال ----------
-    window.publishNewArticle = async () => {
-        const title = document.getElementById('post-title').value.trim();
-        const author = document.getElementById('post-author').value;
-        const category = document.getElementById('post-category').value;
-        const subfield = document.getElementById('post-subfield').value;
-        if (!title || !author || !category || !subfield || contentBlocks.length === 0) {
-            showMsg('publish-status', '❌ جميع الحقول مطلوبة وكتلة واحدة على الأقل', 'error');
-            return;
+    function renderBlocks() {
+        const container = document.getElementById('blocksEditor');
+        if(!blocks.length) { container.innerHTML = '<div style="text-align:center; color:#aaa;">➕ أضف كتلة</div>'; return; }
+        container.innerHTML = '';
+        blocks.forEach((block, idx) => {
+            const div = document.createElement('div');
+            div.className = 'block';
+            div.setAttribute('data-idx', idx);
+            let inner = `<div class="block-header"><span>${block.type==='text'?'📝 نص':block.type==='image'?'🖼️ صورة':block.type==='code'?'💻 كود':'✨ مختصر'}</span><button class="delete-block" onclick="deleteBlock(${idx})"><i class="fas fa-trash"></i></button></div>`;
+            if(block.type === 'text') inner += `<textarea rows="4" onchange="updateBlockValue(${idx}, null, this.value)">${escapeHtml(block.value)}</textarea>`;
+            else if(block.type === 'image') {
+                inner += `<input type="file" accept="image/*" onchange="uploadImage(${idx}, this)">`;
+                if(block.value.url) inner += `<div><img src="${block.value.url}" class="image-preview"><br><input type="text" placeholder="التسمية" value="${escapeHtml(block.value.caption)}" onchange="updateBlockValue(${idx},'caption',this.value)"></div>`;
+            }
+            else if(block.type === 'code') {
+                inner += `<select onchange="updateBlockValue(${idx}, 'language', this.value)">${languages.map(l=>`<option value="${l}" ${block.value.language===l?'selected':''}>${l}</option>`).join('')}</select>`;
+                inner += `<textarea rows="6" onchange="updateBlockValue(${idx}, 'code', this.value)">${escapeHtml(block.value.code)}</textarea>`;
+                inner += `<div class="code-preview"><pre><code class="language-${block.value.language}">${escapeHtml(block.value.code)}</code></pre></div>`;
+            }
+            else if(block.type === 'summary') inner += `<textarea rows="3" onchange="updateBlockValue(${idx}, null, this.value)">${escapeHtml(block.value)}</textarea>`;
+            div.innerHTML = inner;
+            container.appendChild(div);
+            if(block.type === 'code') {
+                const codeBlock = div.querySelector('pre code');
+                if(codeBlock) hljs.highlightElement(codeBlock);
+            }
+        });
+        new Sortable(container, { animation: 200, onEnd: () => { syncBlocksOrder(); } });
+    }
+    function syncBlocksOrder() {
+        const newBlocks = [];
+        document.querySelectorAll('.block').forEach(el => {
+            const idx = parseInt(el.getAttribute('data-idx'));
+            newBlocks.push(blocks[idx]);
+        });
+        blocks = newBlocks;
+        saveBlocksToLocal();
+        renderBlocks();
+    }
+    function saveBlocksToLocal() { localStorage.setItem('admin_blocks', JSON.stringify(blocks)); }
+    function loadBlocksFromLocal() { const saved = localStorage.getItem('admin_blocks'); if(saved) blocks = JSON.parse(saved); else blocks = []; renderBlocks(); }
+    function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, m=> m==='&'?'&amp;':m==='<'?'&lt;':'&gt;'); }
+    // publish
+    document.getElementById('publishBtn').onclick = async () => {
+        const title = document.getElementById('articleTitle').value.trim();
+        const author = document.getElementById('authorSelect').value;
+        const cat = document.getElementById('catSelect').value;
+        const sub = document.getElementById('subSelect').value;
+        if(!title || !author || !cat || !sub || blocks.length===0) {
+            showMsg('publishMsg','❌ جميع الحقول مطلوبة وكتلة واحدة على الأقل','error'); return;
         }
-        const cleanBlocks = contentBlocks.map(b => {
-            if (b.type === 'image') return { type: 'image', value: { url: b.value.url, caption: b.value.caption } };
+        const cleanBlocks = blocks.map(b => {
+            if(b.type === 'image') return { type:'image', value:{ url:b.value.url, caption:b.value.caption } };
             return b;
         });
         try {
             await db.collection('articles').add({
-                title, author, category, subfield,
-                contentBlocks: cleanBlocks,
-                views: 0,
+                title, author, category: cat, subfield: sub,
+                contentBlocks: cleanBlocks, views: 0,
                 date: firebase.firestore.FieldValue.serverTimestamp()
             });
-            showMsg('publish-status', '✅ تم نشر المقال بنجاح!', 'success');
-            contentBlocks = [];
-            localStorage.removeItem('awj_temp_blocks');
-            document.getElementById('post-title').value = '';
+            showMsg('publishMsg','✅ نشر المقال بنجاح','success');
+            blocks = []; localStorage.removeItem('admin_blocks');
+            document.getElementById('articleTitle').value = '';
             renderBlocks();
-        } catch (e) { showMsg('publish-status', '❌ خطأ: ' + e.message, 'error'); }
+        } catch(e) { showMsg('publishMsg','❌ '+e.message,'error'); }
     };
-
-    function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;'); }
-    loadLocalBlocks();
+    document.getElementById('addTextBtn').onclick = () => addBlock('text');
+    document.getElementById('addImageBtn').onclick = () => addBlock('image');
+    document.getElementById('addCodeBtn').onclick = () => addBlock('code');
+    document.getElementById('addSummaryBtn').onclick = () => addBlock('summary');
 </script>
 </body>
 </html>

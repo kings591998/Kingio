@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-    <title>أوج | منصة المعرفة السيادية</title>
-    <meta name="description" content="أوج - منصة معرفية سيادية تقدم محتوى استراتيجياً وفلسفياً وعلمياً. نهدف إلى تمكين العقول بالنخبة الفكرية.">
-    <meta name="keywords" content="معرفة, استراتيجية, فلسفة, علوم, أوج, AWJ, منصة, مقالات">
+    <title>شنفر | منصة المعرفة السيادية</title>
+    <meta name="description" content="شنفر - منصة معرفية سيادية تقدم محتوى استراتيجياً وفلسفياً وعلمياً. نهدف إلى تمكين العقول بالنخبة الفكرية.">
+    <meta name="keywords" content="معرفة, استراتيجية, فلسفة, علوم, شنفر, SHNFR, منصة, مقالات">
     <meta name="theme-color" content="#050505">
-    <meta property="og:title" content="أوج | منصة المعرفة السيادية">
+    <meta property="og:title" content="شنفر | منصة المعرفة السيادية">
     <meta property="og:description" content="محتوى استراتيجي وفلسفي وعلمي للعقول النخبوية.">
     <meta property="og:type" content="website">
-    <meta property="og:image" content="https://via.placeholder.com/1200x630/0C0F17/D4AF37?text=AWJ+%7C+%D8%A3%D9%88%D8%AC">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦅</text></svg>">
+    <meta property="og:image" content="https://via.placeholder.com/1200x630/0C0F17/D4AF37?text=SHNFR+%7C+%D8%B4%D9%86%D9%81%D8%B1">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦁</text></svg>">
     
     <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -43,7 +43,7 @@
             min-height: 100vh;
         }
         
-        /* شاشة التحميل */
+        /* Loading Screen - Lamp */
         #loadingScreen {
             position: fixed;
             inset: 0;
@@ -56,17 +56,54 @@
             align-items: center;
             transition: opacity 0.8s ease-out;
         }
-        .falcon-run {
-            width: 120px;
-            height: 120px;
-            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path fill="%23D4AF37" d="M30,60 Q40,30 55,35 Q70,40 75,55 Q80,70 70,75 Q60,80 50,70 Q40,60 30,60Z"/><circle cx="55" cy="45" r="4" fill="black"/><path d="M20,70 L10,80 L25,78 L15,90 L35,85 L30,95 L50,80 L45,70 L55,65 L50,55 L40,60 L30,70Z" fill="%23D4AF37"/></svg>') no-repeat center;
-            background-size: contain;
-            animation: fly 0.4s infinite alternate ease-in-out;
-            filter: drop-shadow(0 0 15px rgba(212,175,55,0.4));
+        .lamp-container {
+            position: relative;
+            width: 100px;
+            height: 140px;
         }
-        @keyframes fly {
-            0% { transform: translateX(-15px) translateY(0) rotate(-5deg); }
-            100% { transform: translateX(15px) translateY(-12px) rotate(5deg); }
+        .lamp-bulb {
+            width: 60px;
+            height: 60px;
+            background: radial-gradient(circle at 30% 30%, #fff8dc, #D4AF37, #8B6914);
+            border-radius: 50% 50% 45% 45%;
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 0 20px rgba(212,175,55,0.3);
+            transition: box-shadow 0.15s ease-out, filter 0.15s ease-out;
+        }
+        .lamp-base {
+            width: 40px;
+            height: 30px;
+            background: linear-gradient(180deg, #4a4a4a, #2a2a2a);
+            border-radius: 0 0 10px 10px;
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .lamp-neck {
+            width: 8px;
+            height: 40px;
+            background: linear-gradient(90deg, #3a3a3a, #5a5a5a, #3a3a3a);
+            position: absolute;
+            top: 55px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 4px;
+        }
+        .lamp-glow {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -60%);
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(212,175,55,0.15) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            transition: opacity 0.15s ease-out;
         }
         .loading-track {
             width: 280px;
@@ -366,6 +403,82 @@
         .copy-code:hover { background: #f0d878; transform: scale(1.05); }
         .copy-code.copied { background: var(--success); color: white; }
         
+        /* Comments Section */
+        .comments-section {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid #1e1e2a;
+        }
+        .comments-section h3 {
+            color: var(--gold);
+            margin-bottom: 1.5rem;
+            font-size: 1.2rem;
+        }
+        .comment-form {
+            background: #0a0a0f;
+            padding: 1.2rem;
+            border-radius: 1rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid #1e1e2a;
+        }
+        .comment-form input,
+        .comment-form textarea {
+            width: 100%;
+            background: #1a1c25;
+            border: 1px solid #2a2a35;
+            padding: 0.8rem 1rem;
+            border-radius: 0.8rem;
+            color: white;
+            margin-bottom: 0.8rem;
+            font-size: 0.9rem;
+        }
+        .comment-form input:focus,
+        .comment-form textarea:focus {
+            outline: none;
+            border-color: var(--gold);
+        }
+        .comment-form button {
+            background: var(--gold);
+            color: #000;
+            border: none;
+            padding: 0.6rem 1.5rem;
+            border-radius: 2rem;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .comment-item {
+            background: #0a0a0f;
+            padding: 1.2rem;
+            border-radius: 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid #1e1e2a;
+        }
+        .comment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        .comment-author {
+            color: var(--gold);
+            font-weight: bold;
+            font-size: 0.95rem;
+        }
+        .comment-date {
+            color: #666;
+            font-size: 0.75rem;
+        }
+        .comment-text {
+            color: #ccc;
+            line-height: 1.6;
+            font-size: 0.9rem;
+        }
+        .no-comments {
+            text-align: center;
+            color: #666;
+            padding: 2rem;
+        }
+        
         /* Bottom Grid */
         .bottom-grid {
             display: grid;
@@ -540,7 +653,7 @@
         .scroll-top.visible { opacity: 1; transform: translateY(0); }
         .scroll-top:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(212,175,55,0.4); }
         
-        /* Toast Notification */
+        /* Toast */
         .toast {
             position: fixed;
             bottom: 2rem;
@@ -560,7 +673,7 @@
         }
         .toast.show { transform: translateX(0); }
         
-        /* Focus Mode Overlay */
+        /* Focus Mode */
         .focus-overlay {
             display: none;
             position: fixed;
@@ -598,6 +711,27 @@
         }
         .focus-close:hover { background: var(--danger); }
         
+        /* Static Pages Content */
+        .static-content h3 {
+            color: var(--gold);
+            margin: 1.5rem 0 0.8rem;
+            font-size: 1.1rem;
+        }
+        .static-content ul {
+            margin: 0.5rem 1.5rem 1rem 0;
+            color: #ccc;
+        }
+        .static-content li {
+            margin-bottom: 0.5rem;
+            line-height: 1.8;
+        }
+        .static-content p {
+            margin-bottom: 1rem;
+            color: #ccc;
+            line-height: 1.8;
+        }
+        .static-content strong { color: var(--gold); }
+        
         /* Responsive */
         @media (max-width: 900px) {
             .articles-grid { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
@@ -623,14 +757,19 @@
 
 <!-- Loading Screen -->
 <div id="loadingScreen">
-    <div class="falcon-run"></div>
+    <div class="lamp-container">
+        <div class="lamp-glow" id="lampGlow"></div>
+        <div class="lamp-bulb" id="lampBulb"></div>
+        <div class="lamp-neck"></div>
+        <div class="lamp-base"></div>
+    </div>
     <div class="loading-track"><div id="loadProgressBar" class="loading-progress"></div></div>
-    <div class="loading-text">صقر الحكمة يحلق.. تجهيز السيادة</div>
+    <div class="loading-text">مصباح الحكمة يستنير.. تجهيز السيادة</div>
 </div>
 
 <!-- Header -->
-<<header>
-    <div class="logo">AWJ</div>
+<header>
+    <div class="logo">SHNFR</div>
     <div class="header-icons">
         <i class="fas fa-search" id="openSearchBtn" title="بحث"></i>
         <i class="fas fa-envelope" id="openSubscribeBtn" title="اشتراك"></i>
@@ -661,8 +800,8 @@
 </div>
 
 <!-- Footer -->
-<<footer>
-    <p>جميع الحقوق محفوظة © <span class="copyright" id="vaultTrigger">2026</span> | أوج</p>
+<footer>
+    <p>جميع الحقوق محفوظة © <span class="copyright" id="vaultTrigger">2026</span> | شنفر</p>
     <div class="footer-links">
         <span onclick="openStaticPage('about')">من نحن</span>
         <span onclick="openStaticPage('privacy')">الخصوصية</span>
@@ -713,7 +852,7 @@
     <div class="modal-card">
         <button class="modal-close" onclick="closeModal('staticModal')"><i class="fas fa-times"></i></button>
         <h3 class="modal-title" id="staticTitle"></h3>
-        <div id="staticBody" style="line-height:1.8; color:#ccc;"></div>
+        <div id="staticBody" class="static-content"></div>
     </div>
 </div>
 
@@ -757,13 +896,26 @@
     let currentSub = null;
     let activeDropdown = null;
 
-    // Loading Screen
+    // Loading Screen - Lamp Glow Effect
     let loadP = 0;
     const loadInterval = setInterval(() => {
         loadP += Math.random() * 10 + 3;
         if (loadP >= 100) loadP = 100;
         const bar = document.getElementById('loadProgressBar');
         if (bar) bar.style.width = loadP + '%';
+        
+        // Update lamp glow intensity
+        const bulb = document.getElementById('lampBulb');
+        const glow = document.getElementById('lampGlow');
+        if (bulb && glow) {
+            const intensity = loadP / 100;
+            const shadowSize = 20 + (intensity * 60);
+            const glowOpacity = 0.15 + (intensity * 0.5);
+            bulb.style.boxShadow = `0 0 ${shadowSize}px rgba(212,175,55,${0.3 + intensity * 0.7})`;
+            bulb.style.filter = `brightness(${0.8 + intensity * 0.4})`;
+            glow.style.opacity = glowOpacity;
+        }
+        
         if (loadP === 100) {
             clearInterval(loadInterval);
             setTimeout(() => {
@@ -786,14 +938,15 @@
             '"': '&quot;',
             "'": '&#039;'
         };
-        return String(str).replace(/[&<<>"']/g, m => map[m]);
+        return String(str).replace(/[&<>"']/g, m => map[m]);
     }
 
     // Toast Notification
-    function showToast(msg, icon = 'fa-check-circle') {
+    function showToast(msg, icon) {
+        icon = icon || 'fa-check-circle';
         const toast = document.getElementById('toast');
         const toastMsg = document.getElementById('toastMsg');
-        toast.querySelector('i').className = `fas ${icon}`;
+        toast.querySelector('i').className = 'fas ' + icon;
         toastMsg.textContent = msg;
         toast.classList.add('show');
         setTimeout(() => toast.classList.remove('show'), 3000);
@@ -821,7 +974,7 @@
                 const target = allArticles.find(a => a.id === articleId);
                 if (target) {
                     viewFullArticle(articleId);
-                    return; // Skip default render
+                    return;
                 }
             }
             
@@ -905,7 +1058,7 @@
 
     function getFirstImageUrl(article) {
         if (!article.contentBlocks) return null;
-        const imgBlock = article.contentBlocks.find(b => b.type === 'image' && b.value?.url);
+        const imgBlock = article.contentBlocks.find(b => b.type === 'image' && b.value && b.value.url);
         return imgBlock ? imgBlock.value.url : null;
     }
 
@@ -921,7 +1074,7 @@
             const textBlock = article.contentBlocks.find(b => b.type === 'text' || b.type === 'summary');
             if (textBlock) {
                 const text = typeof textBlock.value === 'string' ? textBlock.value : 
-                            (textBlock.value?.caption || JSON.stringify(textBlock.value));
+                            (textBlock.value && textBlock.value.caption ? textBlock.value.caption : JSON.stringify(textBlock.value));
                 return stripHtml(text).slice(0, 140);
             }
         }
@@ -943,36 +1096,35 @@
                 year: 'numeric', month: 'short', day: 'numeric'
             }) : 'قديم';
             
-            html += `
-                <div class="article-card animate-in" data-id="${art.id}" style="animation-delay: ${idx * 0.05}s">
-                    ${imgUrl ? 
-                        `<img src="${escapeHtml(imgUrl)}" class="article-img" loading="lazy" alt="${escapeHtml(art.title)}">` : 
-                        `<div class="article-img-placeholder"><i class="fas fa-newspaper" style="font-size: 3rem; color: var(--gold); opacity: 0.5;"></i></div>`
-                    }
-                    <div class="article-content">
-                        <div class="article-title" onclick="viewFullArticle('${art.id}')">${escapeHtml(art.title)}</div>
-                        <div class="meta">
-                            <span><i class="fas fa-user"></i> ${escapeHtml(art.author)}</span>
-                            <span><i class="fas fa-eye"></i> ${art.views || 0}</span>
-                            <span><i class="fas fa-calendar-alt"></i> ${dateStr}</span>
-                        </div>
-                        <div style="color: #999; font-size: 0.9rem; line-height: 1.6;">${escapeHtml(preview)}${preview.length >= 140 ? '...' : ''}</div>
-                        <button class="summary-trigger" onclick="showSummary('${art.id}')">
-                            <i class="fas fa-lightbulb"></i> زبدة المقال
-                        </button>
-                        <div class="article-actions">
-                            <button class="dots-btn" onclick="toggleMenu(event, '${art.id}')" aria-label="خيارات">
-                                <i class="fas fa-ellipsis-v"></i>
-                            </button>
-                            <div id="drop-${art.id}" class="dropdown">
-                                <button onclick="copyLink('${art.id}')"><i class="fas fa-copy"></i> نسخ الرابط</button>
-                                <button onclick="shareArticle('${art.id}')"><i class="fas fa-share-alt"></i> مشاركة</button>
-                                <button onclick="focusArticle('${art.id}')"><i class="fas fa-expand"></i> وضع التركيز</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
+            html += 
+                '<div class="article-card animate-in" data-id="' + art.id + '" style="animation-delay: ' + (idx * 0.05) + 's">' +
+                    (imgUrl ? 
+                        '<img src="' + escapeHtml(imgUrl) + '" class="article-img" loading="lazy" alt="' + escapeHtml(art.title) + '">' : 
+                        '<div class="article-img-placeholder"><i class="fas fa-newspaper" style="font-size: 3rem; color: var(--gold); opacity: 0.5;"></i></div>'
+                    ) +
+                    '<div class="article-content">' +
+                        '<div class="article-title" onclick="viewFullArticle(\'' + art.id + '\')">' + escapeHtml(art.title) + '</div>' +
+                        '<div class="meta">' +
+                            '<span><i class="fas fa-user"></i> ' + escapeHtml(art.author) + '</span>' +
+                            '<span><i class="fas fa-eye"></i> ' + (art.views || 0) + '</span>' +
+                            '<span><i class="fas fa-calendar-alt"></i> ' + dateStr + '</span>' +
+                        '</div>' +
+                        '<div style="color: #999; font-size: 0.9rem; line-height: 1.6;">' + escapeHtml(preview) + (preview.length >= 140 ? '...' : '') + '</div>' +
+                        '<button class="summary-trigger" onclick="showSummary(\'' + art.id + '\')">' +
+                            '<i class="fas fa-lightbulb"></i> زبدة المقال' +
+                        '</button>' +
+                        '<div class="article-actions">' +
+                            '<button class="dots-btn" onclick="toggleMenu(event, \'' + art.id + '\')" aria-label="خيارات">' +
+                                '<i class="fas fa-ellipsis-v"></i>' +
+                            '</button>' +
+                            '<div id="drop-' + art.id + '" class="dropdown">' +
+                                '<button onclick="copyLink(\'' + art.id + '\')"><i class="fas fa-copy"></i> نسخ الرابط</button>' +
+                                '<button onclick="shareArticle(\'' + art.id + '\')"><i class="fas fa-share-alt"></i> مشاركة</button>' +
+                                '<button onclick="focusArticle(\'' + art.id + '\')"><i class="fas fa-expand"></i> وضع التركيز</button>' +
+                            '</div>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>';
         });
         grid.innerHTML = html;
     }
@@ -994,59 +1146,114 @@
         let fullHtml = '';
         if (art.contentBlocks && art.contentBlocks.length) {
             fullHtml = art.contentBlocks.map(block => {
-                if (block.type === 'text') return `<div style="margin:1.5rem 0; line-height:1.8;">${block.value}</div>`;
+                if (block.type === 'text') return '<div style="margin:1.5rem 0; line-height:1.8;">' + block.value + '</div>';
                 if (block.type === 'image') {
-                    const caption = block.value?.caption || '';
-                    return `<div class="image-block">
-                        <img src="${escapeHtml(block.value.url)}" alt="${escapeHtml(caption)}" loading="lazy">
-                        ${caption ? `<div class="caption">${escapeHtml(caption)}</div>` : ''}
-                    </div>`;
+                    const caption = block.value && block.value.caption ? block.value.caption : '';
+                    return '<div class="image-block">' +
+                        '<img src="' + escapeHtml(block.value.url) + '" alt="' + escapeHtml(caption) + '" loading="lazy">' +
+                        (caption ? '<div class="caption">' + escapeHtml(caption) + '</div>' : '') +
+                    '</div>';
                 }
                 if (block.type === 'code') {
-                    return `<pre><code class="language-${escapeHtml(block.value.language || 'text')}">${escapeHtml(block.value.code)}</code></pre>`;
+                    return '<pre><code class="language-' + escapeHtml(block.value.language || 'text') + '">' + escapeHtml(block.value.code) + '</code></pre>';
                 }
                 if (block.type === 'summary') {
-                    return `<div style="background:rgba(212,175,55,0.08); padding:1.2rem; border-right:3px solid var(--gold); border-radius: 0.8rem; margin: 1.5rem 0;">
-                        <i class="fas fa-lightbulb" style="color: var(--gold); margin-left: 0.5rem;"></i> ${block.value}
-                    </div>`;
+                    return '<div style="background:rgba(212,175,55,0.08); padding:1.2rem; border-right:3px solid var(--gold); border-radius: 0.8rem; margin: 1.5rem 0;">' +
+                        '<i class="fas fa-lightbulb" style="color: var(--gold); margin-left: 0.5rem;"></i> ' + block.value +
+                    '</div>';
                 }
                 return '';
             }).join('');
         } else {
-            fullHtml = `<div style="line-height:1.8;">${art.content || ''}</div>`;
+            fullHtml = '<div style="line-height:1.8;">' + (art.content || '') + '</div>';
         }
         
         const dateStr = art.date ? new Date(art.date.toDate()).toLocaleDateString('ar-EG', {
             year: 'numeric', month: 'long', day: 'numeric'
         }) : 'قديم';
         
-        document.getElementById('articlesGrid').innerHTML = `
-            <div style="max-width: 900px; margin: auto; width: 100%;" class="animate-in">
-                <div class="article-card" style="padding: 2rem;">
-                    <button onclick="restoreGrid()" style="background:transparent; border:1px solid var(--gold); color:var(--gold); padding:0.5rem 1.2rem; border-radius:30px; cursor:pointer; margin-bottom:1.5rem; display:flex; align-items:center; gap:0.5rem; font-size:0.9rem;">
-                        <i class="fas fa-arrow-right"></i> العودة للقائمة
-                    </button>
-                    <h1 style="color: var(--gold); font-size: 1.8rem; margin-bottom: 1rem; line-height: 1.4;">${escapeHtml(art.title)}</h1>
-                    <div class="meta" style="margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid #1e1e2a;">
-                        <span><i class="fas fa-user"></i> ${escapeHtml(art.author)}</span>
-                        <span><i class="fas fa-eye"></i> ${art.views || 0}</span>
-                        <span><i class="fas fa-calendar-alt"></i> ${dateStr}</span>
-                        <span style="cursor:pointer; color:var(--gold);" onclick="copyLink('${art.id}')"><i class="fas fa-link"></i> نسخ الرابط</span>
-                    </div>
-                    ${fullHtml}
-                </div>
-            </div>
-        `;
+        // Fetch comments for this article
+        let commentsHtml = '';
+        try {
+            const commentsSnap = await db.collection('articles').doc(id).collection('comments').orderBy('date', 'desc').get();
+            const comments = commentsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+            
+            if (comments.length) {
+                commentsHtml = '<div class="comments-section"><h3><i class="fas fa-comments"></i> التعليقات (' + comments.length + ')</h3>';
+                comments.forEach(c => {
+                    const cDate = c.date ? new Date(c.date.toDate()).toLocaleDateString('ar-EG') : 'الآن';
+                    commentsHtml += 
+                        '<div class="comment-item">' +
+                            '<div class="comment-header">' +
+                                '<span class="comment-author"><i class="fas fa-user-circle"></i> ' + escapeHtml(c.name) + '</span>' +
+                                '<span class="comment-date">' + cDate + '</span>' +
+                            '</div>' +
+                            '<div class="comment-text">' + escapeHtml(c.text) + '</div>' +
+                        '</div>';
+                });
+                commentsHtml += '</div>';
+            } else {
+                commentsHtml = '<div class="comments-section"><h3><i class="fas fa-comments"></i> التعليقات</h3><div class="no-comments">لا توجد تعليقات بعد. كن أول من يعلق.</div></div>';
+            }
+        } catch (e) {
+            commentsHtml = '<div class="comments-section"><h3><i class="fas fa-comments"></i> التعليقات</h3><div class="no-comments">تعذر تحميل التعليقات</div></div>';
+        }
+        
+        document.getElementById('articlesGrid').innerHTML = 
+            '<div style="max-width: 900px; margin: auto; width: 100%;" class="animate-in">' +
+                '<div class="article-card" style="padding: 2rem;">' +
+                    '<button onclick="restoreGrid()" style="background:transparent; border:1px solid var(--gold); color:var(--gold); padding:0.5rem 1.2rem; border-radius:30px; cursor:pointer; margin-bottom:1.5rem; display:flex; align-items:center; gap:0.5rem; font-size:0.9rem;">' +
+                        '<i class="fas fa-arrow-right"></i> العودة للقائمة' +
+                    '</button>' +
+                    '<h1 style="color: var(--gold); font-size: 1.8rem; margin-bottom: 1rem; line-height: 1.4;">' + escapeHtml(art.title) + '</h1>' +
+                    '<div class="meta" style="margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid #1e1e2a;">' +
+                        '<span><i class="fas fa-user"></i> ' + escapeHtml(art.author) + '</span>' +
+                        '<span><i class="fas fa-eye"></i> ' + (art.views || 0) + '</span>' +
+                        '<span><i class="fas fa-calendar-alt"></i> ' + dateStr + '</span>' +
+                        '<span style="cursor:pointer; color:var(--gold);" onclick="copyLink(\'' + art.id + '\')"><i class="fas fa-link"></i> نسخ الرابط</span>' +
+                    '</div>' +
+                    fullHtml +
+                    commentsHtml +
+                    '<div class="comment-form">' +
+                        '<h3 style="color:var(--gold); margin-bottom:1rem; font-size:1.1rem;"><i class="fas fa-pen"></i> أضف تعليقاً</h3>' +
+                        '<input type="text" id="commentName" placeholder="اسمك">' +
+                        '<textarea id="commentText" rows="3" placeholder="اكتب تعليقك هنا..."></textarea>' +
+                        '<button onclick="submitComment(\'' + art.id + '\')" style="background:var(--gold); color:#000; border:none; padding:0.6rem 1.5rem; border-radius:2rem; cursor:pointer; font-weight:bold;"><i class="fas fa-paper-plane"></i> إرسال التعليق</button>' +
+                    '</div>' +
+                '</div>' +
+            '</div>';
         
         document.querySelectorAll('pre code').forEach(block => {
-            if (hljs) hljs.highlightElement(block);
+            if (window.hljs) hljs.highlightElement(block);
         });
         attachCopyButtons();
         updateSidePanels();
         
-        // Update URL without reload
-        const newUrl = `${window.location.pathname}?article=${id}`;
+        const newUrl = window.location.pathname + '?article=' + id;
         window.history.pushState({ articleId: id }, '', newUrl);
+    };
+
+    window.submitComment = async function(articleId) {
+        if (!db) return;
+        const name = document.getElementById('commentName').value.trim();
+        const text = document.getElementById('commentText').value.trim();
+        
+        if (!name || !text) {
+            showToast('يرجى ملء الاسم والتعليق', 'fa-exclamation-circle');
+            return;
+        }
+        
+        try {
+            await db.collection('articles').doc(articleId).collection('comments').add({
+                name: name,
+                text: text,
+                date: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            showToast('تم إرسال التعليق بنجاح');
+            viewFullArticle(articleId); // Refresh to show new comment
+        } catch (e) {
+            showToast('فشل إرسال التعليق: ' + e.message, 'fa-exclamation-circle');
+        }
     };
 
     function restoreGrid() {
@@ -1056,9 +1263,8 @@
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // Handle browser back button
     window.onpopstate = function(event) {
-        if (!event.state?.articleId) {
+        if (!event.state || !event.state.articleId) {
             if (currentCat) filterAndRender();
         }
     };
@@ -1070,8 +1276,9 @@
             btn.innerHTML = '<i class="fas fa-copy"></i> نسخ';
             btn.className = 'copy-code';
             btn.onclick = () => {
-                const code = pre.querySelector('code')?.innerText || '';
-                navigator.clipboard.writeText(code).then(() => {
+                const code = pre.querySelector('code');
+                const text = code ? code.innerText : '';
+                navigator.clipboard.writeText(text).then(() => {
                     btn.innerHTML = '<i class="fas fa-check"></i> تم';
                     btn.classList.add('copied');
                     setTimeout(() => {
@@ -1102,32 +1309,31 @@
             sum = stripHtml(art.content || '').slice(0, 400);
         }
         
-        document.getElementById('summaryContent').innerHTML = `
-            <div style="font-size: 1.1rem; margin-bottom: 1rem;">${escapeHtml(sum)}${sum.length >= 400 ? '...' : ''}</div>
-            <p style="color: #888; font-size: 0.9rem; border-top: 1px solid #222; padding-top: 1rem;">
-                <i class="fas fa-info-circle"></i> ملخص سريع. اضغط على العنوان للقراءة الكاملة.
-            </p>
-        `;
+        document.getElementById('summaryContent').innerHTML = 
+            '<div style="font-size: 1.1rem; margin-bottom: 1rem;">' + escapeHtml(sum) + (sum.length >= 400 ? '...' : '') + '</div>' +
+            '<p style="color: #888; font-size: 0.9rem; border-top: 1px solid #222; padding-top: 1rem;">' +
+                '<i class="fas fa-info-circle"></i> ملخص سريع. اضغط على العنوان للقراءة الكاملة.' +
+            '</p>';
         openModal('summaryModal');
     };
 
-    window.copyLink = (id) => {
-        const url = `${window.location.origin}${window.location.pathname}?article=${id}`;
+    window.copyLink = function(id) {
+        const url = window.location.origin + window.location.pathname + '?article=' + id;
         navigator.clipboard.writeText(url).then(() => {
             showToast('تم نسخ الرابط');
             closeDropdown();
         });
     };
 
-    window.shareArticle = async (id) => {
+    window.shareArticle = async function(id) {
         const art = allArticles.find(a => a.id === id);
-        const url = `${window.location.origin}${window.location.pathname}?article=${id}`;
+        const url = window.location.origin + window.location.pathname + '?article=' + id;
         
         if (navigator.share) {
             try {
                 await navigator.share({ 
-                    title: art?.title || 'أوج', 
-                    text: art?.title,
+                    title: art && art.title ? art.title : 'شنفر', 
+                    text: art && art.title ? art.title : '',
                     url: url 
                 });
             } catch (err) {
@@ -1143,16 +1349,14 @@
         closeDropdown();
     };
 
-    window.focusArticle = (id) => {
-        const art = allArticles.find(a => a.id === id);
-        if (!art) return;
-        viewFullArticle(id); // Use the full article view as focus mode
+    window.focusArticle = function(id) {
+        viewFullArticle(id);
         closeDropdown();
     };
 
-    window.toggleMenu = (e, id) => {
+    window.toggleMenu = function(e, id) {
         e.stopPropagation();
-        const menu = document.getElementById(`drop-${id}`);
+        const menu = document.getElementById('drop-' + id);
         if (activeDropdown && activeDropdown !== menu) activeDropdown.classList.remove('show');
         menu.classList.toggle('show');
         activeDropdown = menu.classList.contains('show') ? menu : null;
@@ -1168,8 +1372,8 @@
         if (!allArticles.length) return;
         
         const latest = [...allArticles].sort((a, b) => {
-            const aTime = a.date?.toMillis?.() || 0;
-            const bTime = b.date?.toMillis?.() || 0;
+            const aTime = a.date && a.date.toMillis ? a.date.toMillis() : 0;
+            const bTime = b.date && b.date.toMillis ? b.date.toMillis() : 0;
             return bTime - aTime;
         }).slice(0, 5);
         
@@ -1179,16 +1383,18 @@
             allArticles.filter(a => a.category === currentCat).slice(0, 5) : 
             allArticles.slice(0, 5);
         
-        const createList = (items, showViews = false) => items.map(a => `
-            <li onclick="viewFullArticle('${a.id}')">
-                <span>${escapeHtml(a.title)}</span>
-                ${showViews ? `<span class="view-count-badge"><i class="fas fa-eye"></i> ${a.views || 0}</span>` : ''}
-            </li>
-        `).join('');
+        const createList = function(items, showViews) {
+            return items.map(a => 
+                '<li onclick="viewFullArticle(\'' + a.id + '\')">' +
+                    '<span>' + escapeHtml(a.title) + '</span>' +
+                    (showViews ? '<span class="view-count-badge"><i class="fas fa-eye"></i> ' + (a.views || 0) + '</span>' : '') +
+                '</li>'
+            ).join('');
+        };
         
-        document.getElementById('latestList').innerHTML = createList(latest);
+        document.getElementById('latestList').innerHTML = createList(latest, false);
         document.getElementById('mostViewedList').innerHTML = createList(most, true);
-        document.getElementById('relatedList').innerHTML = createList(related);
+        document.getElementById('relatedList').innerHTML = createList(related, false);
     }
 
     // Search with Debounce
@@ -1211,22 +1417,22 @@
         if (!res.length) {
             div.innerHTML = '<div class="empty-state" style="padding:2rem;"><i class="fas fa-search" style="font-size:2rem; color:#333;"></i><p>لا توجد نتائج</p></div>';
         } else {
-            div.innerHTML = res.map(a => `
-                <div class="search-result-item" onclick="viewFullArticle('${a.id}'); closeModal('searchModal');">
-                    <div class="search-result-title">${escapeHtml(a.title)}</div>
-                    <div class="search-result-meta">${escapeHtml(a.author)} • ${a.category || 'عام'}</div>
-                </div>
-            `).join('');
+            div.innerHTML = res.map(a => 
+                '<div class="search-result-item" onclick="viewFullArticle(\'' + a.id + '\'); closeModal(\'searchModal\');">' +
+                    '<div class="search-result-title">' + escapeHtml(a.title) + '</div>' +
+                    '<div class="search-result-meta">' + escapeHtml(a.author) + ' • ' + (a.category || 'عام') + '</div>' +
+                '</div>'
+            ).join('');
         }
     }
 
-    document.getElementById('searchInput')?.addEventListener('input', () => {
+    document.getElementById('searchInput').addEventListener('input', () => {
         clearTimeout(searchTimeout);
         searchTimeout = setTimeout(performSearch, 300);
     });
 
     // Subscribe
-    document.getElementById('doSubscribeBtn')?.addEventListener('click', () => {
+    document.getElementById('doSubscribeBtn').addEventListener('click', () => {
         const email = document.getElementById('subEmail').value.trim();
         const msgDiv = document.getElementById('subMsg');
         
@@ -1235,7 +1441,6 @@
             return;
         }
         
-        // Here you would normally save to Firestore
         msgDiv.innerHTML = '<p style="color:var(--success);"><i class="fas fa-check-circle"></i> تم الاشتراك بنجاح!</p>';
         document.getElementById('subEmail').value = '';
         setTimeout(() => closeModal('subscribeModal'), 2000);
@@ -1275,19 +1480,17 @@
         setTimeout(() => document.getElementById('subEmail').focus(), 100);
     };
 
-    // Close modals on Escape key
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
             closeModal();
             const focusOverlay = document.getElementById('focusOverlay');
-            if (focusOverlay?.classList.contains('show')) {
+            if (focusOverlay && focusOverlay.classList.contains('show')) {
                 focusOverlay.classList.remove('show');
                 document.body.style.overflow = '';
             }
         }
     });
 
-    // Close modal on backdrop click
     document.querySelectorAll('.modal-overlay').forEach(modal => {
         modal.addEventListener('click', (e) => {
             if (e.target === modal) closeModal(modal.id);
@@ -1295,23 +1498,127 @@
     });
 
     // Static Pages
-    window.openStaticPage = (page) => {
+    window.openStaticPage = function(page) {
         const titles = { 
             about: 'من نحن', 
             privacy: 'سياسة الخصوصية', 
             cookies: 'سياسة الكوكيز', 
             terms: 'شروط الاستخدام' 
         };
+        
         const contents = {
-            about: `<p style="margin-bottom:1rem;">أوج (AWJ) هي منصة معرفية سيادية تقدم محتوى استراتيجياً وفلسفياً وعلمياً. نهدف إلى تمكين العقول بالنخبة الفكرية وبناء مجتمع واعٍ.</p>
-                    <p>نسعى لأن نكون المصدر الموثوق للمعرفة العميقة في العالم العربي.</p>`,
-            privacy: `<p style="margin-bottom:1rem;">نحن لا نشارك بياناتك مع أي طرف ثالث. جميع البيانات مخزنة بأمان في خوادم مشفرة.</p>
-                       <p>نحترم خصوصيتك تماماً ولا نستخدم بياناتك لأي أغراض تجارية.</p>`,
-            cookies: `<p style="margin-bottom:1rem;">نستخدم التخزين المحلي (LocalStorage) لتحسين تجربتك فقط. لا نستخدم كوكيز خارجية أو أدوات تتبع.</p>`,
-            terms: `<p style="margin-bottom:1rem;">المحتوى محمي بحقوق النشر. يمنع النسخ أو إعادة النشر دون إذن خطي صريح من إدارة المنصة.</p>
-                    <p>يحق للإدارة تعديل هذه الشروط في أي وقت دون إشعار مسبق.</p>`
+            about: 
+                '<p>شنفر (SHNFR) هي منصة معرفية سيادية تقدم محتوى استراتيجياً وفلسفياً وعلمياً. نهدف إلى تمكين العقول بالنخبة الفكرية وبناء مجتمع واعٍ ومتمكن.</p>' +
+                '<h3>رؤيتنا</h3>' +
+                '<ul>' +
+                    '<li>أن نكون المصدر الموثوق للمعرفة العميقة في العالم العربي.</li>' +
+                    '<li>أن نبني مجتمعاً يفكر نقدياً ويحلل استراتيجياً.</li>' +
+                    '<li>أن ننشر الفلسفة العملية والعلوم التطبيقية بأسلوب مبسط وعميق.</li>' +
+                '</ul>' +
+                '<h3>رسالتنا</h3>' +
+                '<ul>' +
+                    '<li>تقديم محتوى أصيل يخاطب العقل قبل العاطفة.</li>' +
+                    '<li>دعم الكتاب والمفكرين المستقلين بمنصة احترافية.</li>' +
+                    '<li>خلق حوار معرفي بنّاء بعيداً عن الضجيج الإعلامي.</li>' +
+                    '<li>توثيق المعرفة النادرة والاستراتيجيات الفكرية.</li>' +
+                '</ul>' +
+                '<h3>قيمنا</h3>' +
+                '<ul>' +
+                    '<li><strong>الاستقلالية:</strong> لا نخضع لأجندات خارجية.</li>' +
+                    '<li><strong>الجودة:</strong> كل مقال يمر بمراجعة دقيقة.</li>' +
+                    '<li><strong>الشفافية:</strong> نعلن مصادرنا ونصحح أخطاءنا.</li>' +
+                    '<li><strong>العمق:</strong> لا نرضى بالسطحية في أي موضوع.</li>' +
+                '</ul>',
+            
+            privacy: 
+                '<p>نحن في شنفر نحترم خصوصيتك تماماً ونتعامل مع بياناتك بأعلى معايير الأمان. هذه السياسة توضح كيف نتعامل مع معلوماتك.</p>' +
+                '<h3>المعلومات التي نجمعها</h3>' +
+                '<ul>' +
+                    '<li><strong>المعلومات التقنية:</strong> نوع المتصفح، نظام التشغيل، وعنوان IP (لتحسين الأداء فقط).</li>' +
+                    '<li><strong>المعلومات الاختيارية:</strong> البريد الإلكتروني إذا اشتركت في النشرة البريدية.</li>' +
+                    '<li><strong>التفاعلات:</strong> المقالات التي تقرأها والتعليقات التي تكتبها (لتحسين التوصيات).</li>' +
+                '</ul>' +
+                '<h3>كيف نستخدم معلوماتك</h3>' +
+                '<ul>' +
+                    '<li>تحسين تجربة المستخدم وتخصيص المحتوى.</li>' +
+                    '<li>إرسال النشرة البريدية فقط إذا طلبت ذلك.</li>' +
+                    '<li>تحليلات داخلية لفهم اهتمامات القراء.</li>' +
+                '</ul>' +
+                '<h3>ما لا نفعله</h3>' +
+                '<ul>' +
+                    '<li>لا نبيع بياناتك لأي طرف ثالث.</li>' +
+                    '<li>لا نشارك معلوماتك مع جهات إعلانية.</li>' +
+                    '<li>لا نستخدم كوكيز لتتبعك خارج منصتنا.</li>' +
+                    '<li>لا نحتفظ ببياناتك بعد حذف حسابك.</li>' +
+                '</ul>' +
+                '<h3>أمان البيانات</h3>' +
+                '<ul>' +
+                    '<li>جميع البيانات مخزنة في خوادم مشفرة (Firebase/Google Cloud).</li>' +
+                    '<li>نستخدم بروتوكول HTTPS في جميع الاتصالات.</li>' +
+                    '<li>نحدث أنظمة الأمان باستمرار.</li>' +
+                '</ul>',
+            
+            cookies: 
+                '<p>نستخدم في شنفر تقنيات تخزين بسيطة لتحسين تجربتك. هذا الإيضاح يوضح ما نستخدمه ولماذا.</p>' +
+                '<h3>ما هي الكوكيز التي نستخدمها</h3>' +
+                '<ul>' +
+                    '<li><strong>كوكيز ضرورية:</strong> للحفاظ على تسجيل دخولك (إذا كنت مسؤولاً).</li>' +
+                    '<li><strong>التخزين المحلي (LocalStorage):</strong> لحفظ تفضيلات القراءة مثل الوضع الليلي.</li>' +
+                    '<li><strong>جلسة التصفح:</strong> لتذكر آخر قسم قرأته.</li>' +
+                '</ul>' +
+                '<h3>ما لا نستخدمه</h3>' +
+                '<ul>' +
+                    '<li>لا نستخدم كوكيز إعلانية من Google أو Facebook.</li>' +
+                    '<li>لا نستخدم أدوات تتبع خارجية مثل Google Analytics.</li>' +
+                    '<li>لا نبني ملفات تعريف اعلانية عن اهتماماتك.</li>' +
+                '</ul>' +
+                '<h3>كيف تتحكم</h3>' +
+                '<ul>' +
+                    '<li>يمكنك مسح التخزين المحلي من إعدادات المتصفح.</li>' +
+                    '<li>يمكنك تعطيل الكوكيز تماماً لكن قد تتأثر بعض الميزات.</li>' +
+                    '<li>لا نطلب موافقة صريحة لأننا لا نستخدم كوكيز تتبع.</li>' +
+                '</ul>',
+            
+            terms: 
+                '<p>باستخدامك لمنصة شنفر، فإنك توافق على الشروط التالية. يرجى قراءتها بعناية.</p>' +
+                '<h3>حقوق المحتوى</h3>' +
+                '<ul>' +
+                    '<li>جميع المقالات محمية بحقوق النشر وملكية فكرية.</li>' +
+                    '<li>يمنع نسخ أو إعادة نشر أي محتوى دون إذن خطي صريح من الإدارة.</li>' +
+                    '<li>يحق للكاتب الاحتفاظ بحقوق نشر عمله ونشره في أماكن أخرى بعد موافقتنا.</li>' +
+                    '<li>الاقتباسات المختصرة مسموحة مع ذكر المصدر والرابط.</li>' +
+                '</ul>' +
+                '<h3>سلوك المستخدم</h3>' +
+                '<ul>' +
+                    '<li>يمنع نشر محتوى مسيء أو تمييزي أو يحرض على العنف.</li>' +
+                    '<li>يمنع استخدام المنصة لنشر محتوى دعائي دون إذن.</li>' +
+                    '<li>يمنع محاولة اختراق الأنظمة أو تعطيل الخدمة.</li>' +
+                    '<li>يمنع انتحال شخصية كاتب أو مسؤول.</li>' +
+                '</ul>' +
+                '<h3>المسؤولية</ أكمل الكود المتبقي لملف `index.html` والملف الثاني `admin.html`:
+
+---
+
+## استكمال ملف `index.html` (الجزء المتبقي)
+
+```html
+                '<h3>المسؤولية</h3>' +
+                '<ul>' +
+                    '<li>آراء الكتاب تعبر عنهم ولا تعبر بالضرورة عن رأي المنصة.</li>' +
+                    '<li>نحرص على دقة المعلومات لكننا لا نضمن خلو المحتوى من أخطاء.</li>' +
+                    '<li>الروابط الخارجية هي مسؤولية الجهة المالكة لها.</li>' +
+                '</ul>' +
+                '<h3>التعديلات</h3>' +
+                '<ul>' +
+                    '<li>يحق للإدارة تعديل هذه الشروط في أي وقت.</li>' +
+                    '<li>سنعلن عن التغييرات الجوهرية عبر النشرة البريدية.</li>' +
+                    '<li>استمرارك في استخدام المنصة بعد التعديلات يعني قبولك لها.</li>' +
+                '</ul>' +
+                '<h3>التواصل</h3>' +
+                '<p>للاستفسارات القانونية أو طلبات النشر، يرجى التواصل عبر قنواتنا الرسمية.</p>'
         };
-        document.getElementById('staticTitle').innerHTML = `<i class="fas fa-file-alt"></i> ${titles[page]}`;
+        
+        document.getElementById('staticTitle').innerHTML = '<i class="fas fa-file-alt"></i> ' + titles[page];
         document.getElementById('staticBody').innerHTML = contents[page];
         openModal('staticModal');
     };
@@ -1339,21 +1646,20 @@
         if (vaultClicks === 3) {
             const pwd = prompt("شَفَرَةُ العُبُورِ:");
             if (pwd === "@...Alshanfricc_1998...@") {
-                document.getElementById('vaultContent').innerHTML = `
-                    <div style="text-align:center; padding:1rem;">
-                        <i class="fas fa-unlock-alt" style="font-size:3rem; color:var(--gold); margin-bottom:1rem;"></i>
-                        <h3 style="color:var(--gold); margin-bottom:1rem;">مرحباً سيد أوج</h3>
-                        <div style="background:#0a0a0a; padding:1rem; border-radius:1rem; margin:0.5rem 0;">
-                            <span style="color:#888;">📚 عدد المقالات:</span> <strong style="color:var(--gold);">${allArticles.length}</strong>
-                        </div>
-                        <div style="background:#0a0a0a; padding:1rem; border-radius:1rem; margin:0.5rem 0;">
-                            <span style="color:#888;">🏷️ التصنيفات:</span> <strong style="color:var(--gold);">${categories.map(c => escapeHtml(c.name)).join(' • ')}</strong>
-                        </div>
-                        <div style="background:#0a0a0a; padding:1rem; border-radius:1rem; margin:0.5rem 0;">
-                            <span style="color:#888;">👁️ إجمالي المشاهدات:</span> <strong style="color:var(--gold);">${allArticles.reduce((a, b) => a + (b.views || 0), 0)}</strong>
-                        </div>
-                    </div>
-                `;
+                document.getElementById('vaultContent').innerHTML = 
+                    '<div style="text-align:center; padding:1rem;">' +
+                        '<i class="fas fa-unlock-alt" style="font-size:3rem; color:var(--gold); margin-bottom:1rem;"></i>' +
+                        '<h3 style="color:var(--gold); margin-bottom:1rem;">مرحباً سيد شنفر</h3>' +
+                        '<div style="background:#0a0a0a; padding:1rem; border-radius:1rem; margin:0.5rem 0;">' +
+                            '<span style="color:#888;">📚 عدد المقالات:</span> <strong style="color:var(--gold);">' + allArticles.length + '</strong>' +
+                        '</div>' +
+                        '<div style="background:#0a0a0a; padding:1rem; border-radius:1rem; margin:0.5rem 0;">' +
+                            '<span style="color:#888;">🏷️ التصنيفات:</span> <strong style="color:var(--gold);">' + categories.map(c => escapeHtml(c.name)).join(' • ') + '</strong>' +
+                        '</div>' +
+                        '<div style="background:#0a0a0a; padding:1rem; border-radius:1rem; margin:0.5rem 0;">' +
+                            '<span style="color:#888;">👁️ إجمالي المشاهدات:</span> <strong style="color:var(--gold);">' + allArticles.reduce((a, b) => a + (b.views || 0), 0) + '</strong>' +
+                        '</div>' +
+                    '</div>';
                 openModal('vaultModal');
             } else {
                 showToast('شفرة خاطئة', 'fa-lock');
@@ -1366,4 +1672,4 @@
     fetchAll();
 </script>
 </body>
-    </html>
+</html>

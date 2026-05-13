@@ -1,33 +1,1369 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>شنفر | منصة المعرفة الذكية</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>أوج | منصة المعرفة السيادية</title>
+    <meta name="description" content="أوج - منصة معرفية سيادية تقدم محتوى استراتيجياً وفلسفياً وعلمياً. نهدف إلى تمكين العقول بالنخبة الفكرية.">
+    <meta name="keywords" content="معرفة, استراتيجية, فلسفة, علوم, أوج, AWJ, منصة, مقالات">
+    <meta name="theme-color" content="#050505">
+    <meta property="og:title" content="أوج | منصة المعرفة السيادية">
+    <meta property="og:description" content="محتوى استراتيجي وفلسفي وعلمي للعقول النخبوية.">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://via.placeholder.com/1200x630/0C0F17/D4AF37?text=AWJ+%7C+%D8%A3%D9%88%D8%AC">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦅</text></svg>">
+    
+    <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-    <style>:root{--bg:#0A0B10;--card:#12141E;--border:#2a2a35;--text:#eee;--acc:#D4AF37}*{margin:0;padding:0;box-sizing:border-box;font-family:system-ui} body{background:var(--bg);color:var(--text);direction:rtl;padding:1rem} header{text-align:center;padding:2rem 0} h1{color:var(--acc);margin-bottom:0.5rem} .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1rem;margin-top:2rem} .card{background:var(--card);border:1px solid var(--border);padding:1rem;border-radius:1rem} .badge{background:rgba(212,175,55,0.2);color:var(--acc);padding:0.2rem 0.5rem;border-radius:0.5rem;font-size:0.8rem}</style>
+    <!-- Highlight.js -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --gold: #D4AF37;
+            --gold-dim: rgba(212, 175, 55, 0.15);
+            --dark: #050505;
+            --card: #0C0F17;
+            --gray: #aaa;
+            --danger: #ff4444;
+            --success: #00C851;
+        }
+        html { scroll-behavior: smooth; }
+        body {
+            background: var(--dark);
+            color: #eef;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            direction: rtl;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        
+        /* شاشة التحميل */
+        #loadingScreen {
+            position: fixed;
+            inset: 0;
+            background: #000000ee;
+            backdrop-filter: blur(6px);
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.8s ease-out;
+        }
+        .falcon-run {
+            width: 120px;
+            height: 120px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path fill="%23D4AF37" d="M30,60 Q40,30 55,35 Q70,40 75,55 Q80,70 70,75 Q60,80 50,70 Q40,60 30,60Z"/><circle cx="55" cy="45" r="4" fill="black"/><path d="M20,70 L10,80 L25,78 L15,90 L35,85 L30,95 L50,80 L45,70 L55,65 L50,55 L40,60 L30,70Z" fill="%23D4AF37"/></svg>') no-repeat center;
+            background-size: contain;
+            animation: fly 0.4s infinite alternate ease-in-out;
+            filter: drop-shadow(0 0 15px rgba(212,175,55,0.4));
+        }
+        @keyframes fly {
+            0% { transform: translateX(-15px) translateY(0) rotate(-5deg); }
+            100% { transform: translateX(15px) translateY(-12px) rotate(5deg); }
+        }
+        .loading-track {
+            width: 280px;
+            height: 4px;
+            background: #2a2a35;
+            margin-top: 40px;
+            border-radius: 4px;
+            overflow: hidden;
+            box-shadow: 0 0 10px rgba(212,175,55,0.1);
+        }
+        .loading-progress {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, var(--gold), #f0d878);
+            transition: width 0.15s ease-out;
+            box-shadow: 0 0 10px rgba(212,175,55,0.5);
+        }
+        .loading-text {
+            margin-top: 15px;
+            color: var(--gold);
+            font-size: 0.95rem;
+            letter-spacing: 1px;
+        }
+        
+        /* Header */
+        header {
+            position: sticky;
+            top: 0;
+            background: rgba(5,5,5,0.96);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(212,175,55,0.2);
+            padding: 1rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+        }
+        .logo { 
+            font-size: 2rem; 
+            font-weight: bold; 
+            color: var(--gold); 
+            letter-spacing: 2px; 
+            font-family: 'Times New Roman', serif;
+            text-shadow: 0 0 20px rgba(212,175,55,0.3);
+        }
+        .header-icons { display: flex; gap: 1.2rem; }
+        .header-icons i { 
+            font-size: 1.3rem; 
+            cursor: pointer; 
+            transition: all 0.2s; 
+            color: #ccc;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+        .header-icons i:hover { 
+            color: var(--gold); 
+            background: rgba(212,175,55,0.1);
+        }
+        
+        /* Tabs */
+        .tabs-row {
+            background: #0A0A0F;
+            border-bottom: 1px solid #1e1e2a;
+            padding: 0.6rem 5%;
+            overflow-x: auto;
+            white-space: nowrap;
+            scrollbar-width: thin;
+            scrollbar-color: var(--gold) #1e1e2a;
+        }
+        .tabs-row::-webkit-scrollbar { height: 4px; }
+        .tabs-row::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 4px; }
+        
+        .tab-btn {
+            display: inline-block;
+            background: transparent;
+            border: 1px solid #2a2a35;
+            color: #bbb;
+            padding: 0.5rem 1.5rem;
+            border-radius: 40px;
+            margin-left: 0.7rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+        }
+        .tab-btn:hover { border-color: var(--gold); color: var(--gold); }
+        .tab-btn.active { 
+            background: var(--gold); 
+            color: #000; 
+            border-color: var(--gold);
+            font-weight: bold;
+            box-shadow: 0 0 15px rgba(212,175,55,0.3);
+        }
+        
+        /* Sub tabs */
+        .sub-row {
+            background: #0D0D14;
+            border-bottom: 1px solid #1e1e2a;
+            padding: 0.4rem 5%;
+            overflow-x: auto;
+            white-space: nowrap;
+            display: none;
+            scrollbar-width: thin;
+        }
+        .sub-row.show { display: block; }
+        .sub-btn {
+            display: inline-block;
+            background: transparent;
+            border: none;
+            color: #aaa;
+            padding: 0.3rem 1rem;
+            margin-left: 0.6rem;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+        .sub-btn:hover { color: var(--gold); }
+        .sub-btn.active { 
+            color: var(--gold); 
+            background: rgba(212,175,55,0.15);
+            font-weight: bold;
+        }
+        
+        /* Articles Grid */
+        .articles-grid {
+            max-width: 1300px;
+            margin: 2rem auto;
+            padding: 0 5%;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 2rem;
+        }
+        .article-card {
+            background: var(--card);
+            border-radius: 1.2rem;
+            overflow: hidden;
+            border-right: 4px solid var(--gold);
+            transition: all 0.3s ease;
+            position: relative;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        .article-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(212,175,55,0.1);
+            border-right-color: #f0d878;
+        }
+        .article-img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            background: #11131e;
+            display: block;
+        }
+        .article-img-placeholder {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, #11131e 0%, #1a1c25 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .article-content { padding: 1.2rem; }
+        .article-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--gold);
+            cursor: pointer;
+            margin-bottom: 0.5rem;
+            line-height: 1.4;
+            transition: color 0.2s;
+        }
+        .article-title:hover { color: #f0d878; }
+        .meta {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.75rem;
+            color: var(--gray);
+            margin: 0.5rem 0;
+            flex-wrap: wrap;
+        }
+        .meta span { display: flex; align-items: center; gap: 0.3rem; }
+        
+        /* Actions */
+        .article-actions {
+            position: absolute;
+            top: 0.8rem;
+            left: 0.8rem;
+            z-index: 10;
+        }
+        .dots-btn {
+            background: rgba(0,0,0,0.7);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: white;
+            font-size: 1.1rem;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            backdrop-filter: blur(4px);
+        }
+        .dots-btn:hover { background: rgba(212,175,55,0.2); border-color: var(--gold); color: var(--gold); }
+        
+        .dropdown {
+            position: absolute;
+            left: 0;
+            top: 2.5rem;
+            background: #1e1e2a;
+            border-radius: 1rem;
+            width: 160px;
+            display: none;
+            flex-direction: column;
+            z-index: 20;
+            border: 1px solid #2a2a35;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            overflow: hidden;
+        }
+        .dropdown.show { display: flex; }
+        .dropdown button {
+            background: none;
+            border: none;
+            color: #eee;
+            padding: 0.7rem 1rem;
+            text-align: right;
+            cursor: pointer;
+            width: 100%;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.15s;
+        }
+        .dropdown button:hover { background: #2a2a35; color: var(--gold); }
+        
+        .summary-trigger {
+            background: rgba(212,175,55,0.15);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            padding: 0.3rem 1rem;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            margin-top: 0.8rem;
+            transition: all 0.2s;
+        }
+        .summary-trigger:hover { background: var(--gold); color: #000; }
+        
+        /* Content Blocks */
+        .image-block { text-align: center; margin: 1.5rem 0; }
+        .image-block img { 
+            max-width: 100%; 
+            border-radius: 1rem; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        .caption {
+            color: #888;
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+            font-style: italic;
+        }
+        pre {
+            background: #0D0F14;
+            padding: 1.2rem;
+            border-radius: 1rem;
+            overflow-x: auto;
+            position: relative;
+            border: 1px solid #1e1e2a;
+            margin: 1rem 0;
+        }
+        .copy-code {
+            position: absolute;
+            top: 0.6rem;
+            left: 0.8rem;
+            background: var(--gold);
+            color: black;
+            border: none;
+            border-radius: 6px;
+            padding: 4px 12px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        .copy-code:hover { background: #f0d878; transform: scale(1.05); }
+        .copy-code.copied { background: var(--success); color: white; }
+        
+        /* Bottom Grid */
+        .bottom-grid {
+            display: grid;
+            grid-template-columns: repeat(3,1fr);
+            gap: 1.5rem;
+            max-width: 1300px;
+            margin: 3rem auto;
+            padding: 0 5%;
+        }
+        .bottom-card {
+            background: #0A0B10;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            border: 1px solid #1e1e2a;
+            transition: all 0.3s;
+        }
+        .bottom-card:hover { border-color: rgba(212,175,55,0.3); }
+        .bottom-card h4 { color: var(--gold); margin-bottom: 1rem; font-size: 1.1rem; }
+        .bottom-card ul { list-style: none; }
+        .bottom-card li { 
+            padding: 0.7rem 0; 
+            border-bottom: 1px dashed #222; 
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .bottom-card li:hover { color: var(--gold); padding-right: 0.5rem; }
+        .view-count-badge {
+            background: rgba(212,175,55,0.1);
+            color: var(--gold);
+            padding: 0.1rem 0.5rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+        }
+        
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 2.5rem 1rem;
+            border-top: 1px solid #1a1a1a;
+            color: #666;
+            margin-top: 2rem;
+        }
+        .footer-links {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        .footer-links span {
+            cursor: pointer;
+            color: #888;
+            font-size: 0.9rem;
+            transition: color 0.2s;
+        }
+        .footer-links span:hover { color: var(--gold); }
+        .copyright { cursor: pointer; color: var(--gold); font-weight: bold; }
+        
+        /* Modals */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(5px);
+            align-items: center;
+            justify-content: center;
+            z-index: 20000;
+            padding: 1rem;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .modal-overlay.show { display: flex; opacity: 1; }
+        .modal-card {
+            background: #111;
+            border: 1px solid rgba(212,175,55,0.3);
+            border-radius: 1.5rem;
+            width: 90%;
+            max-width: 600px;
+            padding: 2rem;
+            max-height: 85vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+            transform: scale(0.95);
+            transition: transform 0.3s;
+        }
+        .modal-overlay.show .modal-card { transform: scale(1); }
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            background: none;
+            border: none;
+            color: #888;
+            font-size: 1.3rem;
+            cursor: pointer;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        .modal-close:hover { background: rgba(255,255,255,0.1); color: var(--gold); }
+        .modal-title {
+            color: var(--gold);
+            margin-bottom: 1.5rem;
+            padding-left: 2rem;
+            font-size: 1.3rem;
+        }
+        .search-input {
+            width: 100%;
+            padding: 0.9rem 1.2rem;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 40px;
+            color: white;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+        .search-input:focus {
+            outline: none;
+            border-color: var(--gold);
+            box-shadow: 0 0 0 3px rgba(212,175,55,0.1);
+        }
+        .search-result-item {
+            padding: 1rem;
+            border-bottom: 1px solid #222;
+            cursor: pointer;
+            border-radius: 0.5rem;
+            transition: all 0.2s;
+        }
+        .search-result-item:hover { background: rgba(212,175,55,0.05); }
+        .search-result-title { color: var(--gold); font-weight: bold; margin-bottom: 0.3rem; }
+        .search-result-meta { color: #666; font-size: 0.8rem; }
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: #666;
+        }
+        .empty-state-icon { font-size: 3rem; margin-bottom: 1rem; opacity: 0.5; }
+        
+        /* Scroll Top */
+        .scroll-top {
+            position: fixed;
+            bottom: 1.5rem;
+            left: 1.5rem;
+            background: var(--gold);
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 999;
+            border: none;
+            color: #000;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 15px rgba(212,175,55,0.3);
+            transform: translateY(20px);
+        }
+        .scroll-top.visible { opacity: 1; transform: translateY(0); }
+        .scroll-top:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(212,175,55,0.4); }
+        
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: #1e1e2a;
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            padding: 1rem 1.5rem;
+            border-radius: 1rem;
+            z-index: 30000;
+            transform: translateX(150%);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .toast.show { transform: translateX(0); }
+        
+        /* Focus Mode Overlay */
+        .focus-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.95);
+            z-index: 25000;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+        .focus-overlay.show { display: block; }
+        .focus-content {
+            max-width: 800px;
+            margin: 0 auto;
+            background: var(--card);
+            border-radius: 1.5rem;
+            border: 1px solid rgba(212,175,55,0.2);
+            padding: 2rem;
+            position: relative;
+        }
+        .focus-close {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        .focus-close:hover { background: var(--danger); }
+        
+        /* Responsive */
+        @media (max-width: 900px) {
+            .articles-grid { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
+            .bottom-grid { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 600px) {
+            .articles-grid { grid-template-columns: 1fr; gap: 1.5rem; }
+            .logo { font-size: 1.5rem; }
+            .header-icons i { width: 36px; height: 36px; font-size: 1.1rem; }
+            .bottom-grid { gap: 1rem; margin-top: 2rem; }
+            .modal-card { padding: 1.5rem; }
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-in { animation: fadeIn 0.5s ease-out forwards; }
+    </style>
 </head>
 <body>
-<header>
-    <h1>🤖 شنفر | مقالات ذكية</h1>
-    <p style="color:#aaa;">منصة المعرفة المتقدمة</p>
-</header>
-<div class="grid" id="shanfarGrid"></div>
 
-<script src="firebase-config.js"></script>
-<script src="security-shield.js"></script>
+<!-- Loading Screen -->
+<div id="loadingScreen">
+    <div class="falcon-run"></div>
+    <div class="loading-track"><div id="loadProgressBar" class="loading-progress"></div></div>
+    <div class="loading-text">صقر الحكمة يحلق.. تجهيز السيادة</div>
+</div>
+
+<!-- Header -->
+<<header>
+    <div class="logo">AWJ</div>
+    <div class="header-icons">
+        <i class="fas fa-search" id="openSearchBtn" title="بحث"></i>
+        <i class="fas fa-envelope" id="openSubscribeBtn" title="اشتراك"></i>
+    </div>
+</header>
+
+<!-- Tabs -->
+<div id="tabsContainer" class="tabs-row"></div>
+<div id="subContainer" class="sub-row"></div>
+
+<!-- Articles -->
+<div id="articlesGrid" class="articles-grid"></div>
+
+<!-- Side Panels -->
+<div class="bottom-grid">
+    <div class="bottom-card">
+        <h4><i class="fas fa-clock"></i> أحدث المقالات</h4>
+        <ul id="latestList"></ul>
+    </div>
+    <div class="bottom-card">
+        <h4><i class="fas fa-crown"></i> الأكثر مشاهدة</h4>
+        <ul id="mostViewedList"></ul>
+    </div>
+    <div class="bottom-card">
+        <h4><i class="fas fa-link"></i> ذات صلة</h4>
+        <ul id="relatedList"></ul>
+    </div>
+</div>
+
+<!-- Footer -->
+<<footer>
+    <p>جميع الحقوق محفوظة © <span class="copyright" id="vaultTrigger">2026</span> | أوج</p>
+    <div class="footer-links">
+        <span onclick="openStaticPage('about')">من نحن</span>
+        <span onclick="openStaticPage('privacy')">الخصوصية</span>
+        <span onclick="openStaticPage('cookies')">سياسة الكوكيز</span>
+        <span onclick="openStaticPage('terms')">شروط الاستخدام</span>
+    </div>
+</footer>
+
+<!-- Modals -->
+<div id="searchModal" class="modal-overlay">
+    <div class="modal-card">
+        <button class="modal-close" onclick="closeModal('searchModal')"><i class="fas fa-times"></i></button>
+        <h3 class="modal-title"><i class="fas fa-search"></i> بحث في المنصة</h3>
+        <input type="text" id="searchInput" class="search-input" placeholder="اكتب كلمة مفتاحية...">
+        <div id="searchResults"></div>
+    </div>
+</div>
+
+<div id="subscribeModal" class="modal-overlay">
+    <div class="modal-card">
+        <button class="modal-close" onclick="closeModal('subscribeModal')"><i class="fas fa-times"></i></button>
+        <h3 class="modal-title"><i class="fas fa-envelope"></i> اشترك في النشرة السيادية</h3>
+        <input type="email" id="subEmail" class="search-input" placeholder="بريدك الإلكتروني">
+        <button id="doSubscribeBtn" style="background:var(--gold); color:#000; border:none; padding:12px; width:100%; border-radius:40px; font-weight:bold; cursor:pointer; font-size:1rem; transition:all 0.2s;">
+            <i class="fas fa-paper-plane"></i> اشتراك
+        </button>
+        <div id="subMsg" style="margin-top:1rem; text-align:center;"></div>
+    </div>
+</div>
+
+<div id="summaryModal" class="modal-overlay">
+    <div class="modal-card">
+        <button class="modal-close" onclick="closeModal('summaryModal')"><i class="fas fa-times"></i></button>
+        <h3 class="modal-title"><i class="fas fa-lightbulb"></i> زبدة المقال</h3>
+        <div id="summaryContent" style="line-height:1.8; color:#ccc;"></div>
+    </div>
+</div>
+
+<div id="vaultModal" class="modal-overlay">
+    <div class="modal-card">
+        <button class="modal-close" onclick="closeModal('vaultModal')"><i class="fas fa-times"></i></button>
+        <h3 class="modal-title"><i class="fas fa-lock"></i> الخزنة السرية</h3>
+        <div id="vaultContent"></div>
+    </div>
+</div>
+
+<div id="staticModal" class="modal-overlay">
+    <div class="modal-card">
+        <button class="modal-close" onclick="closeModal('staticModal')"><i class="fas fa-times"></i></button>
+        <h3 class="modal-title" id="staticTitle"></h3>
+        <div id="staticBody" style="line-height:1.8; color:#ccc;"></div>
+    </div>
+</div>
+
+<!-- Focus Mode Overlay -->
+<div id="focusOverlay" class="focus-overlay">
+    <div class="focus-content" id="focusContent"></div>
+</div>
+
+<!-- Scroll Top -->
+<button id="scrollTopBtn" class="scroll-top" aria-label="العودة للأعلى"><i class="fas fa-arrow-up"></i></button>
+
+<!-- Toast -->
+<div id="toast" class="toast"><i class="fas fa-check-circle"></i> <span id="toastMsg"></span></div>
+
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-    db.collection('articles').where('category','==','شنفر').orderBy('date','desc').limit(6).get().then(snap=>{
-        const g=document.getElementById('shanfarGrid');
-        if(snap.empty){g.innerHTML='<p style="color:#aaa;text-align:center;grid-column:1/-1">جاري تحضير المقالات الأولى...</p>';return;}
-        g.innerHTML=snap.docs.map(d=>{
-            const a=d.data();
-            const p=a.contentBlocks.find(b=>b.type==='summary')?.value||'';
-            return `<div class="card"><h3 style="margin-bottom:0.5rem">${a.title}</h3><p style="color:#aaa;font-size:0.9rem;margin-bottom:0.5rem">${p}</p><span class="badge">توليد ذكي</span></div>`;
-        }).join('');
+    // Firebase Config
+    const firebaseConfig = {
+        apiKey: "AIzaSyDjgVxvtPXTn1tpr4IxOK3wOW4r3gzB1VU",
+        authDomain: "awj-website-29f16.firebaseapp.com",
+        projectId: "awj-website-29f16",
+        storageBucket: "awj-website-29f16.firebasestorage.app",
+        messagingSenderId: "406747568578",
+        appId: "1:406747568578:web:741821d3c60df0011b5e5b",
+        measurementId: "G-DFB0GYH7LN"
+    };
+    
+    // Initialize Firebase safely
+    let db;
+    try {
+        firebase.initializeApp(firebaseConfig);
+        db = firebase.firestore();
+    } catch (e) {
+        console.error('Firebase init failed:', e);
+        document.getElementById('articlesGrid').innerHTML = 
+            '<div class="empty-state"><div class="empty-state-icon">⚠️</div><h3>تعذر الاتصال بالخادم</h3><p>يرجى التحقق من اتصال الإنترنت وإعادة تحميل الصفحة</p></div>';
+    }
+
+    let allArticles = [];
+    let categories = [];
+    let currentCat = null;
+    let currentSub = null;
+    let activeDropdown = null;
+
+    // Loading Screen
+    let loadP = 0;
+    const loadInterval = setInterval(() => {
+        loadP += Math.random() * 10 + 3;
+        if (loadP >= 100) loadP = 100;
+        const bar = document.getElementById('loadProgressBar');
+        if (bar) bar.style.width = loadP + '%';
+        if (loadP === 100) {
+            clearInterval(loadInterval);
+            setTimeout(() => {
+                const scr = document.getElementById('loadingScreen');
+                if (scr) {
+                    scr.style.opacity = '0';
+                    setTimeout(() => scr.remove(), 800);
+                }
+            }, 500);
+        }
+    }, 100);
+
+    // Enhanced Escape HTML
+    function escapeHtml(str) {
+        if (!str) return '';
+        const map = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#039;'
+        };
+        return String(str).replace(/[&<<>"']/g, m => map[m]);
+    }
+
+    // Toast Notification
+    function showToast(msg, icon = 'fa-check-circle') {
+        const toast = document.getElementById('toast');
+        const toastMsg = document.getElementById('toastMsg');
+        toast.querySelector('i').className = `fas ${icon}`;
+        toastMsg.textContent = msg;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    // Fetch Data
+    async function fetchAll() {
+        if (!db) return;
+        try {
+            const [articlesSnap, catsSnap] = await Promise.all([
+                db.collection('articles').orderBy('date', 'desc').get(),
+                db.collection('categories').orderBy('name').get()
+            ]);
+            
+            allArticles = articlesSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+            categories = catsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+            
+            renderTabs();
+            
+            // Deep Linking Support
+            const urlParams = new URLSearchParams(window.location.search);
+            const articleId = urlParams.get('article');
+            
+            if (articleId) {
+                const target = allArticles.find(a => a.id === articleId);
+                if (target) {
+                    viewFullArticle(articleId);
+                    return; // Skip default render
+                }
+            }
+            
+            if (categories.length) {
+                selectCategory(categories[0].name);
+            } else {
+                document.getElementById('articlesGrid').innerHTML = 
+                    '<div class="empty-state"><div class="empty-state-icon">📭</div><h3>لا توجد تبويبات</h3><p>أضفها من لوحة الإدارة</p></div>';
+            }
+            
+            updateSidePanels();
+        } catch (err) {
+            console.error('Fetch error:', err);
+            document.getElementById('articlesGrid').innerHTML = 
+                '<div class="empty-state"><div class="empty-state-icon">⚠️</div><h3>خطأ في تحميل البيانات</h3><p>يرجى المحاولة لاحقاً</p></div>';
+        }
+    }
+
+    function renderTabs() {
+        const container = document.getElementById('tabsContainer');
+        container.innerHTML = '';
+        categories.forEach(cat => {
+            const btn = document.createElement('button');
+            btn.textContent = escapeHtml(cat.name);
+            btn.className = 'tab-btn';
+            btn.onclick = () => selectCategory(cat.name);
+            container.appendChild(btn);
+        });
+    }
+
+    function selectCategory(catName) {
+        currentCat = catName;
+        currentSub = null;
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        const activeTab = Array.from(document.querySelectorAll('.tab-btn')).find(b => b.textContent === catName);
+        if (activeTab) activeTab.classList.add('active');
+        renderSubTabs(catName);
+        filterAndRender();
+    }
+
+    function renderSubTabs(catName) {
+        const subDiv = document.getElementById('subContainer');
+        const cat = categories.find(c => c.name === catName);
+        if (!cat || !cat.subfields || cat.subfields.length === 0) {
+            subDiv.classList.remove('show');
+            return;
+        }
+        subDiv.classList.add('show');
+        subDiv.innerHTML = '';
+        
+        const allBtn = document.createElement('button');
+        allBtn.textContent = 'الكل';
+        allBtn.className = 'sub-btn active';
+        allBtn.onclick = () => { currentSub = null; refreshSubActive(); filterAndRender(); };
+        subDiv.appendChild(allBtn);
+        
+        cat.subfields.forEach(sub => {
+            const btn = document.createElement('button');
+            btn.textContent = escapeHtml(sub);
+            btn.className = 'sub-btn';
+            btn.onclick = () => { currentSub = sub; refreshSubActive(); filterAndRender(); };
+            subDiv.appendChild(btn);
+        });
+        
+        function refreshSubActive() {
+            document.querySelectorAll('.sub-btn').forEach(b => b.classList.remove('active'));
+            if (currentSub === null) {
+                allBtn.classList.add('active');
+            } else {
+                const target = Array.from(document.querySelectorAll('.sub-btn')).find(b => b.textContent === currentSub);
+                if (target) target.classList.add('active');
+            }
+        }
+    }
+
+    function filterAndRender() {
+        let filtered = allArticles.filter(a => a.category === currentCat);
+        if (currentSub) filtered = filtered.filter(a => a.subfield === currentSub);
+        renderArticlesGrid(filtered);
+    }
+
+    function getFirstImageUrl(article) {
+        if (!article.contentBlocks) return null;
+        const imgBlock = article.contentBlocks.find(b => b.type === 'image' && b.value?.url);
+        return imgBlock ? imgBlock.value.url : null;
+    }
+
+    function stripHtml(html) {
+        if (!html) return '';
+        const tmp = document.createElement('div');
+        tmp.innerHTML = html;
+        return tmp.textContent || tmp.innerText || '';
+    }
+
+    function getPreviewText(article) {
+        if (article.contentBlocks) {
+            const textBlock = article.contentBlocks.find(b => b.type === 'text' || b.type === 'summary');
+            if (textBlock) {
+                const text = typeof textBlock.value === 'string' ? textBlock.value : 
+                            (textBlock.value?.caption || JSON.stringify(textBlock.value));
+                return stripHtml(text).slice(0, 140);
+            }
+        }
+        return '';
+    }
+
+    function renderArticlesGrid(articles) {
+        const grid = document.getElementById('articlesGrid');
+        if (!articles.length) {
+            grid.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📭</div><h3>لا توجد مقالات</h3><p>في هذا القسم حالياً</p></div>';
+            return;
+        }
+        
+        let html = '';
+        articles.forEach((art, idx) => {
+            const imgUrl = getFirstImageUrl(art);
+            const preview = getPreviewText(art);
+            const dateStr = art.date ? new Date(art.date.toDate()).toLocaleDateString('ar-EG', {
+                year: 'numeric', month: 'short', day: 'numeric'
+            }) : 'قديم';
+            
+            html += `
+                <div class="article-card animate-in" data-id="${art.id}" style="animation-delay: ${idx * 0.05}s">
+                    ${imgUrl ? 
+                        `<img src="${escapeHtml(imgUrl)}" class="article-img" loading="lazy" alt="${escapeHtml(art.title)}">` : 
+                        `<div class="article-img-placeholder"><i class="fas fa-newspaper" style="font-size: 3rem; color: var(--gold); opacity: 0.5;"></i></div>`
+                    }
+                    <div class="article-content">
+                        <div class="article-title" onclick="viewFullArticle('${art.id}')">${escapeHtml(art.title)}</div>
+                        <div class="meta">
+                            <span><i class="fas fa-user"></i> ${escapeHtml(art.author)}</span>
+                            <span><i class="fas fa-eye"></i> ${art.views || 0}</span>
+                            <span><i class="fas fa-calendar-alt"></i> ${dateStr}</span>
+                        </div>
+                        <div style="color: #999; font-size: 0.9rem; line-height: 1.6;">${escapeHtml(preview)}${preview.length >= 140 ? '...' : ''}</div>
+                        <button class="summary-trigger" onclick="showSummary('${art.id}')">
+                            <i class="fas fa-lightbulb"></i> زبدة المقال
+                        </button>
+                        <div class="article-actions">
+                            <button class="dots-btn" onclick="toggleMenu(event, '${art.id}')" aria-label="خيارات">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </button>
+                            <div id="drop-${art.id}" class="dropdown">
+                                <button onclick="copyLink('${art.id}')"><i class="fas fa-copy"></i> نسخ الرابط</button>
+                                <button onclick="shareArticle('${art.id}')"><i class="fas fa-share-alt"></i> مشاركة</button>
+                                <button onclick="focusArticle('${art.id}')"><i class="fas fa-expand"></i> وضع التركيز</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        grid.innerHTML = html;
+    }
+
+    window.viewFullArticle = async function(id) {
+        if (!db) return;
+        const art = allArticles.find(a => a.id === id);
+        if (!art) return;
+        
+        try {
+            await db.collection('articles').doc(id).update({ 
+                views: firebase.firestore.FieldValue.increment(1) 
+            });
+            art.views = (art.views || 0) + 1;
+        } catch (e) {
+            console.error('View update failed:', e);
+        }
+        
+        let fullHtml = '';
+        if (art.contentBlocks && art.contentBlocks.length) {
+            fullHtml = art.contentBlocks.map(block => {
+                if (block.type === 'text') return `<div style="margin:1.5rem 0; line-height:1.8;">${block.value}</div>`;
+                if (block.type === 'image') {
+                    const caption = block.value?.caption || '';
+                    return `<div class="image-block">
+                        <img src="${escapeHtml(block.value.url)}" alt="${escapeHtml(caption)}" loading="lazy">
+                        ${caption ? `<div class="caption">${escapeHtml(caption)}</div>` : ''}
+                    </div>`;
+                }
+                if (block.type === 'code') {
+                    return `<pre><code class="language-${escapeHtml(block.value.language || 'text')}">${escapeHtml(block.value.code)}</code></pre>`;
+                }
+                if (block.type === 'summary') {
+                    return `<div style="background:rgba(212,175,55,0.08); padding:1.2rem; border-right:3px solid var(--gold); border-radius: 0.8rem; margin: 1.5rem 0;">
+                        <i class="fas fa-lightbulb" style="color: var(--gold); margin-left: 0.5rem;"></i> ${block.value}
+                    </div>`;
+                }
+                return '';
+            }).join('');
+        } else {
+            fullHtml = `<div style="line-height:1.8;">${art.content || ''}</div>`;
+        }
+        
+        const dateStr = art.date ? new Date(art.date.toDate()).toLocaleDateString('ar-EG', {
+            year: 'numeric', month: 'long', day: 'numeric'
+        }) : 'قديم';
+        
+        document.getElementById('articlesGrid').innerHTML = `
+            <div style="max-width: 900px; margin: auto; width: 100%;" class="animate-in">
+                <div class="article-card" style="padding: 2rem;">
+                    <button onclick="restoreGrid()" style="background:transparent; border:1px solid var(--gold); color:var(--gold); padding:0.5rem 1.2rem; border-radius:30px; cursor:pointer; margin-bottom:1.5rem; display:flex; align-items:center; gap:0.5rem; font-size:0.9rem;">
+                        <i class="fas fa-arrow-right"></i> العودة للقائمة
+                    </button>
+                    <h1 style="color: var(--gold); font-size: 1.8rem; margin-bottom: 1rem; line-height: 1.4;">${escapeHtml(art.title)}</h1>
+                    <div class="meta" style="margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid #1e1e2a;">
+                        <span><i class="fas fa-user"></i> ${escapeHtml(art.author)}</span>
+                        <span><i class="fas fa-eye"></i> ${art.views || 0}</span>
+                        <span><i class="fas fa-calendar-alt"></i> ${dateStr}</span>
+                        <span style="cursor:pointer; color:var(--gold);" onclick="copyLink('${art.id}')"><i class="fas fa-link"></i> نسخ الرابط</span>
+                    </div>
+                    ${fullHtml}
+                </div>
+            </div>
+        `;
+        
+        document.querySelectorAll('pre code').forEach(block => {
+            if (hljs) hljs.highlightElement(block);
+        });
+        attachCopyButtons();
+        updateSidePanels();
+        
+        // Update URL without reload
+        const newUrl = `${window.location.pathname}?article=${id}`;
+        window.history.pushState({ articleId: id }, '', newUrl);
+    };
+
+    function restoreGrid() {
+        window.history.pushState({}, '', window.location.pathname);
+        if (currentCat) filterAndRender();
+        else if (categories.length) selectCategory(categories[0].name);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Handle browser back button
+    window.onpopstate = function(event) {
+        if (!event.state?.articleId) {
+            if (currentCat) filterAndRender();
+        }
+    };
+
+    function attachCopyButtons() {
+        document.querySelectorAll('pre').forEach(pre => {
+            if (pre.querySelector('.copy-code')) return;
+            const btn = document.createElement('button');
+            btn.innerHTML = '<i class="fas fa-copy"></i> نسخ';
+            btn.className = 'copy-code';
+            btn.onclick = () => {
+                const code = pre.querySelector('code')?.innerText || '';
+                navigator.clipboard.writeText(code).then(() => {
+                    btn.innerHTML = '<i class="fas fa-check"></i> تم';
+                    btn.classList.add('copied');
+                    setTimeout(() => {
+                        btn.innerHTML = '<i class="fas fa-copy"></i> نسخ';
+                        btn.classList.remove('copied');
+                    }, 2000);
+                });
+            };
+            pre.style.position = 'relative';
+            pre.appendChild(btn);
+        });
+    }
+
+    window.showSummary = function(id) {
+        const art = allArticles.find(a => a.id === id);
+        if (!art) return;
+        
+        let sum = '';
+        if (art.contentBlocks) {
+            const sBlock = art.contentBlocks.find(b => b.type === 'summary');
+            if (sBlock) {
+                sum = typeof sBlock.value === 'string' ? sBlock.value : JSON.stringify(sBlock.value);
+            } else {
+                const firstText = art.contentBlocks.find(b => b.type === 'text');
+                sum = firstText ? stripHtml(firstText.value).slice(0, 400) : '';
+            }
+        } else {
+            sum = stripHtml(art.content || '').slice(0, 400);
+        }
+        
+        document.getElementById('summaryContent').innerHTML = `
+            <div style="font-size: 1.1rem; margin-bottom: 1rem;">${escapeHtml(sum)}${sum.length >= 400 ? '...' : ''}</div>
+            <p style="color: #888; font-size: 0.9rem; border-top: 1px solid #222; padding-top: 1rem;">
+                <i class="fas fa-info-circle"></i> ملخص سريع. اضغط على العنوان للقراءة الكاملة.
+            </p>
+        `;
+        openModal('summaryModal');
+    };
+
+    window.copyLink = (id) => {
+        const url = `${window.location.origin}${window.location.pathname}?article=${id}`;
+        navigator.clipboard.writeText(url).then(() => {
+            showToast('تم نسخ الرابط');
+            closeDropdown();
+        });
+    };
+
+    window.shareArticle = async (id) => {
+        const art = allArticles.find(a => a.id === id);
+        const url = `${window.location.origin}${window.location.pathname}?article=${id}`;
+        
+        if (navigator.share) {
+            try {
+                await navigator.share({ 
+                    title: art?.title || 'أوج', 
+                    text: art?.title,
+                    url: url 
+                });
+            } catch (err) {
+                if (err.name !== 'AbortError') {
+                    navigator.clipboard.writeText(url);
+                    showToast('تم نسخ الرابط للمشاركة');
+                }
+            }
+        } else {
+            navigator.clipboard.writeText(url);
+            showToast('تم نسخ الرابط للمشاركة');
+        }
+        closeDropdown();
+    };
+
+    window.focusArticle = (id) => {
+        const art = allArticles.find(a => a.id === id);
+        if (!art) return;
+        viewFullArticle(id); // Use the full article view as focus mode
+        closeDropdown();
+    };
+
+    window.toggleMenu = (e, id) => {
+        e.stopPropagation();
+        const menu = document.getElementById(`drop-${id}`);
+        if (activeDropdown && activeDropdown !== menu) activeDropdown.classList.remove('show');
+        menu.classList.toggle('show');
+        activeDropdown = menu.classList.contains('show') ? menu : null;
+    };
+
+    function closeDropdown() {
+        if (activeDropdown) activeDropdown.classList.remove('show');
+        activeDropdown = null;
+    }
+    document.addEventListener('click', closeDropdown);
+
+    async function updateSidePanels() {
+        if (!allArticles.length) return;
+        
+        const latest = [...allArticles].sort((a, b) => {
+            const aTime = a.date?.toMillis?.() || 0;
+            const bTime = b.date?.toMillis?.() || 0;
+            return bTime - aTime;
+        }).slice(0, 5);
+        
+        const most = [...allArticles].sort((a, b) => (b.views || 0) - (a.views || 0)).slice(0, 5);
+        
+        let related = currentCat ? 
+            allArticles.filter(a => a.category === currentCat).slice(0, 5) : 
+            allArticles.slice(0, 5);
+        
+        const createList = (items, showViews = false) => items.map(a => `
+            <li onclick="viewFullArticle('${a.id}')">
+                <span>${escapeHtml(a.title)}</span>
+                ${showViews ? `<span class="view-count-badge"><i class="fas fa-eye"></i> ${a.views || 0}</span>` : ''}
+            </li>
+        `).join('');
+        
+        document.getElementById('latestList').innerHTML = createList(latest);
+        document.getElementById('mostViewedList').innerHTML = createList(most, true);
+        document.getElementById('relatedList').innerHTML = createList(related);
+    }
+
+    // Search with Debounce
+    let searchTimeout;
+    function performSearch() {
+        const q = document.getElementById('searchInput').value.toLowerCase().trim();
+        const div = document.getElementById('searchResults');
+        
+        if (!q) {
+            div.innerHTML = '';
+            return;
+        }
+        
+        const res = allArticles.filter(a => 
+            (a.title && a.title.toLowerCase().includes(q)) || 
+            (a.content && a.content.toLowerCase().includes(q)) ||
+            (a.author && a.author.toLowerCase().includes(q))
+        );
+        
+        if (!res.length) {
+            div.innerHTML = '<div class="empty-state" style="padding:2rem;"><i class="fas fa-search" style="font-size:2rem; color:#333;"></i><p>لا توجد نتائج</p></div>';
+        } else {
+            div.innerHTML = res.map(a => `
+                <div class="search-result-item" onclick="viewFullArticle('${a.id}'); closeModal('searchModal');">
+                    <div class="search-result-title">${escapeHtml(a.title)}</div>
+                    <div class="search-result-meta">${escapeHtml(a.author)} • ${a.category || 'عام'}</div>
+                </div>
+            `).join('');
+        }
+    }
+
+    document.getElementById('searchInput')?.addEventListener('input', () => {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(performSearch, 300);
     });
-});
+
+    // Subscribe
+    document.getElementById('doSubscribeBtn')?.addEventListener('click', () => {
+        const email = document.getElementById('subEmail').value.trim();
+        const msgDiv = document.getElementById('subMsg');
+        
+        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            msgDiv.innerHTML = '<p style="color:var(--danger);"><i class="fas fa-exclamation-circle"></i> بريد إلكتروني غير صالح</p>';
+            return;
+        }
+        
+        // Here you would normally save to Firestore
+        msgDiv.innerHTML = '<p style="color:var(--success);"><i class="fas fa-check-circle"></i> تم الاشتراك بنجاح!</p>';
+        document.getElementById('subEmail').value = '';
+        setTimeout(() => closeModal('subscribeModal'), 2000);
+    });
+
+    // Modal Management
+    function openModal(id) {
+        const modal = document.getElementById(id);
+        if (modal) {
+            modal.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+    }
+
+    window.closeModal = function(id) {
+        if (!id) {
+            document.querySelectorAll('.modal-overlay').forEach(m => {
+                m.classList.remove('show');
+            });
+        } else {
+            const modal = document.getElementById(id);
+            if (modal) modal.classList.remove('show');
+        }
+        document.body.style.overflow = '';
+    };
+
+    document.getElementById('openSearchBtn').onclick = () => {
+        openModal('searchModal');
+        document.getElementById('searchInput').value = '';
+        document.getElementById('searchResults').innerHTML = '';
+        setTimeout(() => document.getElementById('searchInput').focus(), 100);
+    };
+
+    document.getElementById('openSubscribeBtn').onclick = () => {
+        openModal('subscribeModal');
+        document.getElementById('subMsg').innerHTML = '';
+        setTimeout(() => document.getElementById('subEmail').focus(), 100);
+    };
+
+    // Close modals on Escape key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            closeModal();
+            const focusOverlay = document.getElementById('focusOverlay');
+            if (focusOverlay?.classList.contains('show')) {
+                focusOverlay.classList.remove('show');
+                document.body.style.overflow = '';
+            }
+        }
+    });
+
+    // Close modal on backdrop click
+    document.querySelectorAll('.modal-overlay').forEach(modal => {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeModal(modal.id);
+        });
+    });
+
+    // Static Pages
+    window.openStaticPage = (page) => {
+        const titles = { 
+            about: 'من نحن', 
+            privacy: 'سياسة الخصوصية', 
+            cookies: 'سياسة الكوكيز', 
+            terms: 'شروط الاستخدام' 
+        };
+        const contents = {
+            about: `<p style="margin-bottom:1rem;">أوج (AWJ) هي منصة معرفية سيادية تقدم محتوى استراتيجياً وفلسفياً وعلمياً. نهدف إلى تمكين العقول بالنخبة الفكرية وبناء مجتمع واعٍ.</p>
+                    <p>نسعى لأن نكون المصدر الموثوق للمعرفة العميقة في العالم العربي.</p>`,
+            privacy: `<p style="margin-bottom:1rem;">نحن لا نشارك بياناتك مع أي طرف ثالث. جميع البيانات مخزنة بأمان في خوادم مشفرة.</p>
+                       <p>نحترم خصوصيتك تماماً ولا نستخدم بياناتك لأي أغراض تجارية.</p>`,
+            cookies: `<p style="margin-bottom:1rem;">نستخدم التخزين المحلي (LocalStorage) لتحسين تجربتك فقط. لا نستخدم كوكيز خارجية أو أدوات تتبع.</p>`,
+            terms: `<p style="margin-bottom:1rem;">المحتوى محمي بحقوق النشر. يمنع النسخ أو إعادة النشر دون إذن خطي صريح من إدارة المنصة.</p>
+                    <p>يحق للإدارة تعديل هذه الشروط في أي وقت دون إشعار مسبق.</p>`
+        };
+        document.getElementById('staticTitle').innerHTML = `<i class="fas fa-file-alt"></i> ${titles[page]}`;
+        document.getElementById('staticBody').innerHTML = contents[page];
+        openModal('staticModal');
+    };
+
+    // Scroll Top
+    const scrollBtn = document.getElementById('scrollTopBtn');
+    let scrollTimeout;
+    window.onscroll = () => {
+        clearTimeout(scrollTimeout);
+        scrollTimeout = setTimeout(() => {
+            if (window.scrollY > 400) scrollBtn.classList.add('visible');
+            else scrollBtn.classList.remove('visible');
+        }, 100);
+    };
+    scrollBtn.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    // Vault
+    let vaultClicks = 0;
+    let vaultTimer;
+    document.getElementById('vaultTrigger').onclick = () => {
+        vaultClicks++;
+        clearTimeout(vaultTimer);
+        vaultTimer = setTimeout(() => vaultClicks = 0, 2000);
+        
+        if (vaultClicks === 3) {
+            const pwd = prompt("شَفَرَةُ العُبُورِ:");
+            if (pwd === "@...Alshanfricc_1998...@") {
+                document.getElementById('vaultContent').innerHTML = `
+                    <div style="text-align:center; padding:1rem;">
+                        <i class="fas fa-unlock-alt" style="font-size:3rem; color:var(--gold); margin-bottom:1rem;"></i>
+                        <h3 style="color:var(--gold); margin-bottom:1rem;">مرحباً سيد أوج</h3>
+                        <div style="background:#0a0a0a; padding:1rem; border-radius:1rem; margin:0.5rem 0;">
+                            <span style="color:#888;">📚 عدد المقالات:</span> <strong style="color:var(--gold);">${allArticles.length}</strong>
+                        </div>
+                        <div style="background:#0a0a0a; padding:1rem; border-radius:1rem; margin:0.5rem 0;">
+                            <span style="color:#888;">🏷️ التصنيفات:</span> <strong style="color:var(--gold);">${categories.map(c => escapeHtml(c.name)).join(' • ')}</strong>
+                        </div>
+                        <div style="background:#0a0a0a; padding:1rem; border-radius:1rem; margin:0.5rem 0;">
+                            <span style="color:#888;">👁️ إجمالي المشاهدات:</span> <strong style="color:var(--gold);">${allArticles.reduce((a, b) => a + (b.views || 0), 0)}</strong>
+                        </div>
+                    </div>
+                `;
+                openModal('vaultModal');
+            } else {
+                showToast('شفرة خاطئة', 'fa-lock');
+            }
+            vaultClicks = 0;
+        }
+    };
+
+    // Initialize
+    fetchAll();
 </script>
 </body>
-</html>
+    </html>

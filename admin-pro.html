@@ -1,81 +1,970 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>أوج | شنفر Admin Pro</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>أوج | لوحة التحكم السيادية</title>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>/* نفس التنسيقات السابقة... */ :root{--bg-primary:#0A0B10;--bg-secondary:#0C0F17;--bg-card:#12141E;--border-color:#2a2a35;--text-primary:#eee;--text-secondary:#aaa;--accent:#D4AF37} *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',system-ui} body{background:var(--bg-primary);color:var(--text-primary);direction:rtl;padding:1rem} .card{background:var(--bg-card);border:1px solid var(--border-color);border-radius:1rem;padding:1.5rem;margin-bottom:1.5rem} .card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;padding-bottom:1rem;border-bottom:1px solid var(--border-color)} .card-title{font-size:1.2rem;color:var(--accent)} .tabs{display:flex;gap:0.25rem;border-bottom:1px solid var(--border-color);margin-bottom:1rem} .tab-btn{padding:0.5rem 1rem;background:transparent;border:none;color:var(--text-secondary);cursor:pointer} .tab-btn.active{color:var(--accent);border-bottom:2px solid var(--accent)} .tab-content{display:none} .tab-content.active{display:block} .flex-row{display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center;margin-bottom:0.5rem} input,select,textarea{width:100%;padding:0.6rem;background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:0.5rem;color:var(--text-primary)} button{background:var(--accent);color:#000;border:none;padding:0.5rem 1rem;border-radius:0.5rem;cursor:pointer} .btn-sm{padding:0.3rem 0.8rem;font-size:0.85rem} .danger{background:#ef4444;color:#fff} .outline{background:transparent;border:1px solid var(--accent);color:var(--accent)} code{background:#1a1c25;padding:0.1rem 0.3rem;border-radius:0.25rem;font-size:0.85rem} .spinner{width:1rem;height:1rem;border:2px solid var(--accent);border-top-color:transparent;border-radius:50%;animation:spin 0.8s linear infinite;display:inline-block} @keyframes spin{to{transform:rotate(360deg)}} .grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem} @media(max-width:768px){.grid-2{grid-template-columns:1fr}}</style>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, -apple-system; }
+        body { background: #0A0B10; color: #eee; direction: rtl; padding: 1.5rem; min-height: 100vh; }
+        .container { max-width: 1400px; margin: auto; }
+        
+        /* Login */
+        #loginPanel { max-width: 500px; margin: 5rem auto; animation: fadeIn 0.5s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Header */
+        .admin-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 2rem; 
+            border-bottom: 1px solid #2a2a35; 
+            padding-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .logo { font-size: 2rem; color: #D4AF37; font-weight: bold; text-shadow: 0 0 20px rgba(212,175,55,0.3); }
+        .stats-badge { background: #1e1e2a; padding: 0.5rem 1.2rem; border-radius: 40px; font-size: 0.85rem; border: 1px solid #2a2a35; }
+        
+        /* Grid */
+        .grid-2col { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; margin-bottom: 2rem; }
+        
+        /* Cards */
+        .card { 
+            background: #0C0F17; 
+            border: 1px solid #2a2a35; 
+            border-radius: 1.5rem; 
+            padding: 1.5rem; 
+            margin-bottom: 1.5rem;
+            transition: border-color 0.3s;
+        }
+        .card:hover { border-color: rgba(212,175,55,0.3); }
+        .card h2 { 
+            color: #D4AF37; 
+            margin-bottom: 1.2rem; 
+            border-right: 3px solid #D4AF37; 
+            padding-right: 0.8rem;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        /* Inputs */
+        input, select, textarea { 
+            background: #1a1c25; 
+            border: 1px solid #2a2a35; 
+            padding: 0.8rem 1rem; 
+            border-radius: 1rem; 
+            color: white; 
+            width: 100%; 
+            margin-bottom: 0.8rem;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #D4AF37;
+            box-shadow: 0 0 0 3px rgba(212,175,55,0.1);
+        }
+        
+        /* Buttons */
+        button { 
+            background: #D4AF37; 
+            color: #000; 
+            border: none; 
+            padding: 0.7rem 1.4rem; 
+            border-radius: 2rem; 
+            cursor: pointer; 
+            font-weight: bold; 
+            transition: all 0.2s;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        button:hover { opacity: 0.9; transform: translateY(-1px); }
+        button:active { transform: scale(0.98); }
+        .btn-outline { 
+            background: transparent; 
+            border: 1px solid #D4AF37; 
+            color: #D4AF37; 
+        }
+        .btn-outline:hover { background: rgba(212,175,55,0.1); }
+        .btn-danger { background: #ff4444; color: white; }
+        .btn-danger:hover { background: #ff6666; }
+        .btn-ai {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+        }
+        .btn-ai:hover { filter: brightness(1.1); }
+        .btn-sm { padding: 0.4rem 0.8rem; font-size: 0.8rem; }
+        
+        /* Flex */
+        .flex-row { display: flex; gap: 1rem; flex-wrap: wrap; align-items: center; margin-bottom: 1rem; }
+        .flex-row input, .flex-row select { margin-bottom: 0; flex: 1; }
+        
+        /* Blocks */
+        .block {
+            background: #12141E;
+            border-radius: 1rem;
+            padding: 1.2rem;
+            margin-bottom: 1rem;
+            border: 1px solid #1e1e2a;
+            transition: all 0.2s;
+        }
+        .block:hover { border-color: #2a2a35; }
+        .block-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 0.8rem; 
+            cursor: move;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #1a1a1a;
+        }
+        .block-type-label {
+            color: #D4AF37;
+            font-weight: bold;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .delete-block { 
+            background: none; 
+            border: none; 
+            color: #ff7777; 
+            font-size: 1.1rem; 
+            cursor: pointer;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        .delete-block:hover { background: rgba(255,68,68,0.1); }
+        
+        /* Image */
+        .image-preview { 
+            max-width: 100%; 
+            max-height: 200px; 
+            margin-top: 0.5rem; 
+            border-radius: 0.8rem;
+            border: 1px solid #2a2a35;
+        }
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            cursor: pointer;
+            width: 100%;
+            height: 100%;
+        }
+        
+        /* Code */
+        .code-preview { 
+            background: #0D0F14; 
+            padding: 0.8rem; 
+            border-radius: 0.8rem; 
+            margin-top: 0.5rem;
+            border: 1px solid #1e1e2a;
+        }
+        
+        /* Messages */
+        .message { 
+            padding: 1rem; 
+            border-radius: 1rem; 
+            margin-top: 1rem; 
+            text-align: center; 
+            display: none;
+            font-size: 0.9rem;
+        }
+        .success { background: rgba(0,200,81,0.15); color: #00C851; border: 1px solid rgba(0,200,81,0.3); display: block; }
+        .error { background: rgba(255,68,68,0.15); color: #ff4444; border: 1px solid rgba(255,68,68,0.3); display: block; }
+        .info { background: rgba(66,133,244,0.15); color: #4285f4; border: 1px solid rgba(66,133,244,0.3); display: block; }
+        
+        /* Sub Items */
+        .sub-item { 
+            background: #2a2a35; 
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            padding: 0.3rem 0.9rem; 
+            border-radius: 40px; 
+            margin-left: 0.5rem; 
+            margin-bottom: 0.3rem;
+            font-size: 0.85rem;
+        }
+        .sub-item i { cursor: pointer; color: #ff7777; transition: color 0.2s; }
+        .sub-item i:hover { color: #ff4444; }
+        
+        /* AI Section */
+        .ai-panel {
+            background: linear-gradient(135deg, rgba(102,126,234,0.1) 0%, rgba(118,75,162,0.1) 100%);
+            border: 1px solid rgba(102,126,234,0.3);
+            border-radius: 1rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        .ai-panel h4 { color: #a78bfa; margin-bottom: 0.8rem; font-size: 1rem; }
+        .api-key-input {
+            font-family: monospace;
+            letter-spacing: 1px;
+        }
+        
+        /* Preview Modal */
+        .preview-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.95);
+            z-index: 20000;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+        .preview-overlay.show { display: block; }
+        .preview-content {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #0C0F17;
+            border: 1px solid #2a2a35;
+            border-radius: 1.5rem;
+            padding: 2rem;
+            position: relative;
+        }
+        .preview-close {
+            position: sticky;
+            top: 0;
+            background: #D4AF37;
+            color: #000;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            cursor: pointer;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        /* Sortable Ghost */
+        .sortable-ghost { opacity: 0.4; background: #1a1c25; border: 2px dashed #D4AF37; }
+        .sortable-drag { cursor: grabbing; }
+        
+        /* Responsive */
+        @media (max-width: 900px) { 
+            .grid-2col { grid-template-columns: 1fr; } 
+            body { padding: 1rem; }
+        }
+        
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #0a0a0a; }
+        ::-webkit-scrollbar-thumb { background: #2a2a35; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #D4AF37; }
+    </style>
 </head>
 <body>
-<div id="appContainer" style="display:none;max-width:1200px;margin:auto;">
-    <header style="display:flex;justify-content:space-between;align-items:center;padding:1rem 0;border-bottom:1px solid var(--border-color);margin-bottom:2rem;">
-        <h1 style="color:var(--accent);">🦅 شنفر | Admin Pro</h1>
-        <button class="outline" onclick="auth.signOut();location.reload()">🚪 خروج</button>
-    </header>
-    <nav class="tabs" id="mainNav">
-        <button class="tab-btn active" data-page="dashboard">🏠 الرئيسية</button>
-        <button class="tab-btn" data-page="ai-ui">🤖 الذكاء الاصطناعي</button>
-        <button class="tab-btn" data-page="auto-pub-ui">🔄 النشر التلقائي</button>
-        <button class="tab-btn" data-page="mon-ui">💰 الربحية</button>
-    </nav>
-    <main>
-        <section id="page-dashboard" class="tab-content active">
-            <div class="card"><h3 class="card-title">مرحباً بك في لوحة تحكم شنفر</h3><p style="margin-top:1rem;color:var(--text-secondary)">اختر قسماً من القائمة العلوية للبدء.</p></div>
-        </section>
-        <section id="ai-ui" class="tab-content"></section>
-        <section id="auto-pub-ui" class="tab-content"></section>
-        <section id="mon-ui" class="tab-content"></section>
-    </main>
+<div class="container">
+    <!-- Login -->
+    <div id="loginPanel" class="card">
+        <h2><i class="fas fa-shield-alt"></i> دخول الإدارة</h2>
+        <input type="email" id="loginEmail" placeholder="البريد الإلكتروني">
+        <input type="password" id="loginPassword" placeholder="كلمة المرور">
+        <button id="doLoginBtn" style="width:100%;"><i class="fas fa-sign-in-alt"></i> تسجيل الدخول</button>
+        <div id="loginMsg" class="message"></div>
+    </div>
+
+    <!-- Admin Panel -->
+    <div id="adminPanel" style="display: none;">
+        <div class="admin-header">
+            <div class="logo"><i class="fas fa-crown"></i> AWJ Admin</div>
+            <div style="display:flex; gap:1rem; align-items:center; flex-wrap:wrap;">
+                <span class="stats-badge" id="statsInfo"></span>
+                <button id="logoutBtn" class="btn-outline btn-sm"><i class="fas fa-sign-out-alt"></i> خروج</button>
+            </div>
+        </div>
+
+        <div class="grid-2col">
+            <!-- Categories -->
+            <div class="card">
+                <h2><i class="fas fa-folder-tree"></i> التبويبات والفروع</h2>
+                <div class="flex-row">
+                    <input type="text" id="newCatName" placeholder="اسم التبويبة الجديدة">
+                    <button id="addCatBtn"><i class="fas fa-plus"></i> إضافة</button>
+                </div>
+                <div id="catsList"></div>
+            </div>
+            
+            <!-- Authors -->
+            <div class="card">
+                <h2><i class="fas fa-users"></i> الكتّاب</h2>
+                <div class="flex-row">
+                    <input type="text" id="newAuthorName" placeholder="اسم الكاتب الجديد">
+                    <button id="addAuthorBtn"><i class="fas fa-plus"></i> إضافة</button>
+                </div>
+                <div id="authorsList"></div>
+            </div>
+        </div>
+
+        <!-- AI Settings -->
+        <div class="card ai-panel">
+            <h4><i class="fas fa-robot"></i> إعدادات الذكاء الاصطناعي (اختياري)</h4>
+            <p style="color:#888; font-size:0.85rem; margin-bottom:0.8rem;">لتفعيل التوليد التلقائي، أدخل مفتاح OpenAI API Key. يُحفظ محلياً فقط.</p>
+            <div class="flex-row">
+                <input type="password" id="aiApiKey" class="api-key-input" placeholder="sk-..." style="flex:1;">
+                <button onclick="saveApiKey()" class="btn-sm btn-outline"><i class="fas fa-save"></i> حفظ</button>
+                <button onclick="clearApiKey()" class="btn-sm btn-danger"><i class="fas fa-trash"></i> مسح</button>
+            </div>
+            <div id="aiKeyMsg" class="message" style="margin-top:0.5rem;"></div>
+        </div>
+
+        <!-- Article Editor -->
+        <div class="card">
+            <h2><i class="fas fa-feather-alt"></i> محرر المقال المتقدم</h2>
+            
+            <div class="flex-row">
+                <input type="text" id="articleTitle" placeholder="عنوان المقال" style="flex:2;">
+                <button onclick="generateTitleAI()" class="btn-ai btn-sm" title="ولّد عنواناً بالذكاء الاصطناعي"><i class="fas fa-magic"></i> ولّد عنوان</button>
+            </div>
+            
+            <select id="authorSelect"></select>
+            
+            <div class="flex-row">
+                <select id="catSelect" style="flex:1"></select>
+                <select id="subSelect" style="flex:1"></select>
+            </div>
+            
+            <div id="blocksEditor"></div>
+            
+            <div class="flex-row" style="margin-top:1rem;">
+                <button id="addTextBtn" class="btn-outline"><i class="fas fa-paragraph"></i> نص HTML</button>
+                <button id="addImageBtn" class="btn-outline"><i class="fas fa-image"></i> صورة</button>
+                <button id="addCodeBtn" class="btn-outline"><i class="fas fa-code"></i> كود</button>
+                <button id="addSummaryBtn" class="btn-outline"><i class="fas fa-lightbulb"></i> مختصر</button>
+                <button onclick="generateSummaryAI()" class="btn-ai"><i class="fas fa-brain"></i> ولّد ملخصاً</button>
+            </div>
+            
+            <hr style="margin: 1.5rem 0; border-color:#2a2a35;">
+            
+            <div class="flex-row">
+                <button id="saveDraftBtn" class="btn-outline"><i class="fas fa-save"></i> حفظ مسودة</button>
+                <button onclick="previewArticle()" class="btn-outline"><i class="fas fa-eye"></i> معاينة</button>
+                <button id="publishBtn" style="flex:1;"><i class="fas fa-paper-plane"></i> نشر المقال</button>
+            </div>
+            
+            <div id="publishMsg" class="message"></div>
+        </div>
+    </div>
 </div>
 
-<div id="loginPanel" class="card" style="max-width:400px;margin:5rem auto;">
-    <h2 style="color:var(--accent);text-align:center;margin-bottom:1rem;">🔐 دخول الإدارة</h2>
-    <input type="email" id="loginEmail" placeholder="البريد">
-    <input type="password" id="loginPassword" placeholder="كلمة المرور">
-    <button id="loginBtn" style="width:100%;margin-top:0.5rem;">دخول</button>
+<!-- Preview Modal -->
+<div id="previewOverlay" class="preview-overlay">
+    <div class="preview-content">
+        <button class="preview-close" onclick="closePreview()"><i class="fas fa-times"></i> إغلاق المعاينة</button>
+        <div id="previewBody"></div>
+    </div>
 </div>
-
-<!-- 📦 استدعاء الملفات بالترتيب -->
-<script src="firebase-config.js"></script>
-<script src="setup-db.js"></script>
-<script src="ai-manager.js"></script>
-<script src="auto-publisher.js"></script>
-<script src="monetization.js"></script>
 
 <script>
-// محاكاة بسيطة لـ app.state لتجنب الأخطاء
-const app = { state: { categories: [], authors: [] } };
-// تحميل بيانات تجريبية سريعة
-db.collection('categories').get().then(s=>app.state.categories=s.docs.map(d=>({id:d.id,...d.data()})));
-db.collection('authors').get().then(s=>app.state.authors=s.docs.map(d=>({id:d.id,...d.data()})));
-
-// التنقل
-document.querySelectorAll('#mainNav .tab-btn').forEach(btn => {
-    btn.onclick = () => {
-        document.querySelectorAll('#mainNav .tab-btn').forEach(b=>b.classList.remove('active'));
-        document.querySelectorAll('main .tab-content').forEach(c=>c.classList.remove('active'));
-        btn.classList.add('active');
-        const page = btn.dataset.page;
-        document.getElementById(`page-${page}`).classList.add('active');
-        if(page==='ai-ui' && !document.getElementById('ai-ui').innerHTML.trim()) aiManager.renderUI('ai-ui');
-        if(page==='auto-pub-ui' && !document.getElementById('auto-pub-ui').innerHTML.trim()) autoPub.renderUI('auto-pub-ui');
-        if(page==='mon-ui' && !document.getElementById('mon-ui').innerHTML.trim()) monManager.renderUI('mon-ui');
+    const firebaseConfig = {
+        apiKey: "AIzaSyDjgVxvtPXTn1tpr4IxOK3wOW4r3gzB1VU",
+        authDomain: "awj-website-29f16.firebaseapp.com",
+        projectId: "awj-website-29f16",
+        storageBucket: "awj-website-29f16.firebasestorage.app",
+        messagingSenderId: "406747568578",
+        appId: "1:406747568578:web:741821d3c60df0011b5e5b",
+        measurementId: "G-DFB0GYH7LN"
     };
-});
+    
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const auth = firebase.auth();
+    const storage = firebase.storage();
 
-// تسجيل الدخول
-document.getElementById('loginBtn').onclick = async () => {
-    try { await auth.signInWithEmailAndPassword(document.getElementById('loginEmail').value, document.getElementById('loginPassword').value);
-    document.getElementById('loginPanel').style.display='none'; document.getElementById('appContainer').style.display='block';
-    } catch(e) { alert('❌ '+e.message); }
-};
-auth.onAuthStateChanged(u => {
-    if(!u) { document.getElementById('loginPanel').style.display='block'; document.getElementById('appContainer').style.display='none'; }
-    else { document.getElementById('loginPanel').style.display='none'; document.getElementById('appContainer').style.display='block'; }
-});
+    let categories = [];
+    let authors = [];
+    let blocks = [];
+    let sortableInstance = null;
+    let apiKey = localStorage.getItem('awj_openai_key') || '';
+    
+    const languages = [
+        "javascript", "python", "html", "css", "php", "java", "csharp", 
+        "go", "ruby", "bash", "typescript", "swift", "kotlin", "sql", "json", "xml"
+    ];
+
+    // Auth
+    document.getElementById('doLoginBtn').onclick = async () => {
+        const email = document.getElementById('loginEmail').value.trim();
+        const pass = document.getElementById('loginPassword').value;
+        try { 
+            await auth.signInWithEmailAndPassword(email, pass); 
+        } catch(e) { 
+            showMsg('loginMsg', '❌ ' + e.message, 'error'); 
+        }
+    };
+    
+    auth.onAuthStateChanged(user => {
+        if (user) {
+            document.getElementById('loginPanel').style.display = 'none';
+            document.getElementById('adminPanel').style.display = 'block';
+            loadCategories(); 
+            loadAuthors(); 
+            loadBlocksFromLocal();
+            updateStats();
+            if (apiKey) document.getElementById('aiApiKey').value = apiKey;
+        } else {
+            document.getElementById('loginPanel').style.display = 'block';
+            document.getElementById('adminPanel').style.display = 'none';
+        }
+    });
+    
+    document.getElementById('logoutBtn').onclick = () => auth.signOut();
+    
+    function showMsg(elId, text, type) { 
+        const d = document.getElementById(elId); 
+        d.innerHTML = text; 
+        d.className = `message ${type}`; 
+        setTimeout(() => d.className = 'message', 4000); 
+    }
+    
+    async function updateStats() { 
+        try {
+            const snap = await db.collection('articles').get(); 
+            document.getElementById('statsInfo').innerHTML = 
+                `📄 ${snap.size} مقال | ✍️ ${authors.length} كاتب | 🗂️ ${categories.length} تبويبة`;
+        } catch(e) {
+            console.error('Stats error:', e);
+        }
+    }
+
+    // Categories
+    async function loadCategories() {
+        try {
+            const snap = await db.collection('categories').orderBy('name').get();
+            categories = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+            renderCatsList(); 
+            updateCatSelects();
+        } catch(e) {
+            showMsg('publishMsg', '❌ خطأ في تحميل التبويبات', 'error');
+        }
+    }
+    
+    function renderCatsList() {
+        const div = document.getElementById('catsList');
+        if (!categories.length) { 
+            div.innerHTML = '<p style="color:#888;">لا توجد تبويبات</p>'; 
+            return; 
+        }
+        div.innerHTML = '';
+        categories.forEach(cat => {
+            const subs = cat.subfields || [];
+            const el = document.createElement('div');
+            el.style.cssText = 'background:#12141E; border-radius:1rem; padding:1rem; margin-bottom:1rem; border:1px solid #1e1e2a;';
+            el.innerHTML = `
+                <div class="flex-row" style="justify-content:space-between; margin-bottom:0.5rem;">
+                    <b style="color:#D4AF37;"><i class="fas fa-folder"></i> ${escapeHtml(cat.name)}</b>
+                    <button class="btn-outline btn-sm" onclick="deleteCat('${cat.id}')"><i class="fas fa-trash"></i> حذف</button>
+                </div>
+                <div style="margin-bottom:0.5rem;">
+                    ${subs.map(s => `<span class="sub-item">${escapeHtml(s)} <i class="fas fa-times-circle" onclick="removeSub('${cat.id}','${escapeHtml(s)}')"></i></span>`).join('')}
+                </div>
+                <div class="flex-row" style="margin-bottom:0;">
+                    <input type="text" id="sub-${cat.id}" placeholder="فرع جديد" style="margin-bottom:0;">
+                    <button class="btn-outline btn-sm" onclick="addSub('${cat.id}')"><i class="fas fa-plus"></i> إضافة</button>
+                </div>
+            `;
+            div.appendChild(el);
+        });
+    }
+    
+    window.deleteCat = async (id) => { 
+        if(!confirm('سيتم حذف التبويبة وجميع فروعها. متأكد؟')) return;
+        try {
+            await db.collection('categories').doc(id).delete(); 
+            loadCategories(); 
+        } catch(e) {
+            showMsg('publishMsg', '❌ ' + e.message, 'error');
+        }
+    };
+    
+    window.addSub = async (catId) => {
+        const input = document.getElementById(`sub-${catId}`);
+        const val = input.value.trim();
+        if(!val) return;
+        try {
+            const cat = categories.find(c => c.id === catId);
+            const newSubs = [...(cat.subfields || []), val];
+            await db.collection('categories').doc(catId).update({ subfields: newSubs });
+            input.value = '';
+            loadCategories();
+        } catch(e) {
+            showMsg('publishMsg', '❌ ' + e.message, 'error');
+        }
+    };
+    
+    window.removeSub = async (catId, subName) => {
+        try {
+            const cat = categories.find(c => c.id === catId);
+            const newSubs = (cat.subfields || []).filter(s => s !== subName);
+            await db.collection('categories').doc(catId).update({ subfields: newSubs });
+            loadCategories();
+        } catch(e) {
+            showMsg('publishMsg', '❌ ' + e.message, 'error');
+        }
+    };
+    
+    document.getElementById('addCatBtn').onclick = async () => {
+        const name = document.getElementById('newCatName').value.trim();
+        if(!name) return;
+        try {
+            await db.collection('categories').add({ name, subfields: [] });
+            document.getElementById('newCatName').value = '';
+            loadCategories();
+        } catch(e) {
+            showMsg('publishMsg', '❌ ' + e.message, 'error');
+        }
+    };
+    
+    function updateCatSelects() {
+        const catSel = document.getElementById('catSelect');
+        const subSel = document.getElementById('subSelect');
+        catSel.innerHTML = '<option value="">اختر التبويبة</option>';
+        categories.forEach(c => {
+            catSel.innerHTML += `<option value="${escapeHtml(c.name)}">${escapeHtml(c.name)}</option>`;
+        });
+        catSel.onchange = () => {
+            const catName = catSel.value;
+            const cat = categories.find(c => c.name === catName);
+            subSel.innerHTML = '<option value="">اختر الفرع (اختياري)</option>';
+            if(cat && cat.subfields) {
+                cat.subfields.forEach(s => {
+                    subSel.innerHTML += `<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`;
+                });
+            }
+        };
+    }
+
+    // Authors
+    async function loadAuthors() {
+        try {
+            const snap = await db.collection('authors').orderBy('name').get();
+            authors = snap.docs.map(d => ({ id: d.id, name: d.data().name }));
+            renderAuthorsList(); 
+            updateAuthorSelect(); 
+            updateStats();
+        } catch(e) {
+            showMsg('publishMsg', '❌ خطأ في تحميل الكتاب', 'error');
+        }
+    }
+    
+    function renderAuthorsList() {
+        const div = document.getElementById('authorsList');
+        if(!authors.length) { 
+            div.innerHTML = '<p style="color:#888;">لا يوجد كتاب</p>'; 
+            return; 
+        }
+        div.innerHTML = authors.map(a => `
+            <div class="flex-row" style="justify-content:space-between; padding:0.5rem 0; border-bottom:1px dashed #222;">
+                <span><i class="fas fa-user-edit" style="color:#D4AF37;"></i> ${escapeHtml(a.name)}</span>
+                <button class="btn-outline btn-sm" onclick="deleteAuthor('${a.id}')"><i class="fas fa-trash"></i></button>
+            </div>
+        `).join('');
+    }
+    
+    window.deleteAuthor = async (id) => { 
+        try {
+            await db.collection('authors').doc(id).delete(); 
+            loadAuthors(); 
+        } catch(e) {
+            showMsg('publishMsg', '❌ ' + e.message, 'error');
+        }
+    };
+    
+    document.getElementById('addAuthorBtn').onclick = async () => {
+        const name = document.getElementById('newAuthorName').value.trim();
+        if(!name) return;
+        try {
+            await db.collection('authors').add({ name });
+            document.getElementById('newAuthorName').value = '';
+            loadAuthors();
+        } catch(e) {
+            showMsg('publishMsg', '❌ ' + e.message, 'error');
+        }
+    };
+    
+    function updateAuthorSelect() { 
+        const sel = document.getElementById('authorSelect');
+        sel.innerHTML = '<option value="">اختر الكاتب</option>';
+        authors.forEach(a => sel.innerHTML += `<option value="${escapeHtml(a.name)}">${escapeHtml(a.name)}</option>`);
+    }
+
+    // Editor Blocks
+    function addBlock(type) {
+        if(type === 'text') blocks.push({ type, value: '<p>اكتب نصك هنا... يمكنك استخدام <strong>HTML</strong></p>' });
+        else if(type === 'image') blocks.push({ type, value: { url: '', caption: '' } });
+        else if(type === 'code') blocks.push({ type, value: { code: '// اكتب كودك هنا', language: 'javascript' } });
+        else if(type === 'summary') blocks.push({ type, value: 'ملخص المقال...' });
+        renderBlocks(); 
+        saveBlocksToLocal();
+    }
+    
+    window.deleteBlock = function(idx) { 
+        if(!confirm('حذف هذه الكتلة؟')) return;
+        blocks.splice(idx, 1); 
+        renderBlocks(); 
+        saveBlocksToLocal(); 
+    };
+    
+    function updateBlockValue(idx, field, val) {
+        if(typeof blocks[idx].value === 'string') blocks[idx].value = val;
+        else blocks[idx].value[field] = val;
+        saveBlocksToLocal();
+        // Don't re-render on every keystroke for text areas - only for file inputs
+        if (field !== 'code' && field !== null) renderBlocks();
+    }
+    
+    async function uploadImage(idx, fileInput) {
+        const file = fileInput.files[0];
+        if(!file) return;
+        if(file.size > 5 * 1024 * 1024) {
+            showMsg('publishMsg', '❌ حجم الصورة يجب أن يكون أقل من 5 ميجابايت', 'error');
+            return;
+        }
+        try {
+            const ref = storage.ref(`articles/${Date.now()}_${file.name}`);
+            await ref.put(file);
+            const url = await ref.getDownloadURL();
+            blocks[idx].value.url = url;
+            saveBlocksToLocal();
+            renderBlocks();
+            showMsg('publishMsg', '✅ تم رفع الصورة', 'success');
+        } catch(e) {
+            showMsg('publishMsg', '❌ فشل رفع الصورة: ' + e.message, 'error');
+        }
+    }
+    
+    function renderBlocks() {
+        const container = document.getElementById('blocksEditor');
+        if(!blocks.length) { 
+            container.innerHTML = '<div style="text-align:center; color:#888; padding:2rem; border:2px dashed #2a2a35; border-radius:1rem;"><i class="fas fa-plus-circle" style="font-size:2rem; margin-bottom:0.5rem; display:block;"></i>أضف كتلة محتوى</div>'; 
+            return; 
+        }
+        
+        container.innerHTML = '';
+        blocks.forEach((block, idx) => {
+            const div = document.createElement('div');
+            div.className = 'block';
+            div.setAttribute('data-idx', idx);
+            div.setAttribute('data-block', JSON.stringify(block));
+            
+            const typeLabels = {
+                text: { icon: 'fa-paragraph', label: 'نص' },
+                image: { icon: 'fa-image', label: 'صورة' },
+                code: { icon: 'fa-code', label: 'كود' },
+                summary: { icon: 'fa-lightbulb', label: 'مختصر' }
+            };
+            const t = typeLabels[block.type];
+            
+            let inner = `
+                <div class="block-header">
+                    <span class="block-type-label"><i class="fas ${t.icon}"></i> ${t.label}</span>
+                    <button class="delete-block" onclick="deleteBlock(${idx})"><i class="fas fa-trash"></i></button>
+                </div>
+            `;
+            
+            if(block.type === 'text') {
+                inner += `<textarea rows="5" onblur="updateBlockValue(${idx}, null, this.value)" style="font-family:monospace;">${escapeHtml(block.value)}</textarea>`;
+            }
+            else if(block.type === 'image') {
+                inner += `
+                    <div class="file-input-wrapper" style="margin-bottom:0.5rem;">
+                        <button class="btn-outline btn-sm"><i class="fas fa-cloud-upload-alt"></i> اختر صورة</button>
+                        <input type="file" accept="image/*" onchange="uploadImage(${idx}, this)">
+                    </div>
+                `;
+                if(block.value.url) {
+                    inner += `<img src="${escapeHtml(block.value.url)}" class="image-preview"><br>
+                              <input type="text" placeholder="وصف الصورة / التسمية" value="${escapeHtml(block.value.caption)}" onchange="updateBlockValue(${idx},'caption',this.value)">`;
+                }
+            }
+            else if(block.type === 'code') {
+                inner += `<select onchange="updateBlockValue(${idx}, 'language', this.value)" style="margin-bottom:0.5rem; width:auto;">${languages.map(l=>`<option value="${l}" ${block.value.language===l?'selected':''}>${l}</option>`).join('')}</select>`;
+                inner += `<textarea rows="6" onblur="updateBlockValue(${idx}, 'code', this.value)" style="font-family:monospace; margin-bottom:0.5rem;">${escapeHtml(block.value.code)}</textarea>`;
+                inner += `<div class="code-preview"><pre><code class="language-${escapeHtml(block.value.language)}">${escapeHtml(block.value.code)}</code></pre></div>`;
+            }
+            else if(block.type === 'summary') {
+                inner += `<textarea rows="3" onblur="updateBlockValue(${idx}, null, this.value)">${escapeHtml(block.value)}</textarea>`;
+            }
+            
+            div.innerHTML = inner;
+            container.appendChild(div);
+            
+            if(block.type === 'code') {
+                const codeBlock = div.querySelector('pre code');
+                if(codeBlock && window.hljs) hljs.highlightElement(codeBlock);
+            }
+        });
+        
+        // Initialize Sortable only once
+        if (!sortableInstance) {
+            sortableInstance = new Sortable(container, { 
+                animation: 200,
+                ghostClass: 'sortable-ghost',
+                dragClass: 'sortable-drag',
+                onEnd: syncBlocksOrder
+            });
+        }
+    }
+    
+    function syncBlocksOrder() {
+        const newBlocks = [];
+        document.querySelectorAll('.block').forEach(el => {
+            const blockData = JSON.parse(el.getAttribute('data-block') || '{}');
+            newBlocks.push(blockData);
+        });
+        blocks = newBlocks;
+        // Update indices for next render
+        document.querySelectorAll('.block').forEach((el, i) => {
+            el.setAttribute('data-idx', i);
+            el.setAttribute('data-block', JSON.stringify(blocks[i]));
+        });
+        saveBlocksToLocal();
+    }
+    
+    function saveBlocksToLocal() { 
+        localStorage.setItem('admin_blocks', JSON.stringify(blocks)); 
+    }
+    
+    function loadBlocksFromLocal() { 
+        const saved = localStorage.getItem('admin_blocks'); 
+        if(saved) {
+            try {
+                blocks = JSON.parse(saved); 
+            } catch(e) {
+                blocks = [];
+            }
+        } else blocks = []; 
+        renderBlocks(); 
+    }
+
+    // AI Functions
+    function saveApiKey() {
+        const key = document.getElementById('aiApiKey').value.trim();
+        if(key) {
+            localStorage.setItem('awj_openai_key', key);
+            apiKey = key;
+            showMsg('aiKeyMsg', '✅ تم حفظ المفتاح', 'success');
+        } else {
+            showMsg('aiKeyMsg', '❌ المفتاح فارغ', 'error');
+        }
+    }
+    
+    function clearApiKey() {
+        localStorage.removeItem('awj_openai_key');
+        apiKey = '';
+        document.getElementById('aiApiKey').value = '';
+        showMsg('aiKeyMsg', '✅ تم مسح المفتاح', 'info');
+    }
+    
+    async function callOpenAI(prompt, maxTokens = 150) {
+        if(!apiKey) {
+            showMsg('publishMsg', '❌ أضف مفتاح OpenAI أولاً في إعدادات الذكاء الاصطناعي', 'error');
+            return null;
+        }
+        try {
+            const res = await fetch('https://api.openai.com/v1/chat/completions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${apiKey}`
+                },
+                body: JSON.stringify({
+                    model: 'gpt-3.5-turbo',
+                    messages: [{ role: 'user', content: prompt }],
+                    max_tokens: maxTokens,
+                    temperature: 0.7
+                })
+            });
+            const data = await res.json();
+            if(data.error) throw new Error(data.error.message);
+            return data.choices[0].message.content.trim();
+        } catch(e) {
+            showMsg('publishMsg', '❌ خطأ في الذكاء الاصطناعي: ' + e.message, 'error');
+            return null;
+        }
+    }
+    
+    window.generateTitleAI = async function() {
+        const currentTitle = document.getElementById('articleTitle').value;
+        const textBlocks = blocks.filter(b => b.type === 'text').map(b => stripHtml(b.value)).join(' ').slice(0, 500);
+        if(!textBlocks && !currentTitle) {
+            showMsg('publishMsg', '❌ أضف نصاً أولاً لتوليد عنوان', 'error');
+            return;
+        }
+        const prompt = `ولّد عنواناً قصيراً وجاذباً (5-7 كلمات) لمقال يتحدث عن: ${currentTitle || textBlocks}. باللغة العربية الفصحى.`;
+        const title = await callOpenAI(prompt, 50);
+        if(title) {
+            document.getElementById('articleTitle').value = title.replace(/["']/g, '');
+            showMsg('publishMsg', '✅ تم توليد العنوان', 'success');
+        }
+    };
+    
+    window.generateSummaryAI = async function() {
+        const textBlocks = blocks.filter(b => b.type === 'text').map(b => stripHtml(b.value)).join(' ').slice(0, 1500);
+        if(!textBlocks) {
+            showMsg('publishMsg', '❌ أضف نصوصاً أولاً لتوليد ملخص', 'error');
+            return;
+        }
+        const prompt = `ولّد ملخصاً موجزاً (3-4 أسطر) للنص التالي باللغة العربية الفصحى:\n\n${textBlocks}`;
+        const summary = await callOpenAI(prompt, 200);
+        if(summary) {
+            // Add as summary block or update existing
+            const existingSummary = blocks.findIndex(b => b.type === 'summary');
+            if(existingSummary >= 0) {
+                blocks[existingSummary].value = summary;
+            } else {
+                blocks.push({ type: 'summary', value: summary });
+            }
+            renderBlocks();
+            saveBlocksToLocal();
+            showMsg('publishMsg', '✅ تم توليد الملخص وإضافته', 'success');
+        }
+    };
+    
+    function stripHtml(html) {
+        if(!html) return '';
+        const tmp = document.createElement('div');
+        tmp.innerHTML = html;
+        return tmp.textContent || tmp.innerText || '';
+    }
+
+    // Preview
+    window.previewArticle = function() {
+        const title = document.getElementById('articleTitle').value || 'بدون عنوان';
+        const author = document.getElementById('authorSelect').value || 'غير معروف';
+        
+        let html = `
+            <h1 style="color:#D4AF37; margin-bottom:1rem;">${escapeHtml(title)}</h1>
+            <div style="color:#888; margin-bottom:2rem; border-bottom:1px solid #2a2a35; padding-bottom:1rem;">
+                <i class="fas fa-user"></i> ${escapeHtml(author)}
+            </div>
+        `;
+        
+        blocks.forEach(block => {
+            if(block.type === 'text') html += `<div style="margin:1rem 0; line-height:1.8;">${block.value}</div>`;
+            if(block.type === 'image' && block.value.url) {
+                html += `<div style="text-align:center; margin:1.5rem 0;">
+                    <img src="${escapeHtml(block.value.url)}" style="max-width:100%; border-radius:1rem;">
+                    ${block.value.caption ? `<div style="color:#888; margin-top:0.5rem;">${escapeHtml(block.value.caption)}</div>` : ''}
+                </div>`;
+            }
+            if(block.type === 'code') {
+                html += `<pre style="background:#0D0F14; padding:1rem; border-radius:1rem; overflow-x:auto;"><code class="language-${escapeHtml(block.value.language)}">${escapeHtml(block.value.code)}</code></pre>`;
+            }
+            if(block.type === 'summary') {
+                html += `<div style="background:rgba(212,175,55,0.1); padding:1rem; border-right:3px solid #D4AF37; border-radius:0.5rem; margin:1rem 0;">
+                    <i class="fas fa-lightbulb" style="color:#D4AF37;"></i> ${escapeHtml(block.value)}
+                </div>`;
+            }
+        });
+        
+        document.getElementById('previewBody').innerHTML = html;
+        document.getElementById('previewOverlay').classList.add('show');
+        document.body.style.overflow = 'hidden';
+        
+        document.querySelectorAll('#previewBody pre code').forEach(block => {
+            if(window.hljs) hljs.highlightElement(block);
+        });
+    };
+    
+    window.closePreview = function() {
+        document.getElementById('previewOverlay').classList.remove('show');
+        document.body.style.overflow = '';
+    };
+
+    // Publish
+    document.getElementById('publishBtn').onclick = async () => {
+        const title = document.getElementById('articleTitle').value.trim();
+        const author = document.getElementById('authorSelect').value;
+        const cat = document.getElementById('catSelect').value;
+        const sub = document.getElementById('subSelect').value;
+        
+        if(!title || !author || !cat || blocks.length === 0) {
+            showMsg('publishMsg', '❌ العنوان والكاتب والتبويبة وكتلة واحدة على الأقل مطلوبة', 'error'); 
+            return;
+        }
+        
+        const cleanBlocks = blocks.map(b => {
+            if(b.type === 'image') return { type:'image', value:{ url: b.value.url, caption: b.value.caption || '' } };
+            return b;
+        });
+        
+        try {
+            await db.collection('articles').add({
+                title, author, category: cat, subfield: sub || '',
+                contentBlocks: cleanBlocks, views: 0,
+                date: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            showMsg('publishMsg', '✅ نشر المقال بنجاح', 'success');
+            blocks = []; 
+            localStorage.removeItem('admin_blocks');
+            document.getElementById('articleTitle').value = '';
+            renderBlocks();
+            updateStats();
+        } catch(e) { 
+            showMsg('publishMsg', '❌ ' + e.message, 'error'); 
+        }
+    };
+    
+    document.getElementById('saveDraftBtn').onclick = () => {
+        saveBlocksToLocal();
+        showMsg('publishMsg', '💾 تم حفظ المسودة محلياً', 'info');
+    };
+    
+    document.getElementById('addTextBtn').onclick = () => addBlock('text');
+    document.getElementById('addImageBtn').onclick = () => addBlock('image');
+    document.getElementById('addCodeBtn').onclick = () => addBlock('code');
+    document.getElementById('addSummaryBtn').onclick = () => addBlock('summary');
+    
+    function escapeHtml(str) { 
+        if(!str) return ''; 
+        return String(str).replace(/[&<<>"']/g, m => ({'&':'&amp;','<<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m])); 
+    }
+    
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+        if (e.ctrlKey && e.key === 's') {
+            e.preventDefault();
+            if(document.getElementById('adminPanel').style.display !== 'none') {
+                saveBlocksToLocal();
+                showMsg('publishMsg', '💾 تم حفظ المسودة (Ctrl+S)', 'info');
+            }
+        }
+        if (e.key === 'Escape') {
+            closePreview();
+        }
+    });
 </script>
 </body>
-</html>
+    </html>

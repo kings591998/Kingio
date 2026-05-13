@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>أوج | شنفر Admin Pro</title>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>/* نفس التنسيقات السابقة... */ :root{--bg-primary:#0A0B10;--bg-secondary:#0C0F17;--bg-card:#12141E;--border-color:#2a2a35;--text-primary:#eee;--text-secondary:#aaa;--accent:#D4AF37} *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',system-ui} body{background:var(--bg-primary);color:var(--text-primary);direction:rtl;padding:1rem} .card{background:var(--bg-card);border:1px solid var(--border-color);border-radius:1rem;padding:1.5rem;margin-bottom:1.5rem} .card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;padding-bottom:1rem;border-bottom:1px solid var(--border-color)} .card-title{font-size:1.2rem;color:var(--accent)} .tabs{display:flex;gap:0.25rem;border-bottom:1px solid var(--border-color);margin-bottom:1rem} .tab-btn{padding:0.5rem 1rem;background:transparent;border:none;color:var(--text-secondary);cursor:pointer} .tab-btn.active{color:var(--accent);border-bottom:2px solid var(--accent)} .tab-content{display:none} .tab-content.active{display:block} .flex-row{display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center;margin-bottom:0.5rem} input,select,textarea{width:100%;padding:0.6rem;background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:0.5rem;color:var(--text-primary)} button{background:var(--accent);color:#000;border:none;padding:0.5rem 1rem;border-radius:0.5rem;cursor:pointer} .btn-sm{padding:0.3rem 0.8rem;font-size:0.85rem} .danger{background:#ef4444;color:#fff} .outline{background:transparent;border:1px solid var(--accent);color:var(--accent)} code{background:#1a1c25;padding:0.1rem 0.3rem;border-radius:0.25rem;font-size:0.85rem} .spinner{width:1rem;height:1rem;border:2px solid var(--accent);border-top-color:transparent;border-radius:50%;animation:spin 0.8s linear infinite;display:inline-block} @keyframes spin{to{transform:rotate(360deg)}} .grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem} @media(max-width:768px){.grid-2{grid-template-columns:1fr}}</style>
+</head>
+<body>
+<div id="appContainer" style="display:none;max-width:1200px;margin:auto;">
+    <header style="display:flex;justify-content:space-between;align-items:center;padding:1rem 0;border-bottom:1px solid var(--border-color);margin-bottom:2rem;">
+        <h1 style="color:var(--accent);">🦅 شنفر | Admin Pro</h1>
+        <button class="outline" onclick="auth.signOut();location.reload()">🚪 خروج</button>
+    </header>
+    <nav class="tabs" id="mainNav">
+        <button class="tab-btn active" data-page="dashboard">🏠 الرئيسية</button>
+        <button class="tab-btn" data-page="ai-ui">🤖 الذكاء الاصطناعي</button>
+        <button class="tab-btn" data-page="auto-pub-ui">🔄 النشر التلقائي</button>
+        <button class="tab-btn" data-page="mon-ui">💰 الربحية</button>
+    </nav>
+    <main>
+        <section id="page-dashboard" class="tab-content active">
+            <div class="card"><h3 class="card-title">مرحباً بك في لوحة تحكم شنفر</h3><p style="margin-top:1rem;color:var(--text-secondary)">اختر قسماً من القائمة العلوية للبدء.</p></div>
+        </section>
+        <section id="ai-ui" class="tab-content"></section>
+        <section id="auto-pub-ui" class="tab-content"></section>
+        <section id="mon-ui" class="tab-content"></section>
+    </main>
+</div>
+
+<div id="loginPanel" class="card" style="max-width:400px;margin:5rem auto;">
+    <h2 style="color:var(--accent);text-align:center;margin-bottom:1rem;">🔐 دخول الإدارة</h2>
+    <input type="email" id="loginEmail" placeholder="البريد">
+    <input type="password" id="loginPassword" placeholder="كلمة المرور">
+    <button id="loginBtn" style="width:100%;margin-top:0.5rem;">دخول</button>
+</div>
+
+<!-- 📦 استدعاء الملفات بالترتيب -->
+<script src="firebase-config.js"></script>
+<script src="setup-db.js"></script>
+<script src="ai-manager.js"></script>
+<script src="auto-publisher.js"></script>
+<script src="monetization.js"></script>
+
+<script>
+// محاكاة بسيطة لـ app.state لتجنب الأخطاء
+const app = { state: { categories: [], authors: [] } };
+// تحميل بيانات تجريبية سريعة
+db.collection('categories').get().then(s=>app.state.categories=s.docs.map(d=>({id:d.id,...d.data()})));
+db.collection('authors').get().then(s=>app.state.authors=s.docs.map(d=>({id:d.id,...d.data()})));
+
+// التنقل
+document.querySelectorAll('#mainNav .tab-btn').forEach(btn => {
+    btn.onclick = () => {
+        document.querySelectorAll('#mainNav .tab-btn').forEach(b=>b.classList.remove('active'));
+        document.querySelectorAll('main .tab-content').forEach(c=>c.classList.remove('active'));
+        btn.classList.add('active');
+        const page = btn.dataset.page;
+        document.getElementById(`page-${page}`).classList.add('active');
+        if(page==='ai-ui' && !document.getElementById('ai-ui').innerHTML.trim()) aiManager.renderUI('ai-ui');
+        if(page==='auto-pub-ui' && !document.getElementById('auto-pub-ui').innerHTML.trim()) autoPub.renderUI('auto-pub-ui');
+        if(page==='mon-ui' && !document.getElementById('mon-ui').innerHTML.trim()) monManager.renderUI('mon-ui');
+    };
+});
+
+// تسجيل الدخول
+document.getElementById('loginBtn').onclick = async () => {
+    try { await auth.signInWithEmailAndPassword(document.getElementById('loginEmail').value, document.getElementById('loginPassword').value);
+    document.getElementById('loginPanel').style.display='none'; document.getElementById('appContainer').style.display='block';
+    } catch(e) { alert('❌ '+e.message); }
+};
+auth.onAuthStateChanged(u => {
+    if(!u) { document.getElementById('loginPanel').style.display='block'; document.getElementById('appContainer').style.display='none'; }
+    else { document.getElementById('loginPanel').style.display='none'; document.getElementById('appContainer').style.display='block'; }
+});
+</script>
+</body>
+</html>

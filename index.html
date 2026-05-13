@@ -320,11 +320,17 @@
 
 <!-- شاشة التحميل (صقر يركض) -->
 <div id="loadingScreen">
-    <div class="falcon-run"></div>
-    <div class="loading-track"><div id="loadProgressBar" class="loading-progress"></div></div>
-    <div style="margin-top: 15px; color: #D4AF37;">صقر الحكمة يحلق.. تجهيز السيادة</div>
+    <div style="position: relative; width: 120px; height: 120px;">
+        <div style="position: absolute; width: 100%; height: 100%; border: 3px solid rgba(212,175,55,0.2); border-radius: 50%;"></div>
+        <div style="position: absolute; width: 100%; height: 100%; border: 3px solid #D4AF37; border-radius: 50%; border-top-color: transparent; animation: spin 1s linear infinite;"></div>
+        <i class="fas fa-crown" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 3rem; color: #D4AF37;"></i>
+    </div>
+    <div class="loading-track" style="margin-top: 30px;"><div id="loadProgressBar" class="loading-progress"></div></div>
+    <div style="margin-top: 15px; color: #D4AF37; letter-spacing: 2px;">تاج الحكمة يُرفع..</div>
 </div>
-
+<style>
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+</style>
 <!-- الهيدر -->
 <header>
     <div class="logo">AWJ</div>
@@ -662,7 +668,28 @@
     window.openStaticPage = (page) => {
         const titles = { about: 'من نحن', privacy: 'الخصوصية', cookies: 'سياسة الكوكيز', terms: 'شروط الاستخدام' };
         const contents = {
-            about: '<p>أوج هي منصة معرفية سيادية تقدم محتوى استراتيجياً وفلسفياً وعلمياً. نهدف إلى تمكين العقول بالنخبة الفكرية.</p><p>تأسست المنصة لتكون ملتقى للمفكرين والباحثين في مجالات الذكاء الاستراتيجي والأمن الرقمي والفلسفة.</p>',
+            about: '<p>أوج 
+نحن منصة معرفية سيادية نؤمن بأن المعرفة هي أساس النهضة.
+
+تأسست منصة "أوج" لتكون ملتقى للعقول الباحثة عن العمق والتميز.
+
+نهدف إلى تقديم محتوى متنوع يغطي شتى مجالات العلوم والفكر والثقافة.
+
+نحرص على مصداقية المعلومات وأصالة المصادر.
+
+نؤمن بأن الحكمة ليست ملكًا لأحد، بل هي تراث إنساني مشترك.
+
+نسعى لبناء جسر بين الماضي والحاضر، وبين الحكمة التقليدية والابتكار الحديث.
+
+نخدم الباحثين والمفكرين وصناع القرار والطلاب وكل من يبحث عن الفهم العميق.
+
+نقدم محتوى مترجمًا ومؤصلاً بأسلوب يجمع بين الرصانة والجاذبية.
+
+نواكب التطور الرقمي ونسخّر التقنية لنشر المعرفة بطرق مبتكرة.
+
+نرحب بكل من يريد المساهمة في إثراء هذا المحتوى بفكره وخبرته.
+
+نحن "أوج"، حيث تلتقي القمم الفكرية.. </p><p>تأسست المنصة لتكون ملتقى للمفكرين والباحثين في مجالات الذكاء الاستراتيجي والأمن الرقمي والفلسفة.</p>',
             privacy: '<p>نحن لا نشارك بياناتك مع أي طرف ثالث. جميع البيانات مخزنة بأمان على خوادم Firebase. يمكنك طلب حذف بياناتك في أي وقت.</p>',
             cookies: '<p>نستخدم التخزين المحلي (localStorage) لتحسين تجربتك. لا نستخدم كوكيز خارجية ولا نتتبعك.</p>',
             terms: '<p>المحتوى محمي بحقوق النشر. يمنع النسخ أو إعادة النشر دون إذن خطي. استخدام الموقع يعني موافقتك على هذه الشروط.</p>'

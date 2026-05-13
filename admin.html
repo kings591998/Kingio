@@ -2,8 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة تحكم أوج - متكاملة</title>
+    <title>لوحة تحكم أوج - إدارة كاملة</title>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
@@ -11,6 +10,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
+        /* جميع التنسيقات السابقة كما هي */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background: #0a0a0a; color: #eee; font-family: 'Segoe UI', sans-serif; padding: 20px; direction: rtl; }
         .container { max-width: 1100px; margin: auto; }
@@ -21,14 +21,8 @@
         button { background: #D4AF37; color: #000; padding: 10px 20px; border: none; border-radius: 30px; cursor: pointer; font-weight: bold; margin: 5px; }
         .btn-small { background: #333; color: #D4AF37; padding: 6px 15px; font-size: 0.8rem; }
         .btn-danger { background: #c62828; color: white; }
-        .block {
-            background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 16px;
-            padding: 15px; margin-bottom: 15px; position: relative;
-        }
-        .block-header {
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 10px; cursor: move;
-        }
+        .block { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 16px; padding: 15px; margin-bottom: 15px; position: relative; }
+        .block-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; cursor: move; }
         .block-type { color: #D4AF37; font-size: 0.8rem; }
         .delete-block { background: none; border: none; color: #ff8888; cursor: pointer; font-size: 1.2rem; }
         .image-preview { max-width: 100%; max-height: 200px; margin: 10px 0; border-radius: 12px; }
@@ -42,7 +36,6 @@
 </head>
 <body>
 <div class="container">
-    <!-- قسم تسجيل الدخول -->
     <div id="login-section" class="card">
         <h2>🔐 دخول الإدارة</h2>
         <input type="email" id="login-email" placeholder="البريد الإلكتروني">
@@ -51,7 +44,6 @@
         <div id="login-msg" class="message"></div>
     </div>
 
-    <!-- قسم الإدارة (يظهر بعد الدخول) -->
     <div id="admin-section" style="display: none;">
         <!-- إدارة التبويبات والفروع -->
         <div class="card">
@@ -73,26 +65,17 @@
             <div id="authors-list"></div>
         </div>
 
-        <!-- محرر الكتل المتقدم -->
+        <!-- محرر المقال المتقدم -->
         <div class="card">
             <h2><i class="fas fa-feather-alt"></i> محرر المقال المتقدم</h2>
             <label>عنوان المقال</label>
             <input type="text" id="article-title" placeholder="العنوان الرئيسي">
-            
             <label>اختر الكاتب</label>
             <select id="author-select"></select>
-            
             <div class="flex">
-                <div style="flex:1;">
-                    <label>اختر التبويبة</label>
-                    <select id="category-select"></select>
-                </div>
-                <div style="flex:1;">
-                    <label>اختر الفرع</label>
-                    <select id="subfield-select"></select>
-                </div>
+                <div style="flex:1;"><label>اختر التبويبة</label><select id="category-select"></select></div>
+                <div style="flex:1;"><label>اختر الفرع</label><select id="subfield-select"></select></div>
             </div>
-            
             <div id="blocks-container"></div>
             <div class="flex">
                 <button onclick="addBlock('text')"><i class="fas fa-paragraph"></i> نص</button>
@@ -101,7 +84,7 @@
                 <button onclick="addBlock('summary')"><i class="fas fa-lightbulb"></i> مختصر المقال</button>
             </div>
             <hr>
-            <button onclick="publishArticle()" style="width: 100%;">🚀 نشر المقال</button>
+            <button onclick="publishArticle()" style="width:100%;">🚀 نشر المقال</button>
             <div id="publish-msg" class="message"></div>
         </div>
         <button onclick="logout()" style="background:#333;">تسجيل الخروج</button>
@@ -123,18 +106,13 @@
     const auth = firebase.auth();
     const storage = firebase.storage();
 
-    let categoriesData = [];
-    let authorsData = [];
-    let blocks = [];
+    let categoriesData = [], authorsData = [], blocks = [];
 
-    // ------------------- المصادقة -------------------
     auth.onAuthStateChanged(user => {
         if (user) {
             document.getElementById('login-section').style.display = 'none';
             document.getElementById('admin-section').style.display = 'block';
-            loadCategories();
-            loadAuthors();
-            loadBlocksFromLocal();
+            loadCategories(); loadAuthors(); loadBlocksFromLocal();
         } else {
             document.getElementById('login-section').style.display = 'block';
             document.getElementById('admin-section').style.display = 'none';
@@ -144,19 +122,17 @@
     window.login = async () => {
         const email = document.getElementById('login-email').value;
         const pwd = document.getElementById('login-password').value;
-        try {
-            await auth.signInWithEmailAndPassword(email, pwd);
-        } catch (e) { showMsg('login-msg', '❌ '+e.message, 'error'); }
+        try { await auth.signInWithEmailAndPassword(email, pwd); }
+        catch(e) { showMsg('login-msg', '❌ '+e.message, 'error'); }
     };
     window.logout = () => auth.signOut();
-
     function showMsg(id, text, type) {
         const el = document.getElementById(id);
         el.textContent = text; el.className = `message ${type}`;
         setTimeout(() => el.className = 'message', 3000);
     }
 
-    // ------------------- إدارة التبويبات -------------------
+    // التبويبات والفروع
     async function loadCategories() {
         const snap = await db.collection('categories').orderBy('name').get();
         categoriesData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -165,20 +141,17 @@
     }
     function renderCategoriesList() {
         const container = document.getElementById('categories-list');
-        if (!categoriesData.length) { container.innerHTML = '<p>لا توجد تبويبات. أضف تبويبة أولاً.</p>'; return; }
-        container.innerHTML = '';
-        categoriesData.forEach(cat => {
-            container.innerHTML += `
-                <div style="background:#1a1a1a; padding:15px; border-radius:16px; margin-bottom:15px;">
-                    <div class="flex" style="justify-content:space-between;">
-                        <h3>📁 ${cat.name}</h3>
-                        <button class="btn-small" onclick="deleteCategory('${cat.id}')">حذف التبويبة</button>
-                    </div>
-                    <div>${cat.subfields.map(sub => `<span class="sub-item">${sub} <i class="fas fa-times-circle" style="cursor:pointer;" onclick="removeSubfield('${cat.id}', '${sub}')"></i></span>`).join('')}</div>
-                    <div class="flex"><input type="text" id="new-sub-${cat.id}" placeholder="فرع جديد"><button class="btn-small" onclick="addSubfield('${cat.id}')">إضافة فرع</button></div>
+        if (!categoriesData.length) { container.innerHTML = '<p>لا توجد تبويبات.</p>'; return; }
+        container.innerHTML = categoriesData.map(cat => `
+            <div style="background:#1a1a1a; padding:15px; border-radius:16px; margin-bottom:15px;">
+                <div class="flex" style="justify-content:space-between;">
+                    <h3>📁 ${cat.name}</h3>
+                    <button class="btn-small" onclick="deleteCategory('${cat.id}')">حذف</button>
                 </div>
-            `;
-        });
+                <div>${cat.subfields.map(sub => `<span class="sub-item">${sub} <i class="fas fa-times-circle" style="cursor:pointer;" onclick="removeSubfield('${cat.id}', '${sub}')"></i></span>`).join('')}</div>
+                <div class="flex"><input type="text" id="new-sub-${cat.id}" placeholder="فرع جديد"><button class="btn-small" onclick="addSubfield('${cat.id}')">إضافة فرع</button></div>
+            </div>
+        `).join('');
     }
     window.addCategory = async () => {
         const name = document.getElementById('new-cat-name').value.trim();
@@ -200,24 +173,21 @@
     };
     window.removeSubfield = async (catId, subName) => {
         const cat = categoriesData.find(c=>c.id===catId);
-        const newSubs = cat.subfields.filter(s=>s!==subName);
-        await db.collection('categories').doc(catId).update({ subfields: newSubs });
+        await db.collection('categories').doc(catId).update({ subfields: cat.subfields.filter(s=>s!==subName) });
         loadCategories();
     };
     function updateCategorySelects() {
-        const catSelect = document.getElementById('category-select');
-        const subSelect = document.getElementById('subfield-select');
+        const catSelect = document.getElementById('category-select'), subSelect = document.getElementById('subfield-select');
         catSelect.innerHTML = '<option value="">اختر التبويبة</option>';
         categoriesData.forEach(cat => catSelect.innerHTML += `<option value="${cat.name}">${cat.name}</option>`);
         catSelect.onchange = () => {
-            const selectedCat = catSelect.value;
-            const cat = categoriesData.find(c=>c.name === selectedCat);
+            const cat = categoriesData.find(c=>c.name === catSelect.value);
             subSelect.innerHTML = '<option value="">اختر الفرع</option>';
-            if(cat && cat.subfields) cat.subfields.forEach(sub => subSelect.innerHTML += `<option value="${sub}">${sub}</option>`);
+            if(cat) cat.subfields.forEach(sub => subSelect.innerHTML += `<option value="${sub}">${sub}</option>`);
         };
     }
 
-    // ------------------- إدارة الكتّاب -------------------
+    // الكتّاب
     async function loadAuthors() {
         const snap = await db.collection('authors').orderBy('name').get();
         authorsData = snap.docs.map(d => ({ id: d.id, name: d.data().name }));
@@ -226,7 +196,7 @@
     }
     function renderAuthorsList() {
         const container = document.getElementById('authors-list');
-        if (!authorsData.length) { container.innerHTML = '<p>لا يوجد كتاب. أضف كاتباً.</p>'; return; }
+        if (!authorsData.length) { container.innerHTML = '<p>لا يوجد كتاب.</p>'; return; }
         container.innerHTML = authorsData.map(a => `<div class="flex" style="justify-content:space-between; margin:5px 0;"><span>✍️ ${a.name}</span><button class="btn-small btn-danger" onclick="deleteAuthor('${a.id}')">حذف</button></div>`).join('');
     }
     window.addAuthor = async () => {
@@ -236,127 +206,71 @@
         document.getElementById('new-author-name').value = '';
         loadAuthors();
     };
-    window.deleteAuthor = async (id) => { if(confirm('حذف الكاتب سيؤثر على المقالات المرتبطة')) await db.collection('authors').doc(id).delete(); loadAuthors(); };
+    window.deleteAuthor = async (id) => { await db.collection('authors').doc(id).delete(); loadAuthors(); };
     function updateAuthorSelect() {
         const select = document.getElementById('author-select');
         select.innerHTML = '<option value="">اختر الكاتب</option>';
         authorsData.forEach(a => select.innerHTML += `<option value="${a.name}">${a.name}</option>`);
     }
 
-    // ------------------- محرر الكتل -------------------
+    // محرر الكتل
     function addBlock(type) {
-        let newBlock = { type, value: '' };
-        if (type === 'text') newBlock.value = '';
-        else if (type === 'image') newBlock.value = { url: '', caption: '' };
-        else if (type === 'code') newBlock.value = { code: '', language: 'javascript' };
-        else if (type === 'summary') newBlock.value = '';
-        blocks.push(newBlock);
-        renderBlocks();
-        saveBlocksToLocal();
+        let value = (type === 'text') ? '' : (type === 'summary') ? '' : (type === 'image') ? { url: '', caption: '' } : { code: '', language: 'javascript' };
+        blocks.push({ type, value });
+        renderBlocks(); saveBlocksToLocal();
     }
-    function deleteBlock(index) {
-        blocks.splice(index, 1);
-        renderBlocks();
-        saveBlocksToLocal();
+    function deleteBlock(i) { blocks.splice(i,1); renderBlocks(); saveBlocksToLocal(); }
+    function updateBlockValue(i, field, val) {
+        if (typeof blocks[i].value === 'string') blocks[i].value = val;
+        else blocks[i].value[field] = val;
+        saveBlocksToLocal(); renderBlocks();
     }
-    function updateBlockValue(index, field, value) {
-        if (typeof blocks[index].value === 'string') blocks[index].value = value;
-        else blocks[index].value[field] = value;
-        saveBlocksToLocal();
-        renderBlocks();
-    }
-    async function uploadImage(file, index) {
+    async function uploadImage(file, i) {
         if (!file) return;
-        const storageRef = storage.ref(`article_images/${Date.now()}_${file.name}`);
-        const uploadTask = await storageRef.put(file);
-        const url = await uploadTask.ref.getDownloadURL();
-        blocks[index].value = { url, caption: blocks[index].value.caption || '' };
-        renderBlocks();
-        saveBlocksToLocal();
+        const ref = storage.ref(`article_images/${Date.now()}_${file.name}`);
+        const upload = await ref.put(file);
+        const url = await upload.ref.getDownloadURL();
+        blocks[i].value = { url, caption: blocks[i].value.caption || '' };
+        renderBlocks(); saveBlocksToLocal();
     }
     function renderBlocks() {
         const container = document.getElementById('blocks-container');
-        if (!blocks.length) { container.innerHTML = '<p>➕ أضف كتلة جديدة باستخدام الأزرار أعلاه</p>'; return; }
+        if (!blocks.length) { container.innerHTML = '<p>➕ أضف كتلة جديدة باستخدام الأزرار</p>'; return; }
         container.innerHTML = '';
-        blocks.forEach((block, idx) => {
-            const blockDiv = document.createElement('div');
-            blockDiv.className = 'block';
-            blockDiv.setAttribute('data-index', idx);
-            let innerHtml = `
-                <div class="block-header">
-                    <span class="block-type">${block.type === 'text' ? '📝 نص' : block.type === 'image' ? '🖼️ صورة' : block.type === 'code' ? '💻 كود' : '✨ مختصر'}</span>
-                    <button class="delete-block" onclick="deleteBlock(${idx})"><i class="fas fa-trash"></i></button>
-                </div>
-            `;
-            if (block.type === 'text') {
-                innerHtml += `<textarea rows="4" placeholder="اكتب المحتوى هنا (يدعم HTML)" onchange="updateBlockValue(${idx}, null, this.value)">${escapeHtml(block.value)}</textarea>`;
-            } else if (block.type === 'image') {
-                innerHtml += `
-                    <input type="file" accept="image/*" onchange="uploadImage(this.files[0], ${idx})">
-                    ${block.value.url ? `<img src="${block.value.url}" class="image-preview"><br><input type="text" placeholder="تسمية الصورة" value="${escapeHtml(block.value.caption)}" onchange="updateBlockValue(${idx}, 'caption', this.value)">` : ''}
-                `;
-            } else if (block.type === 'code') {
-                innerHtml += `
-                    <select onchange="updateBlockValue(${idx}, 'language', this.value)">
-                        <option value="javascript" ${block.value.language === 'javascript' ? 'selected' : ''}>JavaScript</option>
-                        <option value="python" ${block.value.language === 'python' ? 'selected' : ''}>Python</option>
-                        <option value="html" ${block.value.language === 'html' ? 'selected' : ''}>HTML</option>
-                        <option value="css" ${block.value.language === 'css' ? 'selected' : ''}>CSS</option>
-                        <option value="bash" ${block.value.language === 'bash' ? 'selected' : ''}>Bash</option>
-                    </select>
-                    <textarea rows="6" placeholder="اكتب الكود هنا" onchange="updateBlockValue(${idx}, 'code', this.value)">${escapeHtml(block.value.code)}</textarea>
-                `;
-            } else if (block.type === 'summary') {
-                innerHtml += `<textarea rows="3" placeholder="مختصر المقال (زبدة المحتوى)" onchange="updateBlockValue(${idx}, null, this.value)">${escapeHtml(block.value)}</textarea>`;
-            }
-            blockDiv.innerHTML = innerHtml;
-            container.appendChild(blockDiv);
+        blocks.forEach((b, idx) => {
+            let inner = `<div class="block" data-index="${idx}"><div class="block-header"><span class="block-type">${b.type==='text'?'📝 نص':b.type==='image'?'🖼️ صورة':b.type==='code'?'💻 كود':'✨ مختصر'}</span><button class="delete-block" onclick="deleteBlock(${idx})"><i class="fas fa-trash"></i></button></div>`;
+            if (b.type === 'text') inner += `<textarea rows="4" onchange="updateBlockValue(${idx}, null, this.value)">${escapeHtml(b.value)}</textarea>`;
+            else if (b.type === 'image') inner += `<input type="file" accept="image/*" onchange="uploadImage(this.files[0], ${idx})">${b.value.url ? `<img src="${b.value.url}" class="image-preview"><br><input type="text" placeholder="تسمية الصورة" value="${escapeHtml(b.value.caption)}" onchange="updateBlockValue(${idx}, 'caption', this.value)">` : ''}`;
+            else if (b.type === 'code') inner += `<select onchange="updateBlockValue(${idx}, 'language', this.value)"><option ${b.value.language==='javascript'?'selected':''}>JavaScript</option><option ${b.value.language==='python'?'selected':''}>Python</option><option ${b.value.language==='html'?'selected':''}>HTML</option><option ${b.value.language==='css'?'selected':''}>CSS</option></select><textarea rows="6" onchange="updateBlockValue(${idx}, 'code', this.value)">${escapeHtml(b.value.code)}</textarea>`;
+            else if (b.type === 'summary') inner += `<textarea rows="3" onchange="updateBlockValue(${idx}, null, this.value)">${escapeHtml(b.value)}</textarea>`;
+            inner += `</div>`;
+            container.innerHTML += inner;
         });
         new Sortable(container, { animation: 150, onEnd: () => saveOrder() });
     }
     function saveOrder() {
         const newBlocks = [];
-        document.querySelectorAll('.block').forEach(el => {
-            const idx = parseInt(el.getAttribute('data-index'));
-            newBlocks.push(blocks[idx]);
-        });
-        blocks = newBlocks;
-        saveBlocksToLocal();
-        renderBlocks();
+        document.querySelectorAll('.block').forEach(el => { newBlocks.push(blocks[parseInt(el.getAttribute('data-index'))]); });
+        blocks = newBlocks; saveBlocksToLocal(); renderBlocks();
     }
     function saveBlocksToLocal() { localStorage.setItem('temp_blocks', JSON.stringify(blocks)); }
-    function loadBlocksFromLocal() {
-        const saved = localStorage.getItem('temp_blocks');
-        if (saved) blocks = JSON.parse(saved);
-        else blocks = [];
-        renderBlocks();
-    }
-    function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, function(m){if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
+    function loadBlocksFromLocal() { blocks = JSON.parse(localStorage.getItem('temp_blocks') || '[]'); renderBlocks(); }
+    function escapeHtml(str) { return (str||'').replace(/[&<>]/g, m => m==='&'?'&amp;':m==='<'?'&lt;':'&gt;'); }
 
-    // ------------------- نشر المقال -------------------
+    // نشر المقال
     window.publishArticle = async () => {
         const title = document.getElementById('article-title').value.trim();
         const author = document.getElementById('author-select').value;
         const category = document.getElementById('category-select').value;
         const subfield = document.getElementById('subfield-select').value;
-
-        if (!title || !author || !category || !subfield || blocks.length === 0) {
-            showMsg('publish-msg', '❌ العنوان، الكاتب، التبويبة، الفرع، وكتلة واحدة على الأقل مطلوبة', 'error');
-            return;
+        if (!title || !author || !category || !subfield || !blocks.length) {
+            showMsg('publish-msg', '❌ جميع الحقول وكتلة واحدة على الأقل مطلوبة', 'error'); return;
         }
         try {
-            await db.collection('articles').add({
-                title, author, category, subfield,
-                contentBlocks: blocks,
-                views: 0,
-                date: firebase.firestore.FieldValue.serverTimestamp()
-            });
-            showMsg('publish-msg', '✅ تم نشر المقال بنجاح!', 'success');
-            blocks = [];
-            localStorage.removeItem('temp_blocks');
-            document.getElementById('article-title').value = '';
-            renderBlocks();
-        } catch (e) { showMsg('publish-msg', '❌ خطأ: '+e.message, 'error'); }
+            await db.collection('articles').add({ title, author, category, subfield, contentBlocks: blocks, views: 0, date: firebase.firestore.FieldValue.serverTimestamp() });
+            showMsg('publish-msg', '✅ تم النشر بنجاح!', 'success');
+            blocks = []; localStorage.removeItem('temp_blocks'); document.getElementById('article-title').value = ''; renderBlocks();
+        } catch(e) { showMsg('publish-msg', '❌ '+e.message, 'error'); }
     };
 </script>
 </body>

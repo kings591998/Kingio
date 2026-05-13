@@ -3,103 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>أوج | لوحة التحكم السيادية</title>
-    <!-- استدعاء المكتبات الضرورية -->
+    <title>أوج | مركز القيادة المستقر</title>
+    
+    <!-- 1. مكتبات Firebase (النسخة المستقرة) -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"></script>
+
     <style>
-        /* التنسيق الجمالي المستوحى من صورتك */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui; }
-        body { background: #0A0B10; color: #eee; direction: rtl; padding: 1.5rem; }
-        .container { max-width: 1400px; margin: auto; }
-        .card { background: #0C0F17; border: 1px solid #2a2a35; border-radius: 1.5rem; padding: 1.5rem; margin-bottom: 1.5rem; }
-        .logo { font-size: 2rem; color: #D4AF37; font-weight: bold; }
-        input, select, textarea { background: #1a1c25; border: 1px solid #2a2a35; padding: 0.7rem 1rem; border-radius: 1rem; color: white; width: 100%; margin-bottom: 0.8rem; outline: none; }
-        input:focus { border-color: #D4AF37; }
-        button { background: #D4AF37; color: #000; border: none; padding: 0.6rem 1.2rem; border-radius: 2rem; cursor: pointer; font-weight: bold; transition: 0.3s; }
-        button:hover { opacity: 0.8; transform: scale(0.98); }
+        body { background: #0A0B10; color: #eee; direction: rtl; padding: 1rem; }
+        .card { background: #0C0F17; border: 1px solid #2a2a35; border-radius: 1.2rem; padding: 1.5rem; margin-bottom: 1.5rem; }
         .hidden { display: none !important; }
-        .block { background: #12141E; border-radius: 1rem; padding: 1rem; margin-bottom: 1rem; border: 1px solid #2a2a35; position: relative; }
-        .flex-row { display: flex; gap: 1rem; flex-wrap: wrap; align-items: center; margin-bottom: 1rem; }
-        .sub-item { background: #2a2a35; padding: 0.2rem 0.8rem; border-radius: 40px; margin: 0.2rem; font-size: 0.8rem; display: inline-block; }
-        .delete-btn { background: none; color: #ff4444; font-size: 1.2rem; cursor: pointer; }
+        input, select, textarea { background: #1a1c25; border: 1px solid #2a2a35; padding: 0.8rem; border-radius: 0.8rem; color: white; width: 100%; margin-bottom: 10px; outline: none; }
+        button { background: #D4AF37; color: #000; border: none; padding: 0.8rem 1.5rem; border-radius: 2rem; cursor: pointer; font-weight: bold; width: 100%; }
+        .flex-row { display: flex; gap: 10px; margin-bottom: 15px; }
+        .sub-item { background: #2a2a35; padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; margin: 3px; display: inline-block; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <!-- 1. شاشة الشفرة السيادية (قبل كل شيء) -->
-    <div id="vaultLock" class="card" style="max-width: 500px; margin: 5rem auto; text-align: center;">
-        <h2 style="color: #D4AF37; margin-bottom: 1.5rem;">🔒 بوابة أوج المشفرة</h2>
-        <input type="password" id="vaultKey" placeholder="أدخل شفرة السيادة..." style="text-align: center;">
-        <button onclick="unlockVault()">فتح التشفير</button>
+<div id="app">
+    <!-- المرحلة 1: شفرة العبور -->
+    <div id="vaultLock" class="card" style="max-width: 400px; margin: 10vh auto;">
+        <h2 style="color:#D4AF37; text-align:center; margin-bottom:20px;">🔒 بوابة أوج</h2>
+        <input type="password" id="vaultKey" placeholder="شفرة السيادة...">
+        <button onclick="checkVaultKey()">فتح البوابة</button>
     </div>
 
-    <!-- 2. لوحة دخول Firebase (بعد فك الشفرة) -->
-    <div id="loginPanel" class="card hidden" style="max-width: 500px; margin: 5rem auto;">
-        <h2>🔐 تسجيل دخول المدير</h2>
+    <!-- المرحلة 2: تسجيل الدخول -->
+    <div id="loginPanel" class="card hidden" style="max-width: 400px; margin: 10vh auto;">
+        <h2 style="text-align:center; margin-bottom:20px;">🔐 دخول الإدارة</h2>
         <input type="email" id="loginEmail" placeholder="البريد الإلكتروني">
         <input type="password" id="loginPassword" placeholder="كلمة المرور">
-        <button id="doLoginBtn">دخول النظام</button>
+        <button id="loginBtn">دخول</button>
     </div>
 
-    <!-- 3. لوحة التحكم الكاملة -->
-    <div id="adminPanel" class="hidden">
-        <div class="flex-row" style="justify-content: space-between;">
-            <div class="logo">AWJ Admin</div>
-            <button onclick="firebase.auth().signOut()" style="background:#333; color:#eee;">خروج</button>
+    <!-- المرحلة 3: لوحة التحكم -->
+    <div id="adminPanel" class="hidden" style="max-width: 1000px; margin: auto;">
+        <div class="card" style="display:flex; justify-content:space-between; align-items:center;">
+            <h1 style="color:#D4AF37;">AWJ CONTROL</h1>
+            <button onclick="firebase.auth().signOut()" style="width:auto; background:#333; color:#fff;">خروج</button>
         </div>
 
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
-            <!-- إدارة الأقسام -->
-            <div class="card">
-                <h3>📁 الأقسام والفروع</h3>
-                <div class="flex-row">
-                    <input type="text" id="newCatName" placeholder="تبويبة جديدة" style="flex:1;">
-                    <button onclick="addCategory()">إضافة</button>
-                </div>
-                <div id="catsList"></div>
-            </div>
-            <!-- إدارة الكتاب -->
-            <div class="card">
-                <h3>✍️ الكتاب</h3>
-                <div class="flex-row">
-                    <input type="text" id="newAuthorName" placeholder="اسم الكاتب" style="flex:1;">
-                    <button onclick="addAuthor()">إضافة</button>
-                </div>
-                <div id="authorsList"></div>
-            </div>
-        </div>
-
-        <!-- محرر المقال -->
         <div class="card">
-            <h3>📝 محرر المقال المتقدم</h3>
-            <input type="text" id="articleTitle" placeholder="عنوان المقال الملكي">
+            <h3>📁 الأقسام</h3>
             <div class="flex-row">
-                <select id="authorSelect"><option value="">اختر الكاتب</option></select>
-                <select id="catSelect" onchange="updateSubSelect()"><option value="">اختر التبويبة</option></select>
-                <select id="subSelect"><option value="">اختر الفرع</option></select>
+                <input type="text" id="catInput" placeholder="قسم جديد" style="margin:0;">
+                <button onclick="addNewCategory()" style="width:auto;">إضافة</button>
             </div>
-            <div id="blocksEditor"></div>
+            <div id="categoriesDisplay"></div>
+        </div>
+
+        <div class="card">
+            <h3>📝 نشر وثيقة</h3>
+            <input type="text" id="postTitle" placeholder="عنوان الوثيقة">
+            <select id="postAuthor"></select>
             <div class="flex-row">
-                <button onclick="addBlock('text')">➕ نص</button>
-                <button onclick="addBlock('image')">➕ صورة</button>
-                <button onclick="addBlock('code')">➕ كود</button>
+                <select id="postCat" onchange="syncSubfields()"></select>
+                <select id="postSub"></select>
             </div>
-            <button id="publishBtn" style="width:100%; margin-top: 2rem;" onclick="publishArticle()">🚀 نشر في أوج</button>
+            <textarea id="postContent" rows="5" placeholder="نص الوثيقة..."></textarea>
+            <button onclick="publishNow()">🚀 نشر الوثيقة</button>
         </div>
     </div>
 </div>
 
 <script>
-    // الإعدادات الأمنية والتقنية
-    const MASTER_KEY = "@...Alshanfricc_1998...@"; 
+    // 1. التكوين والأمن
+    const MASTER_KEY = "@...Alshanfricc_1998...@";
     const firebaseConfig = {
         apiKey: "AIzaSyDjgVxvtPXTn1tpr4IxOK3wOW4r3gzB1VU",
         authDomain: "awj-website-29f16.firebaseapp.com",
@@ -107,151 +80,118 @@
         storageBucket: "awj-website-29f16.firebasestorage.app",
         appId: "1:406747568578:web:741821d3c60df0011b5e5b"
     };
+
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
+    let allCategories = [];
 
-    let categories = [];
-    let blocks = [];
-
-    // 1. منطق الحماية الأولى
-    function unlockVault() {
-        if(document.getElementById('vaultKey').value === MASTER_KEY) {
+    // 2. دوال الحماية
+    function checkVaultKey() {
+        const input = document.getElementById('vaultKey').value;
+        if(input === MASTER_KEY) {
             document.getElementById('vaultLock').classList.add('hidden');
             document.getElementById('loginPanel').classList.remove('hidden');
-        } else { alert("الشفرة خاطئة."); }
+        } else { alert("وصول مرفوض."); }
     }
 
-    // 2. منطق دخول Firebase
-    document.getElementById('doLoginBtn').onclick = async () => {
+    // 3. نظام الدخول
+    document.getElementById('loginBtn').onclick = () => {
         const email = document.getElementById('loginEmail').value;
         const pass = document.getElementById('loginPassword').value;
-        try { await firebase.auth().signInWithEmailAndPassword(email, pass); }
-        catch(e) { alert("فشل الدخول: " + e.message); }
+        firebase.auth().signInWithEmailAndPassword(email, pass)
+            .catch(e => alert("خطأ: " + e.message));
     };
 
     firebase.auth().onAuthStateChanged(user => {
-        if (user) {
+        if(user) {
             document.getElementById('loginPanel').classList.add('hidden');
             document.getElementById('adminPanel').classList.remove('hidden');
-            loadAllData();
+            initDataListeners();
         } else {
             document.getElementById('adminPanel').classList.add('hidden');
             document.getElementById('vaultLock').classList.remove('hidden');
         }
     });
 
-    // 3. إدارة البيانات (Firestore)
-    async function loadAllData() {
-        // تحميل الأقسام
+    // 4. إدارة البيانات
+    function initDataListeners() {
+        // الاستماع للأقسام
         db.collection('categories').onSnapshot(snap => {
-            categories = snap.docs.map(d => ({id: d.id, ...d.data()}));
+            allCategories = snap.docs.map(d => ({id: d.id, ...d.data()}));
             renderCategories();
-            populateSelects();
+            updateDropdowns();
         });
-        // تحميل الكتاب
+
+        // الاستماع للكتّاب
         db.collection('authors').onSnapshot(snap => {
-            const authSel = document.getElementById('authorSelect');
-            const authList = document.getElementById('authorsList');
-            authSel.innerHTML = '<option value="">اختر الكاتب</option>';
-            authList.innerHTML = '';
+            const sel = document.getElementById('postAuthor');
+            sel.innerHTML = '<option>اختر الكاتب</option>';
             snap.docs.forEach(d => {
-                const a = d.data().name;
-                authSel.innerHTML += `<option value="${a}">${a}</option>`;
-                authList.innerHTML += `<div class="sub-item">${a}</div>`;
+                sel.innerHTML += `<option value="${d.data().name}">${d.data().name}</option>`;
             });
         });
     }
 
-    // إضافة قسم
-    async function addCategory() {
-        const name = document.getElementById('newCatName').value;
+    async function addNewCategory() {
+        const name = document.getElementById('catInput').value;
         if(name) await db.collection('categories').add({name, subfields: []});
-        document.getElementById('newCatName').value = '';
-    }
-
-    // إضافة كاتب
-    async function addAuthor() {
-        const name = document.getElementById('newAuthorName').value;
-        if(name) await db.collection('authors').add({name});
-        document.getElementById('newAuthorName').value = '';
+        document.getElementById('catInput').value = '';
     }
 
     function renderCategories() {
-        const div = document.getElementById('catsList');
-        div.innerHTML = categories.map(c => `
-            <div class="block">
+        const container = document.getElementById('categoriesDisplay');
+        container.innerHTML = allCategories.map(c => `
+            <div style="background:#12141E; padding:10px; border-radius:10px; margin-bottom:10px;">
                 <strong>${c.name}</strong>
                 <div>${c.subfields.map(s => `<span class="sub-item">${s}</span>`).join('')}</div>
-                <div class="flex-row" style="margin-top:5px">
-                    <input type="text" id="in-${c.id}" placeholder="فرع جديد" style="margin:0; flex:1">
-                    <button onclick="addSub('${c.id}')">+</button>
+                <div class="flex-row" style="margin-top:10px;">
+                    <input type="text" id="sub-${c.id}" placeholder="فرع جديد" style="margin:0;">
+                    <button onclick="addSubfield('${c.id}')" style="width:auto;">+</button>
                 </div>
             </div>
         `).join('');
     }
 
-    async function addSub(id) {
-        const val = document.getElementById('in-'+id).value;
-        const cat = categories.find(c => c.id === id);
+    async function addSubfield(id) {
+        const val = document.getElementById('sub-'+id).value;
+        const cat = allCategories.find(c => c.id === id);
         if(val) await db.collection('categories').doc(id).update({
-            subfields: [...cat.subfields, val]
+            subfields: firebase.firestore.FieldValue.arrayUnion(val)
         });
     }
 
-    function populateSelects() {
-        const sel = document.getElementById('catSelect');
-        const current = sel.value;
-        sel.innerHTML = '<option value="">اختر التبويبة</option>';
-        categories.forEach(c => sel.innerHTML += `<option value="${c.name}">${c.name}</option>`);
-        sel.value = current;
+    function updateDropdowns() {
+        const catSel = document.getElementById('postCat');
+        catSel.innerHTML = '<option value="">القسم الرئيسي</option>';
+        allCategories.forEach(c => catSel.innerHTML += `<option value="${c.name}">${c.name}</option>`);
     }
 
-    function updateSubSelect() {
-        const catName = document.getElementById('catSelect').value;
-        const subSel = document.getElementById('subSelect');
-        const cat = categories.find(c => c.name === catName);
-        subSel.innerHTML = '<option value="">اختر الفرع</option>';
-        if(cat) cat.subfields.forEach(s => subSel.innerHTML += `<option value="${s}">${s}</option>`);
+    function syncSubfields() {
+        const name = document.getElementById('postCat').value;
+        const subSel = document.getElementById('postSub');
+        const cat = allCategories.find(c => c.name === name);
+        subSel.innerHTML = '<option value="">الفرع</option>';
+        if(cat && cat.subfields) {
+            cat.subfields.forEach(s => subSel.innerHTML += `<option value="${s}">${s}</option>`);
+        }
     }
 
-    // 4. نظام الكتل (Editor)
-    function addBlock(type) {
-        blocks.push({type, value: ''});
-        renderBlocks();
-    }
-
-    function renderBlocks() {
-        const editor = document.getElementById('blocksEditor');
-        editor.innerHTML = blocks.map((b, i) => `
-            <div class="block">
-                <div class="flex-row" style="justify-content:space-between">
-                    <small>${b.type.toUpperCase()}</small>
-                    <span class="delete-btn" onclick="blocks.splice(${i},1);renderBlocks()">×</span>
-                </div>
-                <textarea rows="3" onchange="blocks[${i}].value=this.value">${b.value}</textarea>
-            </div>
-        `).join('');
-    }
-
-    // 5. النشر النهائي
-    async function publishArticle() {
-        const title = document.getElementById('articleTitle').value;
-        const author = document.getElementById('authorSelect').value;
-        const category = document.getElementById('catSelect').value;
-        const subfield = document.getElementById('subSelect').value;
-
-        if(!title || !author || blocks.length === 0) return alert("البيانات ناقصة يا سيد أوج.");
-
-        try {
-            await db.collection('articles').add({
-                title, author, category, subfield,
-                contentBlocks: blocks,
-                date: firebase.firestore.FieldValue.serverTimestamp()
-            });
-            alert("✅ تم النشر بنجاح!");
-            blocks = []; renderBlocks();
-            document.getElementById('articleTitle').value = '';
-        } catch(e) { alert("خطأ في النشر: " + e.message); }
+    async function publishNow() {
+        const data = {
+            title: document.getElementById('postTitle').value,
+            author: document.getElementById('postAuthor').value,
+            category: document.getElementById('postCat').value,
+            subfield: document.getElementById('postSub').value,
+            content: document.getElementById('postContent').value,
+            date: firebase.firestore.FieldValue.serverTimestamp()
+        };
+        
+        if(!data.title || !data.content) return alert("املأ البيانات الأساسية.");
+        
+        await db.collection('articles').add(data);
+        alert("تم النشر بنجاح!");
+        document.getElementById('postTitle').value = '';
+        document.getElementById('postContent').value = '';
     }
 </script>
 </body>

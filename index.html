@@ -3,487 +3,292 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>أوج | AWJ - منصة المعرفة السيادية</title>
+    <title>أوج | منصة المعرفة السيادية</title>
     <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-    <!-- Highlight.js لتلوين الأكواد -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/dark.min.css">
+    <!-- Highlight.js -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
     <!-- Font Awesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        /* ===== RESET & GLOBAL ===== */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
             --gold: #D4AF37;
             --gold-dim: rgba(212, 175, 55, 0.15);
-            --dark-bg: #050505;
-            --card-bg: #0c0c0c;
-            --border-color: #222;
-            --text-muted: #aaa;
-            --gradient-gold: linear-gradient(135deg, var(--gold), #b68b1a);
+            --dark: #050505;
+            --card: #0C0F17;
+            --gray: #aaa;
         }
-
         body {
-            background-color: var(--dark-bg);
-            color: #eee;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--dark);
+            color: #eef;
+            font-family: 'Segoe UI', system-ui, sans-serif;
             direction: rtl;
             line-height: 1.6;
-            overflow-x: hidden;
         }
-
-        /* ===== شاشة التحميل ===== */
-        #loading-screen {
+        /* شاشة التحميل بصقر يركض */
+        #loadingScreen {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #000000;
-            z-index: 100000;
+            inset: 0;
+            background: #000000dd;
+            backdrop-filter: blur(4px);
+            z-index: 10000;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            transition: opacity 1.2s ease;
+            transition: opacity 0.8s;
         }
-
-        .walker {
-            width: 100px;
-            height: 100px;
-            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="30" r="12" fill="%23D4AF37"/><rect x="45" y="42" width="10" height="25" fill="%23D4AF37"/><rect x="35" y="50" width="10" height="20" fill="%23D4AF37"/><rect x="55" y="50" width="10" height="20" fill="%23D4AF37"/></svg>') no-repeat center;
+        .falcon-run {
+            width: 120px;
+            height: 120px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path fill="%23D4AF37" d="M30,60 Q40,30 55,35 Q70,40 75,55 Q80,70 70,75 Q60,80 50,70 Q40,60 30,60Z"/><circle cx="55" cy="45" r="4" fill="black"/><path d="M20,70 L10,80 L25,78 L15,90 L35,85 L30,95 L50,80 L45,70 L55,65 L50,55 L40,60 L30,70Z" fill="%23D4AF37"/></svg>') no-repeat center;
             background-size: contain;
-            animation: walk 0.6s infinite alternate ease-in-out;
+            animation: fly 0.3s infinite alternate;
         }
-
-        @keyframes walk {
-            0% { transform: translateX(-15px); }
-            100% { transform: translateX(15px); }
+        @keyframes fly {
+            0% { transform: translateX(-20px) translateY(0); }
+            100% { transform: translateX(20px) translateY(-10px); }
         }
-
-        .progress-container {
-            width: 80%;
-            max-width: 400px;
+        .loading-track {
+            width: 280px;
             height: 4px;
-            background: #222;
+            background: #2a2a35;
+            margin-top: 40px;
             border-radius: 4px;
             overflow: hidden;
-            margin: 30px 0 15px;
         }
-
-        .progress-fill {
+        .loading-progress {
             width: 0%;
             height: 100%;
-            background: var(--gradient-gold);
+            background: var(--gold);
             transition: width 0.08s linear;
         }
-
-        .loading-text {
-            font-family: monospace;
-            letter-spacing: 2px;
-            color: var(--gold);
-        }
-
-        /* ===== الهيدر ===== */
+        /* باقي التنسيقات */
         header {
-            position: fixed;
+            position: sticky;
             top: 0;
-            left: 0;
-            width: 100%;
-            background: rgba(5, 5, 5, 0.97);
+            background: rgba(5,5,5,0.96);
             backdrop-filter: blur(12px);
-            padding: 0 5%;
-            height: 75px;
+            border-bottom: 1px solid rgba(212,175,55,0.2);
+            padding: 1rem 5%;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            z-index: 2000;
-            border-bottom: 1px solid var(--gold-dim);
-            transition: transform 0.3s ease;
+            z-index: 1000;
         }
-
-        .logo {
-            font-family: 'Times New Roman', serif;
-            font-size: 2rem;
-            font-weight: bold;
-            color: var(--gold);
-            text-shadow: 0 0 8px rgba(212, 175, 55, 0.5);
-            letter-spacing: 2px;
-        }
-
-        .header-actions {
-            display: flex;
-            gap: 20px;
-        }
-
-        .header-actions i {
-            font-size: 1.3rem;
-            cursor: pointer;
-            transition: 0.2s;
-            color: #ccc;
-        }
-
-        .header-actions i:hover {
-            color: var(--gold);
-            transform: scale(1.05);
-        }
-
-        /* ===== شريط التبويبات (الأقسام الرئيسية) ===== */
-        .categories-tab {
-            position: fixed;
-            top: 75px;
-            left: 0;
-            width: 100%;
-            background: #0a0a0a;
-            border-bottom: 1px solid var(--border-color);
-            z-index: 1999;
+        .logo { font-size: 2rem; font-weight: bold; color: var(--gold); letter-spacing: 2px; font-family: 'Times New Roman', serif; }
+        .header-icons i { font-size: 1.4rem; margin-right: 1.2rem; cursor: pointer; transition: 0.2s; }
+        .header-icons i:hover { color: var(--gold); }
+        .tabs-row {
+            background: #0A0A0F;
+            border-bottom: 1px solid #1e1e2a;
+            padding: 0.6rem 5%;
             overflow-x: auto;
             white-space: nowrap;
-            padding: 10px 5%;
             scrollbar-width: thin;
         }
-
-        .category-btn {
+        .tab-btn {
             display: inline-block;
             background: transparent;
-            border: 1px solid #333;
-            color: #aaa;
-            padding: 8px 24px;
-            margin-left: 12px;
+            border: 1px solid #2a2a35;
+            color: #bbb;
+            padding: 0.5rem 1.5rem;
             border-radius: 40px;
+            margin-left: 0.7rem;
             cursor: pointer;
             transition: 0.2s;
-            font-weight: 500;
         }
-
-        .category-btn.active {
-            background: var(--gold);
-            color: #000;
-            border-color: var(--gold);
-            box-shadow: 0 0 12px rgba(212, 175, 55, 0.4);
-        }
-
-        /* ===== شريط المجالات الفرعية ===== */
-        .subfields-tab {
-            position: fixed;
-            top: 130px;
-            left: 0;
-            width: 100%;
-            background: #0f0f0f;
-            border-bottom: 1px solid #2a2a2a;
-            z-index: 1998;
+        .tab-btn.active { background: var(--gold); color: #000; border-color: var(--gold); }
+        .sub-row {
+            background: #0D0D14;
+            border-bottom: 1px solid #1e1e2a;
+            padding: 0.4rem 5%;
             overflow-x: auto;
             white-space: nowrap;
-            padding: 8px 5%;
             display: none;
-            scrollbar-width: thin;
         }
-
-        .subfields-tab.show {
-            display: block;
-        }
-
-        .subfield-btn {
+        .sub-row.show { display: block; }
+        .sub-btn {
             display: inline-block;
             background: transparent;
             border: none;
             color: #aaa;
-            padding: 6px 20px;
-            margin-left: 10px;
+            padding: 0.3rem 1rem;
+            margin-left: 0.6rem;
             border-radius: 30px;
             cursor: pointer;
-            font-size: 0.85rem;
+        }
+        .sub-btn.active { color: var(--gold); background: rgba(212,175,55,0.15); }
+        .articles-grid {
+            max-width: 1300px;
+            margin: 2rem auto;
+            padding: 0 5%;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 2rem;
+        }
+        .article-card {
+            background: var(--card);
+            border-radius: 1.2rem;
+            overflow: hidden;
+            border-right: 4px solid var(--gold);
             transition: 0.2s;
-        }
-
-        .subfield-btn.active {
-            color: var(--gold);
-            background: rgba(212, 175, 55, 0.1);
-        }
-
-        /* ===== منطقة المحتوى الرئيسية ===== */
-        .main-content {
-            margin-top: 190px;
-            padding: 0 5% 60px;
-        }
-
-        /* بطاقة المقال */
-        .post-card {
-            background: var(--card-bg);
-            border-radius: 20px;
-            padding: 25px;
-            margin-bottom: 35px;
-            border-right: 3px solid var(--gold);
             position: relative;
-            transition: 0.2s;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
         }
-
-        .post-card:hover {
-            transform: translateY(-2px);
-            border-right-color: var(--gold);
-            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4);
+        .article-img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            background: #11131e;
         }
-
-        .post-title {
-            font-size: 1.7rem;
-            color: var(--gold);
-            cursor: pointer;
-            margin-bottom: 12px;
+        .article-content { padding: 1.2rem; }
+        .article-title {
+            font-size: 1.4rem;
             font-weight: bold;
-        }
-
-        .post-meta {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 18px;
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            margin-bottom: 15px;
-        }
-
-        .post-excerpt {
-            color: #ccc;
-            line-height: 1.6;
-        }
-
-        .summary-trigger {
-            background: rgba(212, 175, 55, 0.15);
-            border: 1px solid var(--gold);
             color: var(--gold);
-            padding: 6px 14px;
-            border-radius: 30px;
             cursor: pointer;
-            display: inline-block;
-            margin-top: 15px;
-            font-size: 0.8rem;
-            transition: 0.2s;
+            margin-bottom: 0.5rem;
         }
-
-        .summary-trigger:hover {
-            background: var(--gold-dim);
+        .meta {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.75rem;
+            color: var(--gray);
+            margin: 0.5rem 0;
+            flex-wrap: wrap;
         }
-
-        /* القائمة المنسدلة (ثلاث نقاط) */
-        .post-actions {
+        .article-actions {
             position: absolute;
-            top: 20px;
-            left: 20px;
+            top: 0.8rem;
+            left: 0.8rem;
         }
-
-        .dots-menu {
-            background: none;
+        .dots-btn {
+            background: rgba(0,0,0,0.6);
             border: none;
-            color: #aaa;
-            font-size: 1.3rem;
+            color: white;
+            font-size: 1.2rem;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
             cursor: pointer;
         }
-
-        .dropdown-content {
+        .dropdown {
             position: absolute;
             left: 0;
-            top: 30px;
-            background: #1e1e1e;
-            border: 1px solid #333;
-            border-radius: 14px;
-            width: 150px;
+            top: 2.2rem;
+            background: #1e1e2a;
+            border-radius: 1rem;
+            width: 140px;
             display: none;
             flex-direction: column;
-            z-index: 150;
-            overflow: hidden;
+            z-index: 20;
         }
-
-        .dropdown-content.show {
-            display: flex;
-        }
-
-        .dropdown-content button {
+        .dropdown.show { display: flex; }
+        .dropdown button {
             background: none;
             border: none;
             color: #eee;
-            padding: 10px 15px;
+            padding: 0.5rem;
             text-align: right;
             cursor: pointer;
             width: 100%;
-            transition: 0.1s;
         }
-
-        .dropdown-content button:hover {
-            background: #2a2a2a;
+        .dropdown button:hover { background: #2a2a35; color: var(--gold); }
+        .summary-trigger {
+            background: rgba(212,175,55,0.15);
+            border: 1px solid var(--gold);
             color: var(--gold);
+            padding: 0.2rem 0.8rem;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            cursor: pointer;
+            display: inline-block;
+            margin-top: 0.6rem;
         }
-
-        /* كتل المحتوى داخل المقال الكامل */
-        .content-text {
-            margin: 15px 0;
-            line-height: 1.8;
-        }
-
-        .content-image img {
-            max-width: 100%;
-            border-radius: 16px;
-            margin: 15px 0;
-        }
-
-        .caption {
-            color: #aaa;
-            font-size: 0.8rem;
-            text-align: center;
-        }
-
+        .image-block { text-align: center; margin: 1rem 0; }
+        .image-block img { max-width: 100%; border-radius: 1rem; }
         pre {
-            background: #1e1e1e;
-            padding: 14px;
-            border-radius: 14px;
+            background: #0D0F14;
+            padding: 1rem;
+            border-radius: 1rem;
             overflow-x: auto;
-            margin: 15px 0;
             position: relative;
         }
-
-        pre code {
-            font-family: 'Fira Code', monospace;
-            font-size: 0.85rem;
-        }
-
-        .copy-code-btn {
+        .copy-code {
             position: absolute;
-            top: 8px;
-            left: 10px;
+            top: 0.4rem;
+            left: 0.6rem;
             background: var(--gold);
             color: black;
             border: none;
-            border-radius: 8px;
-            padding: 4px 12px;
+            border-radius: 6px;
+            padding: 2px 8px;
             font-size: 0.7rem;
             cursor: pointer;
-            font-weight: bold;
         }
-
-        .summary-block {
-            background: rgba(212, 175, 55, 0.1);
-            border-right: 3px solid var(--gold);
-            padding: 15px;
-            border-radius: 14px;
-            margin: 15px 0;
-        }
-
-        /* الأقسام السفلية (ذات صلة، أحدث، الأكثر مشاهدة) */
         .bottom-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 25px;
-            margin-top: 60px;
+            grid-template-columns: repeat(3,1fr);
+            gap: 1.5rem;
+            max-width: 1300px;
+            margin: 2rem auto;
+            padding: 0 5%;
         }
-
-        .info-box {
-            background: #0a0a0a;
-            border-radius: 20px;
-            padding: 20px;
-            border: 1px solid #222;
+        .bottom-card {
+            background: #0A0B10;
+            border-radius: 1rem;
+            padding: 1.2rem;
+            border: 1px solid #1e1e2a;
         }
-
-        .info-box h4 {
-            color: var(--gold);
-            margin-bottom: 15px;
-            font-size: 1.2rem;
-            border-bottom: 1px solid #333;
-            padding-bottom: 8px;
-        }
-
-        .info-box ul {
-            list-style: none;
-        }
-
-        .info-box li {
-            padding: 8px 0;
-            border-bottom: 1px dashed #2a2a2a;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        .info-box li:hover {
-            color: var(--gold);
-            padding-right: 5px;
-        }
-
+        .bottom-card h4 { color: var(--gold); margin-bottom: 0.8rem; }
+        .bottom-card ul { list-style: none; }
+        .bottom-card li { padding: 0.5rem 0; border-bottom: 1px dashed #222; cursor: pointer; }
+        .bottom-card li:hover { color: var(--gold); }
         footer {
             text-align: center;
-            padding: 40px 20px;
-            border-top: 1px solid #222;
+            padding: 2rem;
+            border-top: 1px solid #1a1a1a;
             color: #666;
-            margin-top: 40px;
         }
-
-        .vault {
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        .vault:hover {
-            color: var(--gold);
-        }
-
-        /* المودالات */
+        .copyright { cursor: pointer; }
         .modal {
             display: none;
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.96);
-            z-index: 30000;
-            justify-content: center;
+            inset: 0;
+            background: rgba(0,0,0,0.95);
             align-items: center;
+            justify-content: center;
+            z-index: 20000;
         }
-
         .modal-card {
             background: #111;
             border: 1px solid var(--gold);
-            border-radius: 28px;
-            padding: 30px;
+            border-radius: 1.5rem;
             width: 90%;
-            max-width: 550px;
-            max-height: 85vh;
+            max-width: 500px;
+            padding: 1.5rem;
+            max-height: 80vh;
             overflow-y: auto;
         }
-
         .search-input {
             width: 100%;
-            padding: 12px;
-            background: #1e1e1e;
+            padding: 0.8rem;
+            background: #1a1a1a;
             border: 1px solid #333;
             border-radius: 40px;
             color: white;
-            margin: 20px 0;
+            margin: 1rem 0;
         }
-
-        .search-result {
-            padding: 12px;
-            border-bottom: 1px solid #2a2a2a;
-            cursor: pointer;
-        }
-
-        .search-result:hover {
-            background: var(--gold-dim);
-            color: var(--gold);
-        }
-
         .scroll-top {
             position: fixed;
-            bottom: 25px;
-            left: 25px;
+            bottom: 1.5rem;
+            left: 1.5rem;
             background: var(--gold);
-            color: #000;
-            width: 48px;
-            height: 48px;
+            width: 45px;
+            height: 45px;
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -491,77 +296,63 @@
             cursor: pointer;
             opacity: 0;
             transition: 0.3s;
-            z-index: 9999;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            z-index: 999;
         }
-
-        .scroll-top.visible {
-            opacity: 1;
-        }
-
-        @media (max-width: 768px) {
-            .main-content {
-                margin-top: 210px;
-                padding: 0 4% 40px;
-            }
-            .post-title {
-                font-size: 1.3rem;
-            }
-            .bottom-grid {
-                grid-template-columns: 1fr;
-            }
+        .scroll-top.visible { opacity: 1; }
+        @media (max-width: 700px) {
+            .articles-grid { grid-template-columns: 1fr; }
+            .bottom-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
 
-<!-- شاشة التحميل -->
-<div id="loading-screen">
-    <div class="walker"></div>
-    <div class="progress-container"><div id="load-progress" class="progress-fill"></div></div>
-    <div class="loading-text" id="load-percent">0%</div>
+<div id="loadingScreen">
+    <div class="falcon-run"></div>
+    <div class="loading-track"><div id="loadProgressBar" class="loading-progress"></div></div>
+    <div style="margin-top: 15px; color: #D4AF37;">صقر الحكمة يحلق.. تجهيز السيادة</div>
 </div>
 
 <header>
     <div class="logo">AWJ</div>
-    <div class="header-actions">
-        <i class="fas fa-search" id="open-search"></i>
-        <i class="fas fa-envelope" id="open-subscribe"></i>
+    <div class="header-icons">
+        <i class="fas fa-search" id="openSearchBtn"></i>
+        <i class="fas fa-envelope" id="openSubscribeBtn"></i>
     </div>
 </header>
 
-<!-- شريط الأقسام الرئيسية -->
-<div class="categories-tab" id="categories-bar"></div>
+<div id="tabsContainer" class="tabs-row"></div>
+<div id="subContainer" class="sub-row"></div>
 
-<!-- شريط المجالات الفرعية -->
-<div class="subfields-tab" id="subfields-bar"></div>
+<div id="articlesGrid" class="articles-grid"></div>
 
-<!-- المحتوى -->
-<div class="main-content" id="main-content">
-    <div id="posts-container"></div>
-
-    <!-- الأقسام السفلية -->
-    <div class="bottom-grid" id="bottom-section">
-        <div class="info-box"><h4>📰 مقالات ذات صلة</h4><ul id="related-list"></ul></div>
-        <div class="info-box"><h4>🕒 أحدث المقالات</h4><ul id="latest-list"></ul></div>
-        <div class="info-box"><h4>👑 الأكثر قراءة</h4><ul id="top-list"></ul></div>
-    </div>
+<div class="bottom-grid">
+    <div class="bottom-card"><h4>🕒 أحدث المقالات</h4><ul id="latestList"></ul></div>
+    <div class="bottom-card"><h4>👑 الأكثر مشاهدة</h4><ul id="mostViewedList"></ul></div>
+    <div class="bottom-card"><h4>🔗 ذات صلة</h4><ul id="relatedList"></ul></div>
 </div>
 
 <footer>
-    <p>جميع الحقوق محفوظة © <span class="vault" id="vault-trigger">2026</span> | منصة أوج</p>
+    <p>جميع الحقوق محفوظة © <span class="copyright" id="vaultTrigger">2026</span> | أوج</p>
+    <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 10px;">
+        <span style="cursor:pointer; color: #aaa;" onclick="openStaticPage('about')">من نحن</span>
+        <span style="cursor:pointer; color: #aaa;" onclick="openStaticPage('privacy')">الخصوصية</span>
+        <span style="cursor:pointer; color: #aaa;" onclick="openStaticPage('cookies')">سياسة الكوكيز</span>
+        <span style="cursor:pointer; color: #aaa;" onclick="openStaticPage('terms')">شروط الاستخدام</span>
+    </div>
 </footer>
 
-<!-- المودالات -->
-<div id="search-modal" class="modal"><div class="modal-card"><i class="fas fa-times" style="float: left; cursor: pointer;" onclick="closeModal()"></i><h3>🔍 ابحث في المعرفة</h3><input type="text" id="search-query" class="search-input" placeholder="اكتب كلمة..."><div id="search-results"></div></div></div>
-<div id="subscribe-modal" class="modal"><div class="modal-card"><i class="fas fa-times" style="float: left; cursor: pointer;" onclick="closeModal()"></i><h3>📧 النشرة السيادية</h3><input type="email" id="sub-email" placeholder="بريدك الإلكتروني" style="width:100%; padding:12px; margin:15px 0;"><button id="sub-btn" style="background:var(--gold); color:#000; border:none; padding:10px; width:100%; border-radius:40px;">اشتراك</button><div id="sub-msg"></div></div></div>
-<div id="summary-modal" class="modal"><div class="modal-card"><i class="fas fa-times" style="float: left; cursor: pointer;" onclick="closeModal()"></i><h3>📖 زبدة المقال</h3><div id="summary-text"></div></div></div>
-<div id="vault-modal" class="modal"><div class="modal-card"><i class="fas fa-times" style="float: left; cursor: pointer;" onclick="closeModal()"></i><h3>🔐 الخزنة السرية</h3><div id="vault-info"></div></div></div>
+<!-- مودالات -->
+<div id="searchModal" class="modal"><div class="modal-card"><i class="fas fa-times" style="float: left; cursor: pointer;" onclick="closeModal(this)"></i><h3>🔍 بحث</h3><input type="text" id="searchInput" class="search-input" placeholder="كلمة مفتاحية"><div id="searchResults"></div></div></div>
+<div id="subscribeModal" class="modal"><div class="modal-card"><i class="fas fa-times" style="float: left; cursor: pointer;" onclick="closeModal(this)"></i><h3>📧 اشترك في النشرة</h3><input type="email" id="subEmail" class="search-input" placeholder="بريدك الإلكتروني"><button id="doSubscribeBtn" style="background:#D4AF37; color:#000; border:none; padding:8px; width:100%; border-radius:40px;">اشتراك</button><div id="subMsg"></div></div></div>
+<div id="summaryModal" class="modal"><div class="modal-card"><i class="fas fa-times" style="float: left; cursor: pointer;" onclick="closeModal(this)"></i><h3>📖 زبدة المقال</h3><div id="summaryContent"></div></div></div>
+<div id="vaultModal" class="modal"><div class="modal-card"><i class="fas fa-times" style="float: left; cursor: pointer;" onclick="closeModal(this)"></i><h3>🔐 الخزنة السرية</h3><div id="vaultContent"></div></div></div>
+<div id="staticModal" class="modal"><div class="modal-card"><i class="fas fa-times" style="float: left; cursor: pointer;" onclick="closeModal(this)"></i><h3 id="staticTitle"></h3><div id="staticBody"></div></div></div>
 
-<div class="scroll-top" id="scroll-top"><i class="fas fa-chevron-up"></i></div>
+<div id="scrollTopBtn" class="scroll-top"><i class="fas fa-arrow-up"></i></div>
 
 <script>
-    // ===================== اعدادات Firebase =====================
+    // Firebase Config
     const firebaseConfig = {
         apiKey: "AIzaSyDjgVxvtPXTn1tpr4IxOK3wOW4r3gzB1VU",
         authDomain: "awj-website-29f16.firebaseapp.com",
@@ -574,322 +365,297 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    // ===================== المتغيرات العامة =====================
     let allArticles = [];
     let categories = [];
-    let currentCategory = null;
+    let currentCat = null;
     let currentSub = null;
     let activeDropdown = null;
 
     // شاشة التحميل
-    let load = 0;
+    let loadP = 0;
     const loadInterval = setInterval(() => {
-        load += Math.floor(Math.random() * 15) + 5;
-        if (load >= 100) load = 100;
-        document.getElementById('load-progress').style.width = load + '%';
-        document.getElementById('load-percent').innerText = load + '%';
-        if (load === 100) {
+        loadP += Math.random() * 15 + 5;
+        if (loadP >= 100) loadP = 100;
+        document.getElementById('loadProgressBar').style.width = loadP + '%';
+        if (loadP === 100) {
             clearInterval(loadInterval);
             setTimeout(() => {
-                const loader = document.getElementById('loading-screen');
-                loader.style.opacity = '0';
-                setTimeout(() => loader.style.display = 'none', 1000);
-            }, 300);
+                const scr = document.getElementById('loadingScreen');
+                scr.style.opacity = '0';
+                setTimeout(() => scr.style.display = 'none', 600);
+            }, 400);
         }
-    }, 70);
+    }, 80);
 
-    // جلب جميع المقالات والتصنيفات
-    async function fetchData() {
+    // جلب البيانات
+    async function fetchAll() {
         const [articlesSnap, catsSnap] = await Promise.all([
             db.collection('articles').orderBy('date', 'desc').get(),
             db.collection('categories').orderBy('name').get()
         ]);
         allArticles = articlesSnap.docs.map(d => ({ id: d.id, ...d.data() }));
         categories = catsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-        renderCategories();
-        if (categories.length > 0) selectCategory(categories[0].name);
-        else document.getElementById('posts-container').innerHTML = '<div style="text-align:center; padding:40px;">📭 لا توجد تصنيفات بعد. أضفها من لوحة الإدارة.</div>';
-        updateBottomSections();
+        renderTabs();
+        if (categories.length) selectCategory(categories[0].name);
+        else document.getElementById('articlesGrid').innerHTML = '<div style="text-align:center; padding:2rem;">📭 لا توجد تبويبات، أضفها من لوحة الإدارة</div>';
+        updateSidePanels();
     }
 
-    // عرض الأقسام الرئيسية
-    function renderCategories() {
-        const bar = document.getElementById('categories-bar');
-        bar.innerHTML = '';
-        categories.forEach(c => {
+    function renderTabs() {
+        const container = document.getElementById('tabsContainer');
+        container.innerHTML = '';
+        categories.forEach(cat => {
             const btn = document.createElement('button');
-            btn.innerText = c.name;
-            btn.classList.add('category-btn');
-            btn.onclick = () => selectCategory(c.name);
-            bar.appendChild(btn);
+            btn.textContent = cat.name;
+            btn.className = 'tab-btn';
+            btn.onclick = () => selectCategory(cat.name);
+            container.appendChild(btn);
         });
     }
 
     function selectCategory(catName) {
-        currentCategory = catName;
+        currentCat = catName;
         currentSub = null;
-        document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
-        Array.from(document.querySelectorAll('.category-btn')).find(btn => btn.innerText === catName)?.classList.add('active');
-        renderSubfields(catName);
-        filterAndRenderPosts();
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        const activeTab = Array.from(document.querySelectorAll('.tab-btn')).find(b => b.textContent === catName);
+        if (activeTab) activeTab.classList.add('active');
+        renderSubTabs(catName);
+        filterAndRender();
     }
 
-    function renderSubfields(catName) {
-        const subBar = document.getElementById('subfields-bar');
+    function renderSubTabs(catName) {
+        const subDiv = document.getElementById('subContainer');
         const cat = categories.find(c => c.name === catName);
-        if (!cat || !cat.subfields?.length) {
-            subBar.classList.remove('show');
+        if (!cat || !cat.subfields || cat.subfields.length === 0) {
+            subDiv.classList.remove('show');
             return;
         }
-        subBar.classList.add('show');
-        subBar.innerHTML = '';
+        subDiv.classList.add('show');
+        subDiv.innerHTML = '';
         const allBtn = document.createElement('button');
-        allBtn.innerText = 'الكل';
-        allBtn.classList.add('subfield-btn');
+        allBtn.textContent = 'الكل';
+        allBtn.className = 'sub-btn';
         if (currentSub === null) allBtn.classList.add('active');
-        allBtn.onclick = () => {
-            currentSub = null;
-            document.querySelectorAll('.subfield-btn').forEach(b => b.classList.remove('active'));
-            allBtn.classList.add('active');
-            filterAndRenderPosts();
-        };
-        subBar.appendChild(allBtn);
+        allBtn.onclick = () => { currentSub = null; refreshSubActive(); filterAndRender(); };
+        subDiv.appendChild(allBtn);
         cat.subfields.forEach(sub => {
             const btn = document.createElement('button');
-            btn.innerText = sub;
-            btn.classList.add('subfield-btn');
+            btn.textContent = sub;
+            btn.className = 'sub-btn';
             if (currentSub === sub) btn.classList.add('active');
-            btn.onclick = () => {
-                currentSub = sub;
-                document.querySelectorAll('.subfield-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                filterAndRenderPosts();
-            };
-            subBar.appendChild(btn);
+            btn.onclick = () => { currentSub = sub; refreshSubActive(); filterAndRender(); };
+            subDiv.appendChild(btn);
         });
+        function refreshSubActive() {
+            document.querySelectorAll('.sub-btn').forEach(b => b.classList.remove('active'));
+            if (currentSub === null) allBtn.classList.add('active');
+            else {
+                const target = Array.from(document.querySelectorAll('.sub-btn')).find(b => b.textContent === currentSub);
+                if (target) target.classList.add('active');
+            }
+        }
     }
 
-    function filterAndRenderPosts() {
-        let filtered = allArticles.filter(a => a.category === currentCategory);
+    function filterAndRender() {
+        let filtered = allArticles.filter(a => a.category === currentCat);
         if (currentSub) filtered = filtered.filter(a => a.subfield === currentSub);
-        renderPosts(filtered);
+        renderArticlesGrid(filtered);
     }
 
-    function renderPosts(posts) {
-        const container = document.getElementById('posts-container');
-        if (!posts.length) {
-            container.innerHTML = '<div style="text-align:center; padding:40px;">⛔ لا توجد مقالات في هذا القسم بعد.</div>';
-            return;
-        }
-        let html = '';
-        posts.forEach(post => {
-            html += `
-                <div class="post-card" data-id="${post.id}">
-                    <div class="post-actions">
-                        <button class="dots-menu" onclick="toggleMenu(event, '${post.id}')"><i class="fas fa-ellipsis-v"></i></button>
-                        <div id="menu-${post.id}" class="dropdown-content">
-                            <button onclick="copyLink('${post.id}')"><i class="fas fa-copy"></i> نسخ الرابط</button>
-                            <button onclick="sharePost('${post.id}')"><i class="fas fa-share-alt"></i> مشاركة</button>
-                            <button onclick="focusPost('${post.id}')"><i class="fas fa-expand"></i> وضع التركيز</button>
-                        </div>
-                    </div>
-                    <div class="post-title" onclick="viewFullPost('${post.id}')">${escapeHtml(post.title)}</div>
-                    <div class="post-meta">
-                        <span><i class="fas fa-user"></i> ${escapeHtml(post.author)}</span>
-                        <span><i class="fas fa-calendar"></i> ${post.date ? new Date(post.date.toDate()).toLocaleDateString('ar-EG') : 'تاريخ غير محدد'}</span>
-                        <span><i class="fas fa-eye"></i> ${post.views || 0}</span>
-                        <span><i class="fas fa-tag"></i> ${escapeHtml(post.category)} / ${escapeHtml(post.subfield)}</span>
-                    </div>
-                    <div class="post-excerpt">${getExcerpt(post)}...</div>
-                    <button class="summary-trigger" onclick="showSummary('${post.id}')"><i class="fas fa-lightbulb"></i> زبدة المقال</button>
-                </div>
-            `;
-        });
-        container.innerHTML = html;
-    }
-
-    function getExcerpt(post) {
-        if (post.contentBlocks && post.contentBlocks.length) {
-            const firstText = post.contentBlocks.find(b => b.type === 'text');
-            if (firstText) return stripHtml(firstText.value).substring(0, 180);
-            const firstSummary = post.contentBlocks.find(b => b.type === 'summary');
-            if (firstSummary) return stripHtml(firstSummary.value).substring(0, 180);
-        }
-        return (post.content || '').substring(0, 180);
+    // استخراج أول صورة من contentBlocks
+    function getFirstImageUrl(article) {
+        if (!article.contentBlocks) return null;
+        const imgBlock = article.contentBlocks.find(b => b.type === 'image' && b.value?.url);
+        return imgBlock ? imgBlock.value.url : null;
     }
 
     function stripHtml(html) {
-        const div = document.createElement('div');
-        div.innerHTML = html;
-        return div.textContent || div.innerText || '';
+        const tmp = document.createElement('div');
+        tmp.innerHTML = html;
+        return tmp.textContent || tmp.innerText || '';
     }
 
-    // عرض المقال كاملاً
-    window.viewFullPost = async function(id) {
-        const post = allArticles.find(p => p.id === id);
-        if (!post) return;
-        await db.collection('articles').doc(id).update({ views: firebase.firestore.FieldValue.increment(1) });
-        post.views = (post.views || 0) + 1;
-
-        let blocksHtml = '';
-        if (post.contentBlocks && post.contentBlocks.length) {
-            blocksHtml = renderContentBlocks(post.contentBlocks);
-        } else if (post.content) {
-            blocksHtml = `<div class="content-text">${linkifyHtml(post.content)}</div>`;
-        } else {
-            blocksHtml = '<p>لا يوجد محتوى للمقال.</p>';
+    function getPreviewText(article) {
+        if (article.contentBlocks) {
+            const textBlock = article.contentBlocks.find(b => b.type === 'text' || b.type === 'summary');
+            if (textBlock) return stripHtml(textBlock.value).slice(0, 120);
         }
+        return '';
+    }
 
-        document.getElementById('posts-container').innerHTML = `
-            <div class="post-card">
-                <div class="post-title">${escapeHtml(post.title)}</div>
-                <div class="post-meta">
-                    <span><i class="fas fa-user"></i> ${escapeHtml(post.author)}</span>
-                    <span><i class="fas fa-calendar"></i> ${post.date ? new Date(post.date.toDate()).toLocaleDateString('ar-EG') : 'غير محدد'}</span>
-                    <span><i class="fas fa-eye"></i> ${post.views}</span>
+    function renderArticlesGrid(articles) {
+        const grid = document.getElementById('articlesGrid');
+        if (!articles.length) {
+            grid.innerHTML = '<div style="text-align:center; padding:2rem;">📭 لا توجد مقالات في هذا القسم</div>';
+            return;
+        }
+        let html = '';
+        articles.forEach(art => {
+            const imgUrl = getFirstImageUrl(art);
+            const preview = getPreviewText(art);
+            html += `
+                <div class="article-card" data-id="${art.id}">
+                    ${imgUrl ? `<img src="${imgUrl}" class="article-img" loading="lazy">` : '<div class="article-img" style="background: #1a1c25; display: flex; align-items: center; justify-content: center;"><i class="fas fa-newspaper" style="font-size: 3rem; color: #D4AF37;"></i></div>'}
+                    <div class="article-content">
+                        <div class="article-title" onclick="viewFullArticle('${art.id}')">${escapeHtml(art.title)}</div>
+                        <div class="meta">
+                            <span><i class="fas fa-user"></i> ${escapeHtml(art.author)}</span>
+                            <span><i class="fas fa-eye"></i> ${art.views || 0}</span>
+                            <span><i class="fas fa-calendar"></i> ${art.date ? new Date(art.date.toDate()).toLocaleDateString('ar-EG') : 'قديم'}</span>
+                        </div>
+                        <div>${escapeHtml(preview)}...</div>
+                        <button class="summary-trigger" onclick="showSummary('${art.id}')"><i class="fas fa-lightbulb"></i> زبدة المقال</button>
+                        <div class="article-actions">
+                            <button class="dots-btn" onclick="toggleMenu(event, '${art.id}')"><i class="fas fa-ellipsis-v"></i></button>
+                            <div id="drop-${art.id}" class="dropdown">
+                                <button onclick="copyLink('${art.id}')"><i class="fas fa-copy"></i> نسخ الرابط</button>
+                                <button onclick="shareArticle('${art.id}')"><i class="fas fa-share-alt"></i> مشاركة</button>
+                                <button onclick="focusArticle('${art.id}')"><i class="fas fa-expand"></i> وضع التركيز</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                ${blocksHtml}
-                <button onclick="location.reload()" style="margin-top:25px; background:var(--gold); color:#000; border:none; padding:8px 24px; border-radius:40px; cursor:pointer;">← العودة للقائمة</button>
+            `;
+        });
+        grid.innerHTML = html;
+    }
+
+    window.viewFullArticle = async function(id) {
+        const art = allArticles.find(a => a.id === id);
+        if (!art) return;
+        await db.collection('articles').doc(id).update({ views: firebase.firestore.FieldValue.increment(1) });
+        art.views = (art.views || 0) + 1;
+        let fullHtml = '';
+        if (art.contentBlocks) {
+            fullHtml = art.contentBlocks.map(block => {
+                if (block.type === 'text') return `<div style="margin:1rem 0;">${block.value}</div>`;
+                if (block.type === 'image') return `<div class="image-block"><img src="${block.value.url}" alt="${escapeHtml(block.value.caption)}"><div class="caption">${escapeHtml(block.value.caption)}</div></div>`;
+                if (block.type === 'code') return `<pre><code class="language-${block.value.language}">${escapeHtml(block.value.code)}</code></pre>`;
+                if (block.type === 'summary') return `<div style="background:rgba(212,175,55,0.1); padding:1rem; border-right:3px solid #D4AF37;">✨ ${block.value}</div>`;
+                return '';
+            }).join('');
+        } else fullHtml = `<div>${art.content || ''}</div>`;
+        document.getElementById('articlesGrid').innerHTML = `
+            <div style="max-width: 1000px; margin: auto; width: 100%;">
+                <div class="article-card" style="padding: 1.5rem;">
+                    <div class="article-title">${escapeHtml(art.title)}</div>
+                    <div class="meta"><span><i class="fas fa-user"></i> ${escapeHtml(art.author)}</span><span><i class="fas fa-eye"></i> ${art.views}</span></div>
+                    ${fullHtml}
+                    <button onclick="location.reload()" style="margin-top:1.5rem; background:#D4AF37; border:none; padding:0.5rem 1.5rem; border-radius:30px;">← العودة</button>
+                </div>
             </div>
         `;
-        document.querySelectorAll('pre code').forEach(block => {
-            hljs.highlightElement(block);
-            addCopyBtn(block.parentElement);
-        });
-        updateBottomSections();
+        document.querySelectorAll('pre code').forEach(block => hljs.highlightElement(block));
+        attachCopyButtons();
+        updateSidePanels();
     };
 
-    function renderContentBlocks(blocks) {
-        let html = '';
-        blocks.forEach(block => {
-            if (block.type === 'text') {
-                html += `<div class="content-text">${linkifyHtml(block.value)}</div>`;
-            } else if (block.type === 'image') {
-                html += `<div class="content-image"><img src="${block.value.url}" alt="${escapeHtml(block.value.caption)}">${block.value.caption ? `<div class="caption">${escapeHtml(block.value.caption)}</div>` : ''}</div>`;
-            } else if (block.type === 'code') {
-                html += `<pre><code class="language-${block.value.language}">${escapeHtml(block.value.code)}</code></pre>`;
-            } else if (block.type === 'summary') {
-                html += `<div class="summary-block">✨ ${linkifyHtml(block.value)}</div>`;
-            }
+    function attachCopyButtons() {
+        document.querySelectorAll('pre').forEach(pre => {
+            if (pre.querySelector('.copy-code')) return;
+            const btn = document.createElement('button');
+            btn.innerHTML = '<i class="fas fa-copy"></i> نسخ';
+            btn.className = 'copy-code';
+            btn.onclick = () => { navigator.clipboard.writeText(pre.querySelector('code')?.innerText || ''); alert('تم نسخ الكود'); };
+            pre.style.position = 'relative';
+            pre.appendChild(btn);
         });
-        return html;
-    }
-
-    function linkifyHtml(text) {
-        const urlRegex = /(https?:\/\/[^\s<]+)/g;
-        return text.replace(urlRegex, url => `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`);
-    }
-
-    function escapeHtml(str) {
-        if (!str) return '';
-        return str.replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;');
-    }
-
-    function addCopyBtn(pre) {
-        if (pre.querySelector('.copy-code-btn')) return;
-        const btn = document.createElement('button');
-        btn.innerHTML = '<i class="fas fa-copy"></i> نسخ';
-        btn.className = 'copy-code-btn';
-        btn.onclick = () => {
-            const code = pre.querySelector('code').innerText;
-            navigator.clipboard.writeText(code);
-            alert('تم نسخ الكود');
-        };
-        pre.style.position = 'relative';
-        pre.appendChild(btn);
     }
 
     window.showSummary = function(id) {
-        const post = allArticles.find(p => p.id === id);
-        if (!post) return;
-        let summary = '';
-        if (post.contentBlocks && post.contentBlocks.length) {
-            const sumBlock = post.contentBlocks.find(b => b.type === 'summary');
-            if (sumBlock) summary = sumBlock.value;
-            else summary = post.contentBlocks[0]?.value?.substring(0, 400) || '';
-        } else {
-            summary = (post.content || '').substring(0, 400);
-        }
-        document.getElementById('summary-text').innerHTML = `<div>${linkifyHtml(summary)}${summary.length >= 400 ? '...' : ''}</div><p style="margin-top:15px;">لقراءة كامل المقال، اضغط على العنوان.</p>`;
-        document.getElementById('summary-modal').style.display = 'flex';
+        const art = allArticles.find(a => a.id === id);
+        if (!art) return;
+        let sum = '';
+        if (art.contentBlocks) {
+            const sBlock = art.contentBlocks.find(b => b.type === 'summary');
+            sum = sBlock ? sBlock.value : (art.contentBlocks[0]?.value?.slice(0, 300) || '');
+        } else sum = (art.content || '').slice(0, 300);
+        document.getElementById('summaryContent').innerHTML = `<div>${sum}...</div><p style="margin-top:1rem;">ملخص سريع. اضغط على العنوان للقراءة الكاملة.</p>`;
+        document.getElementById('summaryModal').style.display = 'flex';
     };
 
-    window.copyLink = (id) => { navigator.clipboard.writeText(window.location.href.split('#')[0] + `?article=${id}`); alert('تم نسخ الرابط'); closeMenu(); };
-    window.sharePost = (id) => { if (navigator.share) navigator.share({ title: 'مقال في أوج', url: window.location.href }); else alert('المشاركة غير مدعومة'); closeMenu(); };
-    window.focusPost = (id) => {
-        const card = document.querySelector(`.post-card[data-id="${id}"]`);
+    window.copyLink = (id) => { const url = `${window.location.origin}${window.location.pathname}?article=${id}`; navigator.clipboard.writeText(url); alert('تم نسخ الرابط'); closeDropdown(); };
+    window.shareArticle = (id) => { if (navigator.share) navigator.share({ title: allArticles.find(a=>a.id===id)?.title }); else alert('المشاركة غير مدعومة'); closeDropdown(); };
+    window.focusArticle = (id) => {
+        const card = document.querySelector(`.article-card[data-id="${id}"]`);
         if (card) {
-            card.style.position = 'fixed'; card.style.top = '50%'; card.style.left = '50%';
-            card.style.transform = 'translate(-50%, -50%)'; card.style.width = '90%'; card.style.maxWidth = '800px';
-            card.style.zIndex = '30000'; card.style.backgroundColor = '#111'; card.style.maxHeight = '90vh'; card.style.overflow = 'auto';
-            const closeFocus = (e) => { if (!card.contains(e.target)) { card.style.position = ''; card.style.transform = ''; card.style.width = ''; card.style.zIndex = ''; card.style.maxHeight = ''; card.style.overflow = ''; document.removeEventListener('click', closeFocus); } };
-            setTimeout(() => document.addEventListener('click', closeFocus), 100);
+            card.style.position = 'fixed'; card.style.top = '50%'; card.style.left = '50%'; card.style.transform = 'translate(-50%, -50%)';
+            card.style.width = '90%'; card.style.maxWidth = '800px'; card.style.zIndex = '30000'; card.style.maxHeight = '90vh'; card.style.overflow = 'auto';
+            const out = (e) => { if (!card.contains(e.target)) { card.style.position = ''; card.style.top = ''; card.style.left = ''; card.style.transform = ''; card.style.width = ''; card.style.zIndex = ''; card.style.maxHeight = ''; card.style.overflow = ''; document.removeEventListener('click', out); } };
+            setTimeout(() => document.addEventListener('click', out), 100);
         }
-        closeMenu();
+        closeDropdown();
     };
+    window.toggleMenu = (e, id) => { e.stopPropagation(); const menu = document.getElementById(`drop-${id}`); if (activeDropdown && activeDropdown !== menu) activeDropdown.classList.remove('show'); menu.classList.toggle('show'); activeDropdown = menu.classList.contains('show') ? menu : null; };
+    function closeDropdown() { if (activeDropdown) activeDropdown.classList.remove('show'); activeDropdown = null; }
+    document.addEventListener('click', closeDropdown);
 
-    window.toggleMenu = (e, id) => {
-        e.stopPropagation();
-        const menu = document.getElementById(`menu-${id}`);
-        if (activeDropdown && activeDropdown !== menu) activeDropdown.classList.remove('show');
-        menu.classList.toggle('show');
-        activeDropdown = menu.classList.contains('show') ? menu : null;
-    };
-    function closeMenu() { if (activeDropdown) activeDropdown.classList.remove('show'); activeDropdown = null; }
-    document.addEventListener('click', closeMenu);
-
-    // الأقسام السفلية
-    async function updateBottomSections() {
+    async function updateSidePanels() {
         const latest = [...allArticles].sort((a,b) => (b.date?.toMillis()||0) - (a.date?.toMillis()||0)).slice(0,5);
-        const mostViewed = [...allArticles].sort((a,b) => (b.views||0) - (a.views||0)).slice(0,5);
-        let related = [];
-        if (currentCategory) related = allArticles.filter(a => a.category === currentCategory).slice(0,5);
-        else related = allArticles.slice(0,5);
-        document.getElementById('latest-list').innerHTML = latest.map(p => `<li onclick="viewFullPost('${p.id}')">${escapeHtml(p.title)}</li>`).join('');
-        document.getElementById('top-list').innerHTML = mostViewed.map(p => `<li onclick="viewFullPost('${p.id}')">${escapeHtml(p.title)} (${p.views||0})</li>`).join('');
-        document.getElementById('related-list').innerHTML = related.map(p => `<li onclick="viewFullPost('${p.id}')">${escapeHtml(p.title)}</li>`).join('');
+        const most = [...allArticles].sort((a,b) => (b.views||0) - (a.views||0)).slice(0,5);
+        let related = currentCat ? allArticles.filter(a => a.category === currentCat).slice(0,5) : allArticles.slice(0,5);
+        document.getElementById('latestList').innerHTML = latest.map(a => `<li onclick="viewFullArticle('${a.id}')">${escapeHtml(a.title)}</li>`).join('');
+        document.getElementById('mostViewedList').innerHTML = most.map(a => `<li onclick="viewFullArticle('${a.id}')">${escapeHtml(a.title)} (${a.views||0})</li>`).join('');
+        document.getElementById('relatedList').innerHTML = related.map(a => `<li onclick="viewFullArticle('${a.id}')">${escapeHtml(a.title)}</li>`).join('');
     }
 
-    // البحث
+    // بحث
     function performSearch() {
-        const q = document.getElementById('search-query').value.toLowerCase();
-        const res = allArticles.filter(a => a.title.toLowerCase().includes(q) || (a.content && a.content.toLowerCase().includes(q)));
-        const container = document.getElementById('search-results');
-        if (!res.length) container.innerHTML = '<p>لا توجد نتائج</p>';
-        else container.innerHTML = res.map(a => `<div class="search-result" onclick="viewFullPost('${a.id}'); closeModal();">${escapeHtml(a.title)} - ${escapeHtml(a.author)}</div>`).join('');
+        const q = document.getElementById('searchInput').value.toLowerCase();
+        const res = allArticles.filter(a => a.title.toLowerCase().includes(q) || (a.content?.toLowerCase().includes(q)));
+        const div = document.getElementById('searchResults');
+        if (!res.length) div.innerHTML = '<p>لا نتائج</p>';
+        else div.innerHTML = res.map(a => `<div style="padding:0.6rem; border-bottom:1px solid #333; cursor:pointer;" onclick="viewFullArticle('${a.id}');closeModal(null)">${escapeHtml(a.title)} - ${escapeHtml(a.author)}</div>`).join('');
     }
-    document.getElementById('search-query')?.addEventListener('input', performSearch);
-    document.getElementById('sub-btn')?.addEventListener('click', () => {
-        const email = document.getElementById('sub-email').value;
-        if (email.includes('@')) { document.getElementById('sub-msg').innerHTML = '<p style="color:green;">✅ تم الاشتراك</p>'; setTimeout(() => closeModal(), 1500); }
-        else document.getElementById('sub-msg').innerHTML = '<p style="color:red;">❌ بريد غير صالح</p>';
+    document.getElementById('searchInput')?.addEventListener('input', performSearch);
+    document.getElementById('doSubscribeBtn')?.addEventListener('click', () => {
+        const email = document.getElementById('subEmail').value;
+        if (email.includes('@')) { document.getElementById('subMsg').innerHTML = '<p style="color:green;">✅ تم الاشتراك</p>'; setTimeout(()=>closeModal(null),1500); }
+        else document.getElementById('subMsg').innerHTML = '<p style="color:red;">❌ بريد غير صالح</p>';
     });
 
-    function closeModal() { document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); }
-    document.getElementById('open-search').onclick = () => { document.getElementById('search-modal').style.display = 'flex'; document.getElementById('search-query').value = ''; document.getElementById('search-results').innerHTML = ''; };
-    document.getElementById('open-subscribe').onclick = () => { document.getElementById('subscribe-modal').style.display = 'flex'; };
+    // مودالات
+    function closeModal(el) { document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); }
+    document.getElementById('openSearchBtn').onclick = () => { document.getElementById('searchModal').style.display = 'flex'; document.getElementById('searchInput').value = ''; document.getElementById('searchResults').innerHTML = ''; };
+    document.getElementById('openSubscribeBtn').onclick = () => { document.getElementById('subscribeModal').style.display = 'flex'; };
     window.closeModal = closeModal;
 
-    const scrollBtn = document.getElementById('scroll-top');
-    window.onscroll = () => { if (window.scrollY > 350) scrollBtn.classList.add('visible'); else scrollBtn.classList.remove('visible'); };
+    // الصفحات الثابتة
+    window.openStaticPage = (page) => {
+        const titles = { about: 'من نحن', privacy: 'الخصوصية', cookies: 'سياسة الكوكيز', terms: 'شروط الاستخدام' };
+        const contents = {
+            about: '<p>أوج هي منصة معرفية سيادية تقدم محتوى استراتيجياً وفلسفياً وعلمياً. نهدف إلى تمكين العقول بالنخبة الفكرية.</p>',
+            privacy: '<p>نحن لا نشارك بياناتك مع أي طرف ثالث. جميع البيانات مخزنة بأمان.</p>',
+            cookies: '<p>نستخدم التخزين المحلي لتحسين تجربتك. لا نستخدم كوكيز خارجية.</p>',
+            terms: '<p>المحتوى محمي بحقوق النشر. يمنع النسخ أو إعادة النشر دون إذن خطي.</p>'
+        };
+        document.getElementById('staticTitle').innerText = titles[page];
+        document.getElementById('staticBody').innerHTML = contents[page];
+        document.getElementById('staticModal').style.display = 'flex';
+    };
+
+    // زر العودة للأعلى
+    const scrollBtn = document.getElementById('scrollTopBtn');
+    window.onscroll = () => { if (window.scrollY > 300) scrollBtn.classList.add('visible'); else scrollBtn.classList.remove('visible'); };
     scrollBtn.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
 
-    // الخزنة السرية (ثلاث نقرات)
+    // الخزنة السرية
     let vaultClicks = 0;
-    document.getElementById('vault-trigger').addEventListener('click', () => {
+    document.getElementById('vaultTrigger').onclick = () => {
         vaultClicks++;
         setTimeout(() => vaultClicks = 0, 1500);
         if (vaultClicks === 3) {
-            const pass = prompt("شَفَرَةُ العُبُورِ:");
-            if (pass === "@...Alshanfricc_1998...@") {
-                document.getElementById('vault-info').innerHTML = `<h3>🔓 مرحباً أيها السيد</h3><p>عدد المقالات: ${allArticles.length}</p><p>التصنيفات: ${categories.map(c=>c.name).join(', ')}</p><p>إجمالي المشاهدات: ${allArticles.reduce((s,a)=>s+(a.views||0),0)}</p>`;
-                document.getElementById('vault-modal').style.display = 'flex';
+            const pwd = prompt("شَفَرَةُ العُبُورِ:");
+            if (pwd === "@...Alshanfricc_1998...@") {
+                document.getElementById('vaultContent').innerHTML = `<h3>🔓 مرحباً سيد أوج</h3><p>📚 عدد المقالات: ${allArticles.length}</p><p>🏷️ التصنيفات: ${categories.map(c=>c.name).join(', ')}</p>`;
+                document.getElementById('vaultModal').style.display = 'flex';
             } else alert("شَفَرَةٌ خَاطِئَةٌ.");
             vaultClicks = 0;
         }
-    });
+    };
+    function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => m==='&'?'&amp;':m==='<'?'&lt;':'&gt;'); }
 
-    fetchData();
+    fetchAll();
 </script>
 </body>
-    </html>
+</html>

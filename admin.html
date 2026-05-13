@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>أوج | لوحة التحكم السيادية</title>
+    <title>شنفر | لوحة التحكم السيادية</title>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
@@ -312,7 +312,7 @@
     <!-- Admin Panel -->
     <div id="adminPanel" style="display: none;">
         <div class="admin-header">
-            <div class="logo"><i class="fas fa-crown"></i> AWJ Admin</div>
+            <div class="logo"><i class="fas fa-crown"></i> SHNFR Admin</div>
             <div style="display:flex; gap:1rem; align-items:center; flex-wrap:wrap;">
                 <span class="stats-badge" id="statsInfo"></span>
                 <button id="logoutBtn" class="btn-outline btn-sm"><i class="fas fa-sign-out-alt"></i> خروج</button>
@@ -422,19 +422,19 @@
     // ==========================================
     // Global State
     // ==========================================
-    let categories = [];
-    let authors = [];
-    let blocks = [];
-    let sortableInstance = null;
-    let apiKey = localStorage.getItem('awj_openai_key') || '';
+    var categories = [];
+    var authors = [];
+    var blocks = [];
+    var sortableInstance = null;
+    var apiKey = localStorage.getItem('shnfr_openai_key') || '';
     
-    const languages = [
+    var languages = [
         "javascript", "python", "html", "css", "php", "java", "csharp", 
         "go", "ruby", "bash", "typescript", "swift", "kotlin", "sql", "json", "xml"
     ];
 
     // ==========================================
-    // Utility Functions (Global)
+    // Utility Functions (Global on window)
     // ==========================================
     window.escapeHtml = function(str) {
         if(!str) return ''; 
@@ -444,16 +444,16 @@
     };
 
     window.showMsg = function(elId, text, type) { 
-        const d = document.getElementById(elId); 
+        var d = document.getElementById(elId); 
         if(!d) return;
         d.innerHTML = text; 
         d.className = 'message ' + type; 
-        setTimeout(() => d.className = 'message', 4000); 
+        setTimeout(function() { d.className = 'message'; }, 4000); 
     };
 
     window.stripHtml = function(html) {
         if(!html) return '';
-        const tmp = document.createElement('div');
+        var tmp = document.createElement('div');
         tmp.innerHTML = html;
         return tmp.textContent || tmp.innerText || '';
     };
@@ -461,10 +461,10 @@
     // ==========================================
     // Auth
     // ==========================================
-    document.getElementById('doLoginBtn').onclick = async () => {
-        const email = document.getElementById('loginEmail').value.trim();
-        const pass = document.getElementById('loginPassword').value;
-        const btn = document.getElementById('doLoginBtn');
+    document.getElementById('doLoginBtn').onclick = async function() {
+        var email = document.getElementById('loginEmail').value.trim();
+        var pass = document.getElementById('loginPassword').value;
+        var btn = document.getElementById('doLoginBtn');
         btn.classList.add('btn-loading');
         btn.innerHTML = '<span class="spinner"></span> جاري الدخول...';
         
@@ -477,7 +477,7 @@
         }
     };
     
-    auth.onAuthStateChanged(user => {
+    auth.onAuthStateChanged(function(user) {
         if (user) {
             document.getElementById('loginPanel').style.display = 'none';
             document.getElementById('adminPanel').style.display = 'block';
@@ -492,14 +492,14 @@
         }
     });
     
-    document.getElementById('logoutBtn').onclick = () => auth.signOut();
+    document.getElementById('logoutBtn').onclick = function() { auth.signOut(); };
 
     // ==========================================
     // Stats
     // ==========================================
     window.updateStats = async function() { 
         try {
-            const snap = await db.collection('articles').get(); 
+            var snap = await db.collection('articles').get(); 
             document.getElementById('statsInfo').innerHTML = 
                 '📄 ' + snap.size + ' مقال | ✍️ ' + authors.length + ' كاتب | 🗂️ ' + categories.length + ' تبويبة';
         } catch(e) {
@@ -512,8 +512,8 @@
     // ==========================================
     window.loadCategories = async function() {
         try {
-            const snap = await db.collection('categories').orderBy('name').get();
-            categories = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+            var snap = await db.collection('categories').orderBy('name').get();
+            categories = snap.docs.map(function(d) { return { id: d.id, ...d.data() }; });
             renderCatsList(); 
             updateCatSelects();
         } catch(e) {
@@ -522,20 +522,20 @@
     };
     
     window.renderCatsList = function() {
-        const div = document.getElementById('catsList');
+        var div = document.getElementById('catsList');
         if (!categories.length) { 
             div.innerHTML = '<p style="color:#888;">لا توجد تبويبات</p>'; 
             return; 
         }
         div.innerHTML = '';
-        categories.forEach(cat => {
-            const subs = cat.subfields || [];
-            const el = document.createElement('div');
+        categories.forEach(function(cat) {
+            var subs = cat.subfields || [];
+            var el = document.createElement('div');
             el.style.cssText = 'background:#12141E; border-radius:1rem; padding:1rem; margin-bottom:1rem; border:1px solid #1e1e2a;';
             
-            let subsHtml = '';
-            subs.forEach(s => {
-                subsHtml += '<span class="sub-item">' + escapeHtml(s) + ' <i class="fas fa-times-circle" onclick="removeSub(\'' + cat.id + '\',\'' + escapeHtml(s).replace(/'/g, "\\'") + '\')"></i></span>';
+            var subsHtml = '';
+            subs.forEach(function(s) {
+                subsHtml += '<span class="sub-item">' + escapeHtml(s) + ' <i class="fas fa-times-circle" onclick="removeSub(\'' + cat.id + '\',\'' + s.replace(/'/g, "\\'") + '\')"></i></span>';
             });
             
             el.innerHTML = 
@@ -563,12 +563,12 @@
     };
     
     window.addSub = async function(catId) {
-        const input = document.getElementById('sub-' + catId);
-        const val = input.value.trim();
+        var input = document.getElementById('sub-' + catId);
+        var val = input.value.trim();
         if(!val) return;
         try {
-            const cat = categories.find(c => c.id === catId);
-            const newSubs = [...(cat.subfields || []), val];
+            var cat = categories.find(function(c) { return c.id === catId; });
+            var newSubs = [...(cat.subfields || []), val];
             await db.collection('categories').doc(catId).update({ subfields: newSubs });
             input.value = '';
             loadCategories();
@@ -579,8 +579,8 @@
     
     window.removeSub = async function(catId, subName) {
         try {
-            const cat = categories.find(c => c.id === catId);
-            const newSubs = (cat.subfields || []).filter(s => s !== subName);
+            var cat = categories.find(function(c) { return c.id === catId; });
+            var newSubs = (cat.subfields || []).filter(function(s) { return s !== subName; });
             await db.collection('categories').doc(catId).update({ subfields: newSubs });
             loadCategories();
         } catch(e) {
@@ -588,11 +588,11 @@
         }
     };
     
-    document.getElementById('addCatBtn').onclick = async () => {
-        const name = document.getElementById('newCatName').value.trim();
+    document.getElementById('addCatBtn').onclick = async function() {
+        var name = document.getElementById('newCatName').value.trim();
         if(!name) return;
         try {
-            await db.collection('categories').add({ name, subfields: [] });
+            await db.collection('categories').add({ name: name, subfields: [] });
             document.getElementById('newCatName').value = '';
             loadCategories();
         } catch(e) {
@@ -601,32 +601,30 @@
     };
     
     window.updateCatSelects = function() {
-        const catSel = document.getElementById('catSelect');
-        const subSel = document.getElementById('subSelect');
-        const currentCat = catSel.value;
+        var catSel = document.getElementById('catSelect');
+        var subSel = document.getElementById('subSelect');
+        var currentCat = catSel.value;
         
         catSel.innerHTML = '<option value="">اختر التبويبة</option>';
-        categories.forEach(c => {
+        categories.forEach(function(c) {
             catSel.innerHTML += '<option value="' + escapeHtml(c.name) + '">' + escapeHtml(c.name) + '</option>';
         });
         
-        // Restore selection if still valid
-        if(currentCat && categories.find(c => c.name === currentCat)) {
+        if(currentCat && categories.find(function(c) { return c.name === currentCat; })) {
             catSel.value = currentCat;
         }
         
         catSel.onchange = function() {
-            const catName = catSel.value;
-            const cat = categories.find(c => c.name === catName);
+            var catName = catSel.value;
+            var cat = categories.find(function(c) { return c.name === catName; });
             subSel.innerHTML = '<option value="">اختر الفرع (اختياري)</option>';
             if(cat && cat.subfields) {
-                cat.subfields.forEach(s => {
+                cat.subfields.forEach(function(s) {
                     subSel.innerHTML += '<option value="' + escapeHtml(s) + '">' + escapeHtml(s) + '</option>';
                 });
             }
         };
         
-        // Trigger change to populate subSelect
         if(catSel.value) catSel.onchange();
     };
 
@@ -635,8 +633,8 @@
     // ==========================================
     window.loadAuthors = async function() {
         try {
-            const snap = await db.collection('authors').orderBy('name').get();
-            authors = snap.docs.map(d => ({ id: d.id, name: d.data().name }));
+            var snap = await db.collection('authors').orderBy('name').get();
+            authors = snap.docs.map(function(d) { return { id: d.id, name: d.data().name }; });
             renderAuthorsList(); 
             updateAuthorSelect(); 
             updateStats();
@@ -646,17 +644,17 @@
     };
     
     window.renderAuthorsList = function() {
-        const div = document.getElementById('authorsList');
+        var div = document.getElementById('authorsList');
         if(!authors.length) { 
             div.innerHTML = '<p style="color:#888;">لا يوجد كتاب</p>'; 
             return; 
         }
-        div.innerHTML = authors.map(a => 
-            '<div class="flex-row" style="justify-content:space-between; padding:0.5rem 0; border-bottom:1px dashed #222;">' +
+        div.innerHTML = authors.map(function(a) {
+            return '<div class="flex-row" style="justify-content:space-between; padding:0.5rem 0; border-bottom:1px dashed #222;">' +
                 '<span><i class="fas fa-user-edit" style="color:#D4AF37;"></i> ' + escapeHtml(a.name) + '</span>' +
                 '<button class="btn-outline btn-sm" onclick="deleteAuthor(\'' + a.id + '\')"><i class="fas fa-trash"></i></button>' +
-            '</div>'
-        ).join('');
+            '</div>';
+        }).join('');
     };
     
     window.deleteAuthor = async function(id) { 
@@ -669,11 +667,11 @@
         }
     };
     
-    document.getElementById('addAuthorBtn').onclick = async () => {
-        const name = document.getElementById('newAuthorName').value.trim();
+    document.getElementById('addAuthorBtn').onclick = async function() {
+        var name = document.getElementById('newAuthorName').value.trim();
         if(!name) return;
         try {
-            await db.collection('authors').add({ name });
+            await db.collection('authors').add({ name: name });
             document.getElementById('newAuthorName').value = '';
             loadAuthors();
         } catch(e) {
@@ -682,13 +680,13 @@
     };
     
     window.updateAuthorSelect = function() { 
-        const sel = document.getElementById('authorSelect');
-        const currentAuthor = sel.value;
+        var sel = document.getElementById('authorSelect');
+        var currentAuthor = sel.value;
         sel.innerHTML = '<option value="">اختر الكاتب</option>';
-        authors.forEach(a => {
+        authors.forEach(function(a) {
             sel.innerHTML += '<option value="' + escapeHtml(a.name) + '">' + escapeHtml(a.name) + '</option>';
         });
-        if(currentAuthor && authors.find(a => a.name === currentAuthor)) {
+        if(currentAuthor && authors.find(function(a) { return a.name === currentAuthor; })) {
             sel.value = currentAuthor;
         }
     };
@@ -697,10 +695,10 @@
     // Editor Blocks
     // ==========================================
     window.addBlock = function(type) {
-        if(type === 'text') blocks.push({ type, value: '<p>اكتب نصك هنا... يمكنك استخدام <strong>HTML</strong></p>' });
-        else if(type === 'image') blocks.push({ type, value: { url: '', caption: '' } });
-        else if(type === 'code') blocks.push({ type, value: { code: '// اكتب كودك هنا', language: 'javascript' } });
-        else if(type === 'summary') blocks.push({ type, value: 'ملخص المقال...' });
+        if(type === 'text') blocks.push({ type: type, value: '<p>اكتب نصك هنا... يمكنك استخدام <strong>HTML</strong></p>' });
+        else if(type === 'image') blocks.push({ type: type, value: { url: '', caption: '' } });
+        else if(type === 'code') blocks.push({ type: type, value: { code: '// اكتب كودك هنا', language: 'javascript' } });
+        else if(type === 'summary') blocks.push({ type: type, value: 'ملخص المقال...' });
         renderBlocks(); 
         saveBlocksToLocal();
     };
@@ -720,20 +718,20 @@
     };
     
     window.uploadImage = async function(idx, fileInput) {
-        const file = fileInput.files[0];
+        var file = fileInput.files[0];
         if(!file) return;
         if(file.size > 5 * 1024 * 1024) {
             showMsg('publishMsg', '❌ حجم الصورة يجب أن يكون أقل من 5 ميجابايت', 'error');
             return;
         }
-        const btn = fileInput.parentElement.querySelector('button');
-        const originalHtml = btn.innerHTML;
+        var btn = fileInput.parentElement.querySelector('button');
+        var originalHtml = btn.innerHTML;
         btn.innerHTML = '<span class="spinner"></span> رفع...';
         
         try {
-            const ref = storage.ref('articles/' + Date.now() + '_' + file.name);
+            var ref = storage.ref('articles/' + Date.now() + '_' + file.name);
             await ref.put(file);
-            const url = await ref.getDownloadURL();
+            var url = await ref.getDownloadURL();
             blocks[idx].value.url = url;
             saveBlocksToLocal();
             renderBlocks();
@@ -745,28 +743,28 @@
     };
     
     window.renderBlocks = function() {
-        const container = document.getElementById('blocksEditor');
+        var container = document.getElementById('blocksEditor');
         if(!blocks.length) { 
             container.innerHTML = '<div style="text-align:center; color:#888; padding:2rem; border:2px dashed #2a2a35; border-radius:1rem;"><i class="fas fa-plus-circle" style="font-size:2rem; margin-bottom:0.5rem; display:block;"></i>أضف كتلة محتوى بالأزرار أدناه</div>'; 
             return; 
         }
         
         container.innerHTML = '';
-        blocks.forEach((block, idx) => {
-            const div = document.createElement('div');
+        blocks.forEach(function(block, idx) {
+            var div = document.createElement('div');
             div.className = 'block';
             div.setAttribute('data-idx', idx);
             div.setAttribute('data-block', JSON.stringify(block));
             
-            const typeLabels = {
+            var typeLabels = {
                 text: { icon: 'fa-paragraph', label: 'نص' },
                 image: { icon: 'fa-image', label: 'صورة' },
                 code: { icon: 'fa-code', label: 'كود' },
                 summary: { icon: 'fa-lightbulb', label: 'مختصر' }
             };
-            const t = typeLabels[block.type];
+            var t = typeLabels[block.type];
             
-            let inner = 
+            var inner = 
                 '<div class="block-header">' +
                     '<span class="block-type-label"><i class="fas ' + t.icon + '"></i> ' + t.label + '</span>' +
                     '<button class="delete-block" onclick="deleteBlock(' + idx + ')"><i class="fas fa-trash"></i></button>' +
@@ -788,7 +786,7 @@
             }
             else if(block.type === 'code') {
                 inner += '<select onchange="updateBlockValue(' + idx + ', \'language\', this.value)" style="margin-bottom:0.5rem; width:auto;">';
-                languages.forEach(l => {
+                languages.forEach(function(l) {
                     inner += '<option value="' + l + '"' + (block.value.language === l ? ' selected' : '') + '>' + l + '</option>';
                 });
                 inner += '</select>';
@@ -803,7 +801,7 @@
             container.appendChild(div);
             
             if(block.type === 'code') {
-                const codeBlock = div.querySelector('pre code');
+                var codeBlock = div.querySelector('pre code');
                 if(codeBlock && window.hljs) hljs.highlightElement(codeBlock);
             }
         });
@@ -820,14 +818,13 @@
     };
     
     window.syncBlocksOrder = function() {
-        const newBlocks = [];
-        document.querySelectorAll('.block').forEach(el => {
-            const blockData = JSON.parse(el.getAttribute('data-block') || '{}');
+        var newBlocks = [];
+        document.querySelectorAll('.block').forEach(function(el) {
+            var blockData = JSON.parse(el.getAttribute('data-block') || '{}');
             newBlocks.push(blockData);
         });
         blocks = newBlocks;
-        // Update indices for next render
-        document.querySelectorAll('.block').forEach((el, i) => {
+        document.querySelectorAll('.block').forEach(function(el, i) {
             el.setAttribute('data-idx', i);
             el.setAttribute('data-block', JSON.stringify(blocks[i]));
         });
@@ -835,11 +832,11 @@
     };
     
     window.saveBlocksToLocal = function() { 
-        localStorage.setItem('admin_blocks', JSON.stringify(blocks)); 
+        localStorage.setItem('shnfr_admin_blocks', JSON.stringify(blocks)); 
     };
     
     window.loadBlocksFromLocal = function() { 
-        const saved = localStorage.getItem('admin_blocks'); 
+        var saved = localStorage.getItem('shnfr_admin_blocks'); 
         if(saved) {
             try {
                 blocks = JSON.parse(saved); 
@@ -855,9 +852,9 @@
     // AI Functions
     // ==========================================
     window.saveApiKey = function() {
-        const key = document.getElementById('aiApiKey').value.trim();
+        var key = document.getElementById('aiApiKey').value.trim();
         if(key) {
-            localStorage.setItem('awj_openai_key', key);
+            localStorage.setItem('shnfr_openai_key', key);
             apiKey = key;
             showMsg('aiKeyMsg', '✅ تم حفظ المفتاح محلياً', 'success');
         } else {
@@ -866,7 +863,7 @@
     };
     
     window.clearApiKey = function() {
-        localStorage.removeItem('awj_openai_key');
+        localStorage.removeItem('shnfr_openai_key');
         apiKey = '';
         document.getElementById('aiApiKey').value = '';
         showMsg('aiKeyMsg', '✅ تم مسح المفتاح', 'info');
@@ -879,7 +876,7 @@
             return null;
         }
         try {
-            const res = await fetch('https://api.openai.com/v1/chat/completions', {
+            var res = await fetch('https://api.openai.com/v1/chat/completions', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -892,7 +889,7 @@
                     temperature: 0.7
                 })
             });
-            const data = await res.json();
+            var data = await res.json();
             if(data.error) throw new Error(data.error.message);
             return data.choices[0].message.content.trim();
         } catch(e) {
@@ -902,18 +899,18 @@
     };
     
     window.generateTitleAI = async function() {
-        const currentTitle = document.getElementById('articleTitle').value;
-        const textBlocks = blocks.filter(b => b.type === 'text').map(b => stripHtml(b.value)).join(' ').slice(0, 500);
+        var currentTitle = document.getElementById('articleTitle').value;
+        var textBlocks = blocks.filter(function(b) { return b.type === 'text'; }).map(function(b) { return stripHtml(b.value); }).join(' ').slice(0, 500);
         if(!textBlocks && !currentTitle) {
             showMsg('publishMsg', '❌ أضف نصاً أولاً لتوليد عنوان', 'error');
             return;
         }
-        const btn = document.getElementById('generateTitleBtn');
+        var btn = document.getElementById('generateTitleBtn');
         btn.classList.add('btn-loading');
         btn.innerHTML = '<span class="spinner"></span> جاري التوليد...';
         
-        const prompt = 'ولّد عنواناً قصيراً وجاذباً (5-7 كلمات) لمقال يتحدث عن: ' + (currentTitle || textBlocks) + '. باللغة العربية الفصحى.';
-        const title = await callOpenAI(prompt, 50);
+        var prompt = 'ولّد عنواناً قصيراً وجاذباً (5-7 كلمات) لمقال يتحدث عن: ' + (currentTitle || textBlocks) + '. باللغة العربية الفصحى.';
+        var title = await callOpenAI(prompt, 50);
         
         btn.classList.remove('btn-loading');
         btn.innerHTML = '<i class="fas fa-magic"></i> ولّد عنوان';
@@ -925,23 +922,23 @@
     };
     
     window.generateSummaryAI = async function() {
-        const textBlocks = blocks.filter(b => b.type === 'text').map(b => stripHtml(b.value)).join(' ').slice(0, 1500);
+        var textBlocks = blocks.filter(function(b) { return b.type === 'text'; }).map(function(b) { return stripHtml(b.value); }).join(' ').slice(0, 1500);
         if(!textBlocks) {
             showMsg('publishMsg', '❌ أضف نصوصاً أولاً لتوليد ملخص', 'error');
             return;
         }
-        const btn = document.getElementById('generateSummaryBtn');
+        var btn = document.getElementById('generateSummaryBtn');
         btn.classList.add('btn-loading');
         btn.innerHTML = '<span class="spinner"></span> جاري التوليد...';
         
-        const prompt = 'ولّد ملخصاً موجزاً (3-4 أسطر) للنص التالي باللغة العربية الفصحى:\n\n' + textBlocks;
-        const summary = await callOpenAI(prompt, 200);
+        var prompt = 'ولّد ملخصاً موجزاً (3-4 أسطر) للنص التالي باللغة العربية الفصحى:\n\n' + textBlocks;
+        var summary = await callOpenAI(prompt, 200);
         
         btn.classList.remove('btn-loading');
         btn.innerHTML = '<i class="fas fa-brain"></i> ولّد ملخصاً';
         
         if(summary) {
-            const existingSummary = blocks.findIndex(b => b.type === 'summary');
+            var existingSummary = blocks.findIndex(function(b) { return b.type === 'summary'; });
             if(existingSummary >= 0) {
                 blocks[existingSummary].value = summary;
             } else {
@@ -957,16 +954,16 @@
     // Preview
     // ==========================================
     window.previewArticle = function() {
-        const title = document.getElementById('articleTitle').value || 'بدون عنوان';
-        const author = document.getElementById('authorSelect').value || 'غير معروف';
+        var title = document.getElementById('articleTitle').value || 'بدون عنوان';
+        var author = document.getElementById('authorSelect').value || 'غير معروف';
         
-        let html = 
+        var html = 
             '<h1 style="color:#D4AF37; margin-bottom:1rem;">' + escapeHtml(title) + '</h1>' +
             '<div style="color:#888; margin-bottom:2rem; border-bottom:1px solid #2a2a35; padding-bottom:1rem;">' +
                 '<i class="fas fa-user"></i> ' + escapeHtml(author) +
             '</div>';
         
-        blocks.forEach(block => {
+        blocks.forEach(function(block) {
             if(block.type === 'text') html += '<div style="margin:1rem 0; line-height:1.8;">' + block.value + '</div>';
             if(block.type === 'image' && block.value.url) {
                 html += '<div style="text-align:center; margin:1.5rem 0;">' +
@@ -988,7 +985,7 @@
         document.getElementById('previewOverlay').classList.add('show');
         document.body.style.overflow = 'hidden';
         
-        document.querySelectorAll('#previewBody pre code').forEach(block => {
+        document.querySelectorAll('#previewBody pre code').forEach(function(block) {
             if(window.hljs) hljs.highlightElement(block);
         });
     };
@@ -1001,40 +998,39 @@
     // ==========================================
     // Publish
     // ==========================================
-    document.getElementById('publishBtn').onclick = async () => {
-        // Blur any active input to save values
+    document.getElementById('publishBtn').onclick = async function() {
         if(document.activeElement && document.activeElement.blur) {
             document.activeElement.blur();
         }
         
-        const title = document.getElementById('articleTitle').value.trim();
-        const author = document.getElementById('authorSelect').value;
-        const cat = document.getElementById('catSelect').value;
-        const sub = document.getElementById('subSelect').value;
+        var title = document.getElementById('articleTitle').value.trim();
+        var author = document.getElementById('authorSelect').value;
+        var cat = document.getElementById('catSelect').value;
+        var sub = document.getElementById('subSelect').value;
         
         if(!title || !author || !cat || blocks.length === 0) {
             showMsg('publishMsg', '❌ العنوان والكاتب والتبويبة وكتلة واحدة على الأقل مطلوبة', 'error'); 
             return;
         }
         
-        const btn = document.getElementById('publishBtn');
+        var btn = document.getElementById('publishBtn');
         btn.classList.add('btn-loading');
         btn.innerHTML = '<span class="spinner"></span> جاري النشر...';
         
-        const cleanBlocks = blocks.map(b => {
+        var cleanBlocks = blocks.map(function(b) {
             if(b.type === 'image') return { type:'image', value:{ url: b.value.url, caption: b.value.caption || '' } };
             return b;
         });
         
         try {
             await db.collection('articles').add({
-                title, author, category: cat, subfield: sub || '',
+                title: title, author: author, category: cat, subfield: sub || '',
                 contentBlocks: cleanBlocks, views: 0,
                 date: firebase.firestore.FieldValue.serverTimestamp()
             });
             showMsg('publishMsg', '✅ نشر المقال بنجاح', 'success');
             blocks = []; 
-            localStorage.removeItem('admin_blocks');
+            localStorage.removeItem('shnfr_admin_blocks');
             document.getElementById('articleTitle').value = '';
             renderBlocks();
             updateStats();
@@ -1046,16 +1042,16 @@
         }
     };
     
-    document.getElementById('saveDraftBtn').onclick = () => {
+    document.getElementById('saveDraftBtn').onclick = function() {
         saveBlocksToLocal();
         showMsg('publishMsg', '💾 تم حفظ المسودة محلياً', 'info');
     };
     
     // Block buttons
-    document.getElementById('addTextBtn').onclick = () => addBlock('text');
-    document.getElementById('addImageBtn').onclick = () => addBlock('image');
-    document.getElementById('addCodeBtn').onclick = () => addBlock('code');
-    document.getElementById('addSummaryBtn').onclick = () => addBlock('summary');
+    document.getElementById('addTextBtn').onclick = function() { addBlock('text'); };
+    document.getElementById('addImageBtn').onclick = function() { addBlock('image'); };
+    document.getElementById('addCodeBtn').onclick = function() { addBlock('code'); };
+    document.getElementById('addSummaryBtn').onclick = function() { addBlock('summary'); };
     
     // AI buttons
     document.getElementById('generateTitleBtn').onclick = generateTitleAI;
@@ -1066,7 +1062,7 @@
     document.getElementById('closePreviewBtn').onclick = closePreview;
     
     // Keyboard shortcuts
-    document.addEventListener('keydown', (e) => {
+    document.addEventListener('keydown', function(e) {
         if (e.ctrlKey && e.key === 's') {
             e.preventDefault();
             if(document.getElementById('adminPanel').style.display !== 'none') {

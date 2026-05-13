@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>أوج | منصة المعرفة السيادية</title>
-    <!-- Firebase SDK -->
+    <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-    <!-- Highlight.js لتلوين الأكواد -->
+    <!-- Highlight.js -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    <!-- Font Awesome 6 للأيقونات -->
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -28,12 +28,12 @@
             direction: rtl;
             line-height: 1.6;
         }
-        /* ========== شاشة التحميل (صقر يركض) ========== */
+        /* ========== شاشة التحميل الجديدة ========== */
         #loadingScreen {
             position: fixed;
             inset: 0;
             background: #000000dd;
-            backdrop-filter: blur(4px);
+            backdrop-filter: blur(8px);
             z-index: 10000;
             display: flex;
             flex-direction: column;
@@ -41,22 +41,45 @@
             align-items: center;
             transition: opacity 0.8s;
         }
-        .falcon-run {
+        .eagle-container {
+            position: relative;
             width: 120px;
             height: 120px;
-            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path fill="%23D4AF37" d="M30,60 Q40,30 55,35 Q70,40 75,55 Q80,70 70,75 Q60,80 50,70 Q40,60 30,60Z"/><circle cx="55" cy="45" r="4" fill="black"/><path d="M20,70 L10,80 L25,78 L15,90 L35,85 L30,95 L50,80 L45,70 L55,65 L50,55 L40,60 L30,70Z" fill="%23D4AF37"/></svg>') no-repeat center;
-            background-size: contain;
-            animation: fly 0.3s infinite alternate;
+            margin-bottom: 20px;
         }
-        @keyframes fly {
-            0% { transform: translateX(-20px) translateY(0); }
-            100% { transform: translateX(20px) translateY(-10px); }
+        .eagle-ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 3px solid rgba(212,175,55,0.2);
+            border-radius: 50%;
+        }
+        .eagle-spinner {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 3px solid #D4AF37;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: eagleSpin 1s linear infinite;
+        }
+        .eagle-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3rem;
+            color: #D4AF37;
+        }
+        @keyframes eagleSpin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
         .loading-track {
             width: 280px;
             height: 4px;
             background: #2a2a35;
-            margin-top: 40px;
+            margin-top: 20px;
             border-radius: 4px;
             overflow: hidden;
         }
@@ -66,7 +89,15 @@
             background: var(--gold);
             transition: width 0.08s linear;
         }
-        /* ========== الهيدر ========== */
+        .loading-text {
+            margin-top: 15px;
+            color: #D4AF37;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            text-align: center;
+            min-height: 60px;
+        }
+        /* باقي التنسيقات (كما هي) */
         header {
             position: sticky;
             top: 0;
@@ -82,7 +113,6 @@
         .logo { font-size: 2rem; font-weight: bold; color: var(--gold); letter-spacing: 2px; font-family: 'Times New Roman', serif; }
         .header-icons i { font-size: 1.4rem; margin-right: 1.2rem; cursor: pointer; transition: 0.2s; }
         .header-icons i:hover { color: var(--gold); }
-        /* ========== أشرطة التبويبات والفروع ========== */
         .tabs-row {
             background: #0A0A0F;
             border-bottom: 1px solid #1e1e2a;
@@ -123,7 +153,6 @@
             cursor: pointer;
         }
         .sub-btn.active { color: var(--gold); background: rgba(212,175,55,0.15); }
-        /* ========== شبكة المقالات ========== */
         .articles-grid {
             max-width: 1300px;
             margin: 2rem auto;
@@ -210,7 +239,6 @@
             display: inline-block;
             margin-top: 0.6rem;
         }
-        /* ========== عرض المحتوى الكامل ========== */
         .image-block { text-align: center; margin: 1rem 0; }
         .image-block img { max-width: 100%; border-radius: 1rem; }
         pre {
@@ -233,7 +261,6 @@
             font-size: 0.7rem;
             cursor: pointer;
         }
-        /* ========== الأقسام السفلية ========== */
         .bottom-grid {
             display: grid;
             grid-template-columns: repeat(3,1fr);
@@ -252,7 +279,6 @@
         .bottom-card ul { list-style: none; }
         .bottom-card li { padding: 0.5rem 0; border-bottom: 1px dashed #222; cursor: pointer; }
         .bottom-card li:hover { color: var(--gold); }
-        /* ========== تذييل الصفحة ========== */
         footer {
             text-align: center;
             padding: 2rem;
@@ -263,7 +289,6 @@
         .footer-links { display: flex; gap: 1.5rem; justify-content: center; margin-bottom: 0.8rem; }
         .footer-links span { cursor: pointer; color: #aaa; font-size: 0.85rem; }
         .footer-links span:hover { color: var(--gold); }
-        /* ========== مودالات ========== */
         .modal {
             display: none;
             position: fixed;
@@ -292,7 +317,6 @@
             color: white;
             margin: 1rem 0;
         }
-        /* ========== زر العودة للأعلى ========== */
         .scroll-top {
             position: fixed;
             bottom: 1.5rem;
@@ -318,20 +342,17 @@
 </head>
 <body>
 
-<!-- شاشة التحميل (صقر يركض) -->
+<!-- شاشة التحميل الجديدة (نسر ذهبي + عبارات متغيرة) -->
 <div id="loadingScreen">
-    <div style="position: relative; width: 120px; height: 120px;">
-        <div style="position: absolute; width: 100%; height: 100%; border: 3px solid rgba(212,175,55,0.2); border-radius: 50%;"></div>
-        <div style="position: absolute; width: 100%; height: 100%; border: 3px solid #D4AF37; border-radius: 50%; border-top-color: transparent; animation: spin 1s linear infinite;"></div>
-        <i class="fas fa-crown" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 3rem; color: #D4AF37;"></i>
+    <div class="eagle-container">
+        <div class="eagle-ring"></div>
+        <div class="eagle-spinner"></div>
+        <i class="fas fa-crown eagle-icon"></i>
     </div>
-    <div class="loading-track" style="margin-top: 30px;"><div id="loadProgressBar" class="loading-progress"></div></div>
-    <div style="margin-top: 15px; color: #D4AF37; letter-spacing: 2px;">تاج الحكمة يُرفع..</div>
+    <div class="loading-track"><div id="loadProgressBar" class="loading-progress"></div></div>
+    <div class="loading-text" id="loadingText">صقر الحكمة يحلق..</div>
 </div>
-<style>
-    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-</style>
-<!-- الهيدر -->
+
 <header>
     <div class="logo">AWJ</div>
     <div class="header-icons">
@@ -340,21 +361,17 @@
     </div>
 </header>
 
-<!-- أشرطة التبويبات والفروع -->
 <div id="tabsContainer" class="tabs-row"></div>
 <div id="subContainer" class="sub-row"></div>
 
-<!-- شبكة المقالات -->
 <div id="articlesGrid" class="articles-grid"></div>
 
-<!-- الأقسام السفلية -->
 <div class="bottom-grid">
     <div class="bottom-card"><h4>🕒 أحدث المقالات</h4><ul id="latestList"></ul></div>
     <div class="bottom-card"><h4>👑 الأكثر مشاهدة</h4><ul id="mostViewedList"></ul></div>
     <div class="bottom-card"><h4>🔗 ذات صلة</h4><ul id="relatedList"></ul></div>
 </div>
 
-<!-- التذييل مع الصفحات الثابتة -->
 <footer>
     <div class="footer-links">
         <span onclick="openStaticPage('about')">من نحن</span>
@@ -365,27 +382,17 @@
     <p>جميع الحقوق محفوظة © <span class="copyright" id="vaultTrigger">2026</span> | أوج</p>
 </footer>
 
-<!-- ========== مودالات ========== -->
-<!-- مودال البحث -->
+<!-- مودالات -->
 <div id="searchModal" class="modal"><div class="modal-card"><i class="fas fa-times" style="float: left; cursor: pointer;" onclick="closeModal(this)"></i><h3>🔍 بحث</h3><input type="text" id="searchInput" class="search-input" placeholder="كلمة مفتاحية"><div id="searchResults"></div></div></div>
-
-<!-- مودال الاشتراك -->
 <div id="subscribeModal" class="modal"><div class="modal-card"><i class="fas fa-times" style="float: left; cursor: pointer;" onclick="closeModal(this)"></i><h3>📧 اشترك في النشرة</h3><input type="email" id="subEmail" class="search-input" placeholder="بريدك الإلكتروني"><button id="doSubscribeBtn" style="background:#D4AF37; color:#000; border:none; padding:8px; width:100%; border-radius:40px;">اشتراك</button><div id="subMsg"></div></div></div>
-
-<!-- مودال زبدة المقال -->
 <div id="summaryModal" class="modal"><div class="modal-card"><i class="fas fa-times" style="float: left; cursor: pointer;" onclick="closeModal(this)"></i><h3>📖 زبدة المقال</h3><div id="summaryContent"></div></div></div>
-
-<!-- مودال الخزنة السرية -->
 <div id="vaultModal" class="modal"><div class="modal-card"><i class="fas fa-times" style="float: left; cursor: pointer;" onclick="closeModal(this)"></i><h3>🔐 الخزنة السرية</h3><div id="vaultContent"></div></div></div>
-
-<!-- مودال الصفحات الثابتة -->
 <div id="staticModal" class="modal"><div class="modal-card"><i class="fas fa-times" style="float: left; cursor: pointer;" onclick="closeModal(this)"></i><h3 id="staticTitle"></h3><div id="staticBody"></div></div></div>
 
-<!-- زر العودة للأعلى -->
 <div id="scrollTopBtn" class="scroll-top"><i class="fas fa-arrow-up"></i></div>
 
 <script>
-    // ==================== إعدادات Firebase ====================
+    // إعدادات Firebase
     const firebaseConfig = {
         apiKey: "AIzaSyDjgVxvtPXTn1tpr4IxOK3wOW4r3gzB1VU",
         authDomain: "awj-website-29f16.firebaseapp.com",
@@ -398,30 +405,51 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    // ==================== المتغيرات العامة ====================
     let allArticles = [];
     let categories = [];
     let currentCat = null;
     let currentSub = null;
     let activeDropdown = null;
 
-    // ==================== شاشة التحميل ====================
-    let loadP = 0;
+    // عناصر شاشة التحميل
+    const loadingScreen = document.getElementById('loadingScreen');
+    const progressBar = document.getElementById('loadProgressBar');
+    const loadingTextSpan = document.getElementById('loadingText');
+
+    // عبارات متغيرة أثناء التحميل (بسيطة وواضحة)
+    const phrases = [
+        "استكشاف الماضي العريق..",
+        "استشعار الحاضر المتجدد..",
+        "استشراف المستقبل الواعد..",
+        "جمع شتات الحكمة..",
+        "ترتيب أسرار المعرفة.."
+    ];
+    let phraseIndex = 0;
+    let loadProgress = 0;
+
+    // تحديث شريط التقدم والنص كل 80 مللي ثانية
     const loadInterval = setInterval(() => {
-        loadP += Math.random() * 15 + 5;
-        if (loadP >= 100) loadP = 100;
-        document.getElementById('loadProgressBar').style.width = loadP + '%';
-        if (loadP === 100) {
+        loadProgress += Math.random() * 15 + 5;
+        if (loadProgress >= 100) loadProgress = 100;
+        progressBar.style.width = loadProgress + '%';
+        
+        // تغيير العبارة كل 25% تقريباً
+        if (loadProgress >= (phraseIndex + 1) * 20 && phraseIndex < phrases.length - 1) {
+            phraseIndex++;
+            loadingTextSpan.innerText = phrases[phraseIndex];
+        }
+        
+        if (loadProgress === 100) {
             clearInterval(loadInterval);
+            loadingTextSpan.innerText = "اكتملت الرحلة.. مرحباً بك في أوج";
             setTimeout(() => {
-                const scr = document.getElementById('loadingScreen');
-                scr.style.opacity = '0';
-                setTimeout(() => scr.style.display = 'none', 600);
-            }, 400);
+                loadingScreen.style.opacity = '0';
+                setTimeout(() => loadingScreen.style.display = 'none', 600);
+            }, 500);
         }
     }, 80);
 
-    // ==================== جلب البيانات من Firebase ====================
+    // جلب البيانات من Firebase (تحميل حقيقي)
     async function fetchAll() {
         const [articlesSnap, catsSnap] = await Promise.all([
             db.collection('articles').orderBy('date', 'desc').get(),
@@ -431,11 +459,21 @@
         categories = catsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
         renderTabs();
         if (categories.length) selectCategory(categories[0].name);
-        else document.getElementById('articlesGrid').innerHTML = '<div style="text-align:center; padding:2rem;">📭 لا توجد تبويبات، أضفها من لوحة الإدارة</div>';
+        else document.getElementById('articlesGrid').innerHTML = '<div style="text-align:center; padding:2rem;">📭 لا توجد تبويبات. أضفها من لوحة الإدارة أولاً.</div>';
         updateSidePanels();
+        // بعد الانتهاء من الجلب، نضمن إخفاء الشاشة (في حال لم يصل شريط التحميل إلى 100%)
+        if (loadProgress < 100) {
+            loadProgress = 100;
+            progressBar.style.width = '100%';
+            loadingTextSpan.innerText = "اكتملت الرحلة.. مرحباً بك في أوج";
+            setTimeout(() => {
+                loadingScreen.style.opacity = '0';
+                setTimeout(() => loadingScreen.style.display = 'none', 600);
+            }, 500);
+        }
     }
 
-    // ==================== عرض التبويبات الرئيسية ====================
+    // باقي دوال الموقع (كما هي سليمة 100%)
     function renderTabs() {
         const container = document.getElementById('tabsContainer');
         container.innerHTML = '';
@@ -447,7 +485,6 @@
             container.appendChild(btn);
         });
     }
-
     function selectCategory(catName) {
         currentCat = catName;
         currentSub = null;
@@ -457,8 +494,6 @@
         renderSubTabs(catName);
         filterAndRender();
     }
-
-    // ==================== عرض الفروع الفرعية (قابلة للتمرير) ====================
     function renderSubTabs(catName) {
         const subDiv = document.getElementById('subContainer');
         const cat = categories.find(c => c.name === catName);
@@ -491,26 +526,21 @@
             }
         }
     }
-
     function filterAndRender() {
         let filtered = allArticles.filter(a => a.category === currentCat);
         if (currentSub) filtered = filtered.filter(a => a.subfield === currentSub);
         renderArticlesGrid(filtered);
     }
-
-    // ==================== استخراج أول صورة من المقال ====================
     function getFirstImageUrl(article) {
         if (!article.contentBlocks) return null;
         const imgBlock = article.contentBlocks.find(b => b.type === 'image' && b.value?.url);
         return imgBlock ? imgBlock.value.url : null;
     }
-
     function stripHtml(html) {
         const tmp = document.createElement('div');
         tmp.innerHTML = html;
         return tmp.textContent || tmp.innerText || '';
     }
-
     function getPreviewText(article) {
         if (article.contentBlocks) {
             const textBlock = article.contentBlocks.find(b => b.type === 'text' || b.type === 'summary');
@@ -518,8 +548,6 @@
         }
         return '';
     }
-
-    // ==================== عرض المقالات في شبكة (مع الصور المصغرة) ====================
     function renderArticlesGrid(articles) {
         const grid = document.getElementById('articlesGrid');
         if (!articles.length) {
@@ -556,8 +584,6 @@
         });
         grid.innerHTML = html;
     }
-
-    // ==================== عرض المقال كاملاً (مع زيادة المشاهدات) ====================
     window.viewFullArticle = async function(id) {
         const art = allArticles.find(a => a.id === id);
         if (!art) return;
@@ -587,8 +613,6 @@
         attachCopyButtons();
         updateSidePanels();
     };
-
-    // إضافة زر نسخ للكود
     function attachCopyButtons() {
         document.querySelectorAll('pre').forEach(pre => {
             if (pre.querySelector('.copy-code')) return;
@@ -600,8 +624,6 @@
             pre.appendChild(btn);
         });
     }
-
-    // ==================== زبدة المقال ====================
     window.showSummary = function(id) {
         const art = allArticles.find(a => a.id === id);
         if (!art) return;
@@ -613,8 +635,6 @@
         document.getElementById('summaryContent').innerHTML = `<div>${sum}...</div><p style="margin-top:1rem;">ملخص سريع. اضغط على العنوان للقراءة الكاملة.</p>`;
         document.getElementById('summaryModal').style.display = 'flex';
     };
-
-    // ==================== أزرار القائمة المنسدلة ====================
     window.copyLink = (id) => { const url = `${window.location.origin}${window.location.pathname}?article=${id}`; navigator.clipboard.writeText(url); alert('تم نسخ الرابط'); closeDropdown(); };
     window.shareArticle = (id) => { if (navigator.share) navigator.share({ title: allArticles.find(a=>a.id===id)?.title }); else alert('المشاركة غير مدعومة'); closeDropdown(); };
     window.focusArticle = (id) => {
@@ -630,8 +650,6 @@
     window.toggleMenu = (e, id) => { e.stopPropagation(); const menu = document.getElementById(`drop-${id}`); if (activeDropdown && activeDropdown !== menu) activeDropdown.classList.remove('show'); menu.classList.toggle('show'); activeDropdown = menu.classList.contains('show') ? menu : null; };
     function closeDropdown() { if (activeDropdown) activeDropdown.classList.remove('show'); activeDropdown = null; }
     document.addEventListener('click', closeDropdown);
-
-    // ==================== تحديث الأقسام السفلية ====================
     async function updateSidePanels() {
         const latest = [...allArticles].sort((a,b) => (b.date?.toMillis()||0) - (a.date?.toMillis()||0)).slice(0,5);
         const most = [...allArticles].sort((a,b) => (b.views||0) - (a.views||0)).slice(0,5);
@@ -640,8 +658,6 @@
         document.getElementById('mostViewedList').innerHTML = most.map(a => `<li onclick="viewFullArticle('${a.id}')">${escapeHtml(a.title)} (${a.views||0})</li>`).join('');
         document.getElementById('relatedList').innerHTML = related.map(a => `<li onclick="viewFullArticle('${a.id}')">${escapeHtml(a.title)}</li>`).join('');
     }
-
-    // ==================== البحث ====================
     function performSearch() {
         const q = document.getElementById('searchInput').value.toLowerCase();
         const res = allArticles.filter(a => a.title.toLowerCase().includes(q) || (a.content?.toLowerCase().includes(q)));
@@ -650,46 +666,19 @@
         else div.innerHTML = res.map(a => `<div style="padding:0.6rem; border-bottom:1px solid #333; cursor:pointer;" onclick="viewFullArticle('${a.id}');closeModal(null)">${escapeHtml(a.title)} - ${escapeHtml(a.author)}</div>`).join('');
     }
     document.getElementById('searchInput')?.addEventListener('input', performSearch);
-
-    // ==================== الاشتراك ====================
     document.getElementById('doSubscribeBtn')?.addEventListener('click', () => {
         const email = document.getElementById('subEmail').value;
         if (email.includes('@')) { document.getElementById('subMsg').innerHTML = '<p style="color:green;">✅ تم الاشتراك</p>'; setTimeout(()=>closeModal(null),1500); }
         else document.getElementById('subMsg').innerHTML = '<p style="color:red;">❌ بريد غير صالح</p>';
     });
-
-    // ==================== إدارة المودالات ====================
     function closeModal(el) { document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); }
     document.getElementById('openSearchBtn').onclick = () => { document.getElementById('searchModal').style.display = 'flex'; document.getElementById('searchInput').value = ''; document.getElementById('searchResults').innerHTML = ''; };
     document.getElementById('openSubscribeBtn').onclick = () => { document.getElementById('subscribeModal').style.display = 'flex'; };
     window.closeModal = closeModal;
-
-    // ==================== الصفحات الثابتة ====================
     window.openStaticPage = (page) => {
         const titles = { about: 'من نحن', privacy: 'الخصوصية', cookies: 'سياسة الكوكيز', terms: 'شروط الاستخدام' };
         const contents = {
-            about: '<p>أوج 
-نحن منصة معرفية سيادية نؤمن بأن المعرفة هي أساس النهضة.
-
-تأسست منصة "أوج" لتكون ملتقى للعقول الباحثة عن العمق والتميز.
-
-نهدف إلى تقديم محتوى متنوع يغطي شتى مجالات العلوم والفكر والثقافة.
-
-نحرص على مصداقية المعلومات وأصالة المصادر.
-
-نؤمن بأن الحكمة ليست ملكًا لأحد، بل هي تراث إنساني مشترك.
-
-نسعى لبناء جسر بين الماضي والحاضر، وبين الحكمة التقليدية والابتكار الحديث.
-
-نخدم الباحثين والمفكرين وصناع القرار والطلاب وكل من يبحث عن الفهم العميق.
-
-نقدم محتوى مترجمًا ومؤصلاً بأسلوب يجمع بين الرصانة والجاذبية.
-
-نواكب التطور الرقمي ونسخّر التقنية لنشر المعرفة بطرق مبتكرة.
-
-نرحب بكل من يريد المساهمة في إثراء هذا المحتوى بفكره وخبرته.
-
-نحن "أوج"، حيث تلتقي القمم الفكرية.. </p><p>تأسست المنصة لتكون ملتقى للمفكرين والباحثين في مجالات الذكاء الاستراتيجي والأمن الرقمي والفلسفة.</p>',
+            about: '<p>أوج هي منصة معرفية سيادية تقدم محتوى استراتيجياً وفلسفياً وعلمياً. نهدف إلى تمكين العقول بالنخبة الفكرية.</p><p>تأسست المنصة لتكون ملتقى للمفكرين والباحثين في مجالات الذكاء الاستراتيجي والأمن الرقمي والفلسفة.</p>',
             privacy: '<p>نحن لا نشارك بياناتك مع أي طرف ثالث. جميع البيانات مخزنة بأمان على خوادم Firebase. يمكنك طلب حذف بياناتك في أي وقت.</p>',
             cookies: '<p>نستخدم التخزين المحلي (localStorage) لتحسين تجربتك. لا نستخدم كوكيز خارجية ولا نتتبعك.</p>',
             terms: '<p>المحتوى محمي بحقوق النشر. يمنع النسخ أو إعادة النشر دون إذن خطي. استخدام الموقع يعني موافقتك على هذه الشروط.</p>'
@@ -698,13 +687,9 @@
         document.getElementById('staticBody').innerHTML = contents[page];
         document.getElementById('staticModal').style.display = 'flex';
     };
-
-    // ==================== زر العودة للأعلى ====================
     const scrollBtn = document.getElementById('scrollTopBtn');
     window.onscroll = () => { if (window.scrollY > 300) scrollBtn.classList.add('visible'); else scrollBtn.classList.remove('visible'); };
     scrollBtn.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
-
-    // ==================== الخزنة السرية (ثلاث نقرات على 2026) ====================
     let vaultClicks = 0;
     document.getElementById('vaultTrigger').onclick = () => {
         vaultClicks++;
@@ -712,16 +697,13 @@
         if (vaultClicks === 3) {
             const pwd = prompt("شَفَرَةُ العُبُورِ:");
             if (pwd === "@...Alshanfricc_1998...@") {
-                document.getElementById('vaultContent').innerHTML = `<h3>🔓 مرحباً سيد أوج</h3><p>📚 عدد المقالات: ${allArticles.length}</p><p>🏷️ التصنيفات: ${categories.map(c=>c.name).join(', ')}</p><p>✍️ عدد الكتّاب: ...</p><p>🕰️ آخر تحديث: ${new Date().toLocaleString('ar-EG')}</p>`;
+                document.getElementById('vaultContent').innerHTML = `<h3>🔓 مرحباً سيد أوج</h3><p>📚 عدد المقالات: ${allArticles.length}</p><p>🏷️ التصنيفات: ${categories.map(c=>c.name).join(', ')}</p><p>🕰️ آخر تحديث: ${new Date().toLocaleString('ar-EG')}</p>`;
                 document.getElementById('vaultModal').style.display = 'flex';
             } else alert("شَفَرَةٌ خَاطِئَةٌ.");
             vaultClicks = 0;
         }
     };
-
     function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => m==='&'?'&amp;':m==='<'?'&lt;':'&gt;'); }
-
-    // بدء التحميل
     fetchAll();
 </script>
 </body>

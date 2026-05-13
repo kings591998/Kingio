@@ -9,9 +9,9 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
-    <!-- SortableJS لترتيب الكتل -->
+    <!-- SortableJS -->
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
-    <!-- Highlight.js لتلوين الأكواد -->
+    <!-- Highlight.js -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
     <!-- Font Awesome -->
@@ -20,7 +20,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui; }
         body { background: #0A0B10; color: #eee; direction: rtl; padding: 1.5rem; }
         .container { max-width: 1400px; margin: auto; }
-        .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; border-bottom: 1px solid #2a2a35; padding-bottom: 1rem; }
+        .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; border-bottom: 1px solid #2a2a35; padding-bottom: 1rem; flex-wrap: wrap; gap: 1rem; }
         .logo { font-size: 2rem; color: #D4AF37; font-weight: bold; }
         .stats-badge { background: #1e1e2a; padding: 0.4rem 1rem; border-radius: 40px; font-size: 0.8rem; }
         .grid-2col { display: grid; grid-template-columns: repeat(2,1fr); gap: 1.5rem; margin-bottom: 2rem; }
@@ -47,6 +47,26 @@
         .error { background: #8b2c2c; display: block; }
         .sub-item { background: #2a2a35; display: inline-block; padding: 0.2rem 0.8rem; border-radius: 40px; margin-left: 0.5rem; margin-bottom: 0.3rem; font-size: 0.8rem; }
         .sub-item i { margin-right: 0.5rem; cursor: pointer; }
+        /* زر العودة للأعلى */
+        .scroll-top {
+            position: fixed;
+            bottom: 1.5rem;
+            left: 1.5rem;
+            background: #D4AF37;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: 0.3s;
+            z-index: 999;
+            box-shadow: 0 0 10px rgba(212,175,55,0.5);
+        }
+        .scroll-top.visible { opacity: 1; }
+        .scroll-top i { color: #000; font-size: 1.2rem; }
         @media (max-width: 800px) { .grid-2col { grid-template-columns: 1fr; } }
     </style>
 </head>
@@ -68,8 +88,8 @@
             <div><span class="stats-badge" id="statsInfo"></span> <button id="logoutBtn" style="background:#333; color:#eee;">تسجيل الخروج</button></div>
         </div>
 
+        <!-- بطاقة إدارة التبويبات والفروع -->
         <div class="grid-2col">
-            <!-- إدارة التبويبات والفروع -->
             <div class="card">
                 <h2><i class="fas fa-folder-tree"></i> التبويبات والفروع</h2>
                 <div class="flex-row">
@@ -78,7 +98,7 @@
                 </div>
                 <div id="catsList"></div>
             </div>
-            <!-- إدارة الكتّاب -->
+            <!-- بطاقة إدارة الكتّاب -->
             <div class="card">
                 <h2><i class="fas fa-users"></i> الكتّاب</h2>
                 <div class="flex-row">
@@ -89,7 +109,7 @@
             </div>
         </div>
 
-        <!-- محرر المقال المتقدم -->
+        <!-- بطاقة محرر المقال المتقدم -->
         <div class="card">
             <h2><i class="fas fa-feather-alt"></i> محرر المقال المتقدم</h2>
             <input type="text" id="articleTitle" placeholder="عنوان المقال">
@@ -112,6 +132,9 @@
     </div>
 </div>
 
+<!-- زر العودة للأعلى -->
+<div id="scrollTopBtn" class="scroll-top"><i class="fas fa-arrow-up"></i></div>
+
 <script>
     // ==================== إعدادات Firebase (بياناتك الحقيقية) ====================
     const firebaseConfig = {
@@ -132,7 +155,7 @@
     let authors = [];
     let blocks = [];
     
-    // قائمة اللغات المدعومة (20 لغة برمجة)
+    // 20 لغة برمجة مدعومة
     const languages = [
         "javascript", "python", "html", "css", "php", "java", "csharp", "cpp", "go", "ruby",
         "swift", "kotlin", "typescript", "bash", "sql", "rust", "perl", "r", "scala", "lua"
@@ -175,7 +198,7 @@
         document.getElementById('statsInfo').innerHTML = `📄 ${snap.size} مقال | ✍️ ${authors.length} كاتب | 🗂️ ${categories.length} تبويبة`;
     }
 
-    // ==================== إدارة التبويبات والفروع (إضافة، حذف، تعديل) ====================
+    // ==================== إدارة التبويبات والفروع ====================
     async function loadCategories() {
         const snap = await db.collection('categories').orderBy('name').get();
         categories = snap.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -312,7 +335,7 @@
         });
     }
 
-    // ==================== محرر الكتل (كل كتلة مستقلة، تدعم حذف وتعديل، صور متعددة، أكواد 20 لغة) ====================
+    // ==================== محرر الكتل ====================
     function addBlock(type) {
         let newBlock;
         if (type === 'text') {
@@ -342,8 +365,7 @@
             blocks[idx].value[field] = value;
         }
         saveBlocksToLocal();
-        // إعادة عرض الكتل لتحديث المعاينة (خاصة للكود)
-        renderBlocks();
+        renderBlocks(); // تحديث المعاينة
     };
 
     window.uploadImage = async (idx, fileInput) => {
@@ -355,7 +377,7 @@
             const url = await storageRef.getDownloadURL();
             blocks[idx].value.url = url;
             saveBlocksToLocal();
-            renderBlocks(); // إعادة عرض الكتل لإظهار الصورة المرفوعة
+            renderBlocks();
         } catch (err) {
             alert('فشل رفع الصورة: ' + err.message);
         }
@@ -406,7 +428,6 @@
             }
             blockDiv.innerHTML = innerHtml;
             container.appendChild(blockDiv);
-            // تلوين الكود إذا كان من نوع code
             if (block.type === 'code') {
                 const codeElement = blockDiv.querySelector('pre code');
                 if (codeElement) hljs.highlightElement(codeElement);
@@ -416,7 +437,6 @@
         new Sortable(container, {
             animation: 200,
             onEnd: () => {
-                // إعادة ترتيب مصفوفة blocks حسب الترتيب الجديد
                 const newBlocks = [];
                 document.querySelectorAll('.block').forEach(el => {
                     const oldIdx = parseInt(el.getAttribute('data-idx'));
@@ -424,7 +444,7 @@
                 });
                 blocks = newBlocks;
                 saveBlocksToLocal();
-                renderBlocks(); // إعادة العرض لتحديث الفهارس
+                renderBlocks();
             }
         });
     }
@@ -457,32 +477,20 @@
             return;
         }
 
-        // تنظيف الكتل (إزالة أي حقول مؤقتة للصور)
         const cleanBlocks = blocks.map(block => {
             if (block.type === 'image') {
-                return {
-                    type: 'image',
-                    value: {
-                        url: block.value.url || '',
-                        caption: block.value.caption || ''
-                    }
-                };
+                return { type: 'image', value: { url: block.value.url || '', caption: block.value.caption || '' } };
             }
             return block;
         });
 
         try {
             await db.collection('articles').add({
-                title,
-                author,
-                category,
-                subfield,
-                contentBlocks: cleanBlocks,
-                views: 0,
+                title, author, category, subfield,
+                contentBlocks: cleanBlocks, views: 0,
                 date: firebase.firestore.FieldValue.serverTimestamp()
             });
             showMsg('publishMsg', '✅ تم نشر المقال بنجاح!', 'success');
-            // إعادة تعيين المحرر
             blocks = [];
             localStorage.removeItem('admin_blocks');
             document.getElementById('articleTitle').value = '';
@@ -498,14 +506,17 @@
     document.getElementById('addCodeBtn').onclick = () => addBlock('code');
     document.getElementById('addSummaryBtn').onclick = () => addBlock('summary');
 
+    // ==================== زر العودة للأعلى ====================
+    const scrollBtn = document.getElementById('scrollTopBtn');
+    window.onscroll = () => {
+        if (window.scrollY > 300) scrollBtn.classList.add('visible');
+        else scrollBtn.classList.remove('visible');
+    };
+    scrollBtn.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+
     function escapeHtml(str) {
         if (!str) return '';
-        return str.replace(/[&<>]/g, m => {
-            if (m === '&') return '&amp;';
-            if (m === '<') return '&lt;';
-            if (m === '>') return '&gt;';
-            return m;
-        });
+        return str.replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;');
     }
 </script>
 </body>

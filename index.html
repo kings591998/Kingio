@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>أوج | منصة المعرفة السيادية</title>
+    <!-- 
+      =========================================================================
+      رقم 1: مكتبات خارجية (Firebase, Highlight.js, Font Awesome)
+      الوظيفة: توفير خدمات قاعدة البيانات، تلوين الأكواد، والأيقونات.
+      =========================================================================
+    -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* =====================================================================
+           رقم 2: التنسيقات الأساسية والعامة (ألوان، خطوط، خلفية)
+           الوظيفة: تحديد الهوية البصرية للموقع (ذهبي على خلفية داكنة)
+        ===================================================================== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root { --gold: #D4AF37; --dark: #050505; --card: #0C0F17; }
+        body {
+            background: var(--dark);
+            color: #eef;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            direction: rtl;
+            line-height: 1.6;
+        }
+        /* =====================================================================
+           رقم 3: شاشة التحميل (دماغ عصبي بنبضات كهربائية)
+           الوظيفة: عرض شاشة ترحيب أنيقة أثناء تحميل البيانات.
+        ===================================================================== */
+        #loadingScreen {
+            position: fixed; inset: 0; background: #000000dd; backdrop-filter: blur(8px);
+            z-index: 10000; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; transition: opacity 0.8s;
+        }
+        .brain-container { width: 100px; height: 100px; position: relative; }
+        .brain-icon {
+            font-size: 4rem; color: #D4AF37; position: absolute;
+            top: 50%; left: 50%; transform: translate(-50%, -50%);
+            animation: brainPulse 1.2s infinite alternate;
+        }
+        @keyframes brainPulse {
+            0% { transform: translate(-50%, -50%) scale(0.9); text-shadow: 0 0 0px #D4AF37; }
+            100% { transform: translate(-50%, -50%) scale(1.1); text-shadow: 0 0 20px #D4AF37; }
+        }
+        .neuron-line {
+            position: absolute; width: 100%; height: 100%; border-radius: 50%;
+            background: radial-gradient(circle, rgba(212,175,55,0.3) 0%, rgba(0,0,0,0) 70%);
+            animation: electricPulse 1.5s infinite;
+        }
+        @keyframes electricPulse {
+            0% { opacity: 0.2; transform: scale(0.8); }
+            100% { opacity: 0.8; transform: scale(1.2); }
+        }
+        .loading-track { width: 280px; height: 4px; background: #2a2a35; margin-top: 30px; border-radius: 4px; overflow: hidden; }
+        .loading-progress { width: 0%; height: 100%; background: var(--gold); transition: width 0.08s linear; }
+        .loading-text { margin-top: 15px; color: #D4AF37; font-size: 0.9rem; letter-spacing: 1px; }
+        /* =====================================================================
+           رقم 4: الهيدر وشريط التبويبات والفروع
+           الوظيفة: التنقل بين أقسام الموقع.
+        ===================================================================== */
+        header {
+            position: sticky; top: 0; background: rgba(5,5,5,0.96); backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(212,175,55,0.2); padding: 1rem 5%;
+            display: flex; justify-content: space-between; align-items: center; z-index: 1000;
+        }
+        .logo { font-size: 2rem; font-weight: bold; color: var(--gold); }
+        .header-icons i { font-size: 1.4rem; margin-right: 1.2rem; cursor: pointer; transition: 0.2s; }
+        .header-icons i:hover { color: var(--gold); }
+        .tabs-row, .sub-row { overflow-x: auto; white-space: nowrap; padding: 0.6rem 5%; background: #0A0A0F; border-bottom: 1px solid #1e1e2a; }
+        .tab-btn, .sub-btn {
+            display: inline-block; background: transparent; border: 1px solid #2a2a35;
+            color: #bbb; padding: 0.5rem 1.5rem; border-radius: 40px; margin-left: 0.7rem;
+            cursor: pointer; transition: 0.2s;
+        }
+        .tab-btn.active, .sub-btn.active { background: var(--gold); color: #000; border-color: var(--gold); }
+        .sub-row { display: none; }
+        .sub-row.show { display: block; }
+        /* =====================================================================
+           رقم 5: شبكة المقالات (Grid) وبطاقات المقالات
+           الوظيفة: عرض المقالات بشكل جذاب مع صور مصغرة ومعلومات.
+        ===================================================================== */
+        .articles-grid {
+            max-width: 1300px; margin: 2rem auto; padding: 0 5%;
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 2rem;
+        }
+        .article-card {
+            background: var(--card); border-radius: 1.2rem; overflow: hidden;
+            border-right: 4px solid var(--gold); transition: 0.2s; position: relative;
+        }
+        .article-img { width: 100%; height: 200px; object-fit: cover; background: #11131e; }
+        .article-content { padding: 1.2rem; }
+        .article-title { font-size: 1.4rem; font-weight: bold; color: var(--gold); cursor: pointer; margin-bottom: 0.5rem; }
+        .meta { display: flex; gap: 1rem; font-size: 0.75rem; color: #aaa; margin: 0.5rem 0; flex-wrap: wrap; }
+        .article-actions { position: absolute; top: 0.8rem; left: 0.8rem; }
+        .dots-btn { background: rgba(0,0,0,0.6); border: none; color: white; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; }
+        .dropdown {
+            position: absolute; left: 0; top: 2.2rem; background: #1e1e2a; border-radius: 1rem;
+            width: 140px; display: none; flex-direction: column; z-index: 20;
+        }
+        .dropdown.show { display: flex; }
+        .dropdown button { background: none; border: none; color: #eee; padding: 0.5rem; text-align: right; cursor: pointer; width: 100%; }
+        .dropdown button:hover { background: #2a2a35; color: var(--gold); }
+        .summary-trigger {
+            background: rgba(212,175,55,0.15); border: 1px solid var(--gold);
+            color: var(--gold); padding: 0.2rem 0.8rem; border-radius: 30px;
+            display: inline-block; margin-top: 0.6rem; cursor: pointer;
+        }
+        /* =====================================================================
+           رقم 6: عرض المحتوى الداخلي للمقال (صور، أكواد، مختصر)
+           الوظيفة: تنسيق كتل المقال، وتحويل الروابط، وإضافة زر نسخ للكود.
+        ===================================================================== */
+        .image-block { text-align: center; margin: 1rem 0; }
+        .image-block img { max-width: 100%; border-radius: 1rem; }
+        pre { background: #0D0F14; padding: 1rem; border-radius: 1rem; overflow-x: auto; position: relative; margin: 1rem 0; }
+        .copy-code {
+            position: absolute; top: 0.4rem; left: 0.6rem; background: var(--gold);
+            color: black; border: none; border-radius: 6px; padding: 2px 8px; font-size: 0.7rem; cursor: pointer;
+        }
+        /* =====================================================================
+           رقم 7: الأقسام السفلية (أحدث، الأكثر مشاهدة، ذات صلة)
+           الوظيفة: عرض قوائم مساعدة للمستخدم.
+        ===================================================================== */
+        .bottom-grid {
+            display: grid; grid-template-columns: repeat(3,1fr); gap: 1.5rem;
+            max-width: 1300px; margin: 2rem auto; padding: 0 5%;
+        }
+        .bottom-card { background: #0A0B10; border-radius: 1rem; padding: 1rem; border: 1px solid #1e1e2a; }
+        .bottom-card h4 { color: var(--gold); margin-bottom: 0.8rem; }
+        .bottom-card ul { list-style: none; }
+        .bottom-card li { padding: 0.5rem 0; border-bottom: 1px dashed #222; cursor: pointer; }
+        .bottom-card li:hover { color: var(--gold); }
+        footer { text-align: center; padding: 2rem; border-top: 1px solid #1a1a1a; color: #666; }
+        .footer-links { display: flex; gap: 1.5rem; justify-content: center; margin-bottom: 0.8rem; }
+        .footer-links span { cursor: pointer; color: #aaa; }
+        .footer-links span:hover { color: var(--gold); }
+        .copyright { cursor: pointer; }
+        /* =====================================================================
+           رقم 8: المودالات (بحث، اشتراك، زبدة المقال، صفحات ثابتة، خزنة)
+           الوظيفة: ظهور نوافذ منبثقة عند الحاجة.
+        ===================================================================== */
+        .modal {
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95);
+            align-items: center; justify-content: center; z-index: 20000;
+        }
+        .modal-card {
+            background: #111; border: 1px solid var(--gold); border-radius: 1.5rem;
+            width: 90%; max-width: 500px; padding: 1.5rem; max-height: 80vh; overflow-y: auto;
+        }
+        .search-input { width: 100%; padding: 0.8rem; background: #1a1a1a; border: 1px solid #333; border-radius: 40px; color: white; margin: 1rem 0; }
+        /* =====================================================================
+           رقم 9: زر العودة للأعلى
+           الوظيفة: تسهيل التنقل في الصفحات الطويلة.
+        ===================================================================== */
+        .scroll-top {
+            position: fixed; bottom: 1.5rem; left: 1.5rem; background: var(--gold);
+            width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center;
+            justify-content: center; cursor: pointer; opacity: 0; transition: 0.3s; z-index: 999;
+        }
+        .scroll-top.visible { opacity: 1; }
+        @media (max-width: 700px) { .articles-grid, .bottom-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+<!-- شاشة التحميل (رقم 3) -->
+<div id="loadingScreen">
+    <div class="brain-container">
+        <div class="neuron-line"></div>
+        <i class="fas fa-brain brain-icon"></i>
+    </div>
+    <div class="loading-track"><div id="loadProgressBar" class="loading-progress"></div></div>
+    <div class="loading-text" id="loadingText">تنشيط الخلايا العصبية...</div>
+</div>
+
+<header>
+    <div class="logo">AWJ</div>
+    <div class="header-icons">
+        <i class="fas fa-search" id="openSearchBtn"></i>
+        <i class="fas fa-envelope" id="openSubscribeBtn"></i>
+    </div>
+</header>
+
+<div id="tabsContainer" class="tabs-row"></div>
+<div id="subContainer" class="sub-row"></div>
+
+<div id="articlesGrid" class="articles-grid"></div>
+
+<div class="bottom-grid">
+    <div class="bottom-card"><h4>🕒 أحدث المقالات</h4><ul id="latestList"></ul></div>
+    <div class="bottom-card"><h4>👑 الأكثر مشاهدة</h4><ul id="mostViewedList"></ul></div>
+    <div class="bottom-card"><h4>🔗 ذات صلة</h4><ul id="relatedList"></ul></div>
+</div>
+
+<footer>
+    <div class="footer-links">
+        <span onclick="openStaticPage('about')">من نحن</span>
+        <span onclick="openStaticPage('privacy')">الخصوصية</span>
+        <span onclick="openStaticPage('cookies')">سياسة الكوكيز</span>
+        <span onclick="openStaticPage('terms')">شروط الاستخدام</span>
+    </div>
+    <p>جميع الحقوق محفوظة © <span class="copyright" id="vaultTrigger">2026</span> | أوج</p>
+</footer>
+
+<!-- مودالات -->
+<div id="searchModal" class="modal"><div class="modal-card"><i class="fas fa-times" style="float: left; cursor: pointer;" onclick="closeModal(this)"></i><h3>🔍 بحث</h3><input type="text" id="searchInput" class="search-input" placeholder="كلمة مفتاحية"><div id="searchResults"></div></div></div>
+<div id="subscribeModal" class="modal"><div class="modal-card"><i class="fas fa-times" style="float: left; cursor: pointer;" onclick="closeModal(this)"></i><h3>📧 اشترك في النشرة</h3><input type="email" id="subEmail" class="search-input" placeholder="بريدك الإلكتروني"><button id="doSubscribeBtn" style="background:#D4AF37; color:#000; border:none; padding:8px; width:100%; border-radius:40px;">اشتراك</button><div id="subMsg"></div></div></div>
+<div id="summaryModal" class="modal"><div class="modal-card"><i class="fas fa-times" style="float: left; cursor: pointer;" onclick="closeModal(this)"></i><h3>📖 زبدة المقال</h3><div id="summaryContent"></div></div></div>
+<div id="vaultModal" class="modal"><div class="modal-card"><i class="fas fa-times" style="float: left; cursor: pointer;" onclick="closeModal(this)"></i><h3>🔐 الخزنة السرية</h3><div id="vaultContent"></div></div></div>
+<div id="staticModal" class="modal"><div class="modal-card"><i class="fas fa-times" style="float: left; cursor: pointer;" onclick="closeModal(this)"></i><h3 id="staticTitle"></h3><div id="staticBody"></div></div></div>
+
+<div id="scrollTopBtn" class="scroll-top"><i class="fas fa-arrow-up"></i></div>
+
+<script>
+    // =====================================================================
+    // رقم 10: إعدادات Firebase (البيانات الحقيقية)
+    // الوظيفة: ربط الموقع بقاعدة البيانات.
+    // =====================================================================
+    const firebaseConfig = {
+        apiKey: "AIzaSyDjgVxvtPXTn1tpr4IxOK3wOW4r3gzB1VU",
+        authDomain: "awj-website-29f16.firebaseapp.com",
+        projectId: "awj-website-29f16",
+        storageBucket: "awj-website-29f16.firebasestorage.app",
+        messagingSenderId: "406747568578",
+        appId: "1:406747568578:web:741821d3c60df0011b5e5b",
+        measurementId: "G-DFB0GYH7LN"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    // =====================================================================
+    // رقم 11: المتغيرات العامة
+    // الوظيفة: تخزين البيانات الحالية للمقالات والتصنيفات والحالة.
+    // =====================================================================
+    let allArticles = [];
+    let categories = [];
+    let currentCat = null;
+    let currentSub = null;
+    let activeDropdown = null;
+
+    // =====================================================================
+    // رقم 12: شاشة التحميل (تقدم وهمي + عبارات متغيرة)
+    // الوظيفة: إعطاء انطباع بالتحميل السريع مع نصوص محفزة.
+    // =====================================================================
+    const loadingScreen = document.getElementById('loadingScreen');
+    const progressBar = document.getElementById('loadProgressBar');
+    const loadingTextSpan = document.getElementById('loadingText');
+    const phrases = ["توليد الوصلات العصبية..", "بناء شبكة المعرفة..", "جمع الخبرات..", "تهيئة الدماغ الرقمي..", "جاهز للاستكشاف.."];
+    let phraseIndex = 0;
+    let loadProgress = 0;
+    const loadInterval = setInterval(() => {
+        loadProgress += Math.random() * 15 + 5;
+        if (loadProgress >= 100) loadProgress = 100;
+        progressBar.style.width = loadProgress + '%';
+        if (loadProgress >= (phraseIndex + 1) * 20 && phraseIndex < phrases.length - 1) {
+            phraseIndex++;
+            loadingTextSpan.innerText = phrases[phraseIndex];
+        }
+        if (loadProgress === 100) {
+            clearInterval(loadInterval);
+            setTimeout(() => {
+                loadingScreen.style.opacity = '0';
+                setTimeout(() => loadingScreen.style.display = 'none', 600);
+            }, 500);
+        }
+    }, 80);
+
+    // =====================================================================
+    // رقم 13: جلب البيانات من Firebase (مقالات + تصنيفات)
+    // الوظيفة: تحميل المحتوى وعرضه بعد اكتمال الجلب.
+    // =====================================================================
+    async function fetchAll() {
+        const [articlesSnap, catsSnap] = await Promise.all([
+            db.collection('articles').orderBy('date', 'desc').get(),
+            db.collection('categories').orderBy('name').get()
+        ]);
+        allArticles = articlesSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+        categories = catsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+        renderTabs();
+        if (categories.length) selectCategory(categories[0].name);
+        else document.getElementById('articlesGrid').innerHTML = '<div style="text-align:center; padding:2rem;">📭 لا توجد تبويبات. أضفها من لوحة الإدارة أولاً.</div>';
+        updateSidePanels();
+        if (loadProgress < 100) { // ضمان إخفاء الشاشة
+            loadProgress = 100;
+            progressBar.style.width = '100%';
+            setTimeout(() => {
+                loadingScreen.style.opacity = '0';
+                setTimeout(() => loadingScreen.style.display = 'none', 600);
+            }, 300);
+        }
+    }
+
+    // =====================================================================
+    // رقم 14: دوال عرض التبويبات والفروع
+    // الوظيفة: بناء واجهة التنقل ديناميكياً من البيانات.
+    // =====================================================================
+    function renderTabs() {
+        const container = document.getElementById('tabsContainer');
+        container.innerHTML = '';
+        categories.forEach(cat => {
+            const btn = document.createElement('button');
+            btn.textContent = cat.name;
+            btn.className = 'tab-btn';
+            btn.onclick = () => selectCategory(cat.name);
+            container.appendChild(btn);
+        });
+    }
+    function selectCategory(catName) {
+        currentCat = catName;
+        currentSub = null;
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        const activeTab = Array.from(document.querySelectorAll('.tab-btn')).find(b => b.textContent === catName);
+        if (activeTab) activeTab.classList.add('active');
+        renderSubTabs(catName);
+        filterAndRender();
+    }
+    function renderSubTabs(catName) {
+        const subDiv = document.getElementById('subContainer');
+        const cat = categories.find(c => c.name === catName);
+        if (!cat || !cat.subfields || cat.subfields.length === 0) {
+            subDiv.classList.remove('show');
+            return;
+        }
+        subDiv.classList.add('show');
+        subDiv.innerHTML = '';
+        const allBtn = document.createElement('button');
+        allBtn.textContent = 'الكل';
+        allBtn.className = 'sub-btn';
+        if (currentSub === null) allBtn.classList.add('active');
+        allBtn.onclick = () => { currentSub = null; refreshSubActive(); filterAndRender(); };
+        subDiv.appendChild(allBtn);
+        cat.subfields.forEach(sub => {
+            const btn = document.createElement('button');
+            btn.textContent = sub;
+            btn.className = 'sub-btn';
+            if (currentSub === sub) btn.classList.add('active');
+            btn.onclick = () => { currentSub = sub; refreshSubActive(); filterAndRender(); };
+            subDiv.appendChild(btn);
+        });
+        function refreshSubActive() {
+            document.querySelectorAll('.sub-btn').forEach(b => b.classList.remove('active'));
+            if (currentSub === null) allBtn.classList.add('active');
+            else {
+                const target = Array.from(document.querySelectorAll('.sub-btn')).find(b => b.textContent === currentSub);
+                if (target) target.classList.add('active');
+            }
+        }
+    }
+
+    // =====================================================================
+    // رقم 15: تصفية المقالات وعرضها في الشبكة
+    // الوظيفة: إظهار المقالات حسب التبويبة/الفرع المختار.
+    // =====================================================================
+    function filterAndRender() {
+        let filtered = allArticles.filter(a => a.category === currentCat);
+        if (currentSub) filtered = filtered.filter(a => a.subfield === currentSub);
+        renderArticlesGrid(filtered);
+    }
+    function getFirstImageUrl(article) {
+        if (!article.contentBlocks) return null;
+        const imgBlock = article.contentBlocks.find(b => b.type === 'image' && b.value?.url);
+        return imgBlock ? imgBlock.value.url : null;
+    }
+    function stripHtml(html) {
+        const tmp = document.createElement('div');
+        tmp.innerHTML = html;
+        return tmp.textContent || tmp.innerText || '';
+    }
+    function getPreviewText(article) {
+        if (article.contentBlocks) {
+            const textBlock = article.contentBlocks.find(b => b.type === 'text' || b.type === 'summary');
+            if (textBlock) return stripHtml(textBlock.value).slice(0, 120);
+        }
+        return '';
+    }
+    function renderArticlesGrid(articles) {
+        const grid = document.getElementById('articlesGrid');
+        if (!articles.length) {
+            grid.innerHTML = '<div style="text-align:center; padding:2rem;">📭 لا توجد مقالات في هذا القسم</div>';
+            return;
+        }
+        let html = '';
+        articles.forEach(art => {
+            const imgUrl = getFirstImageUrl(art);
+            const preview = getPreviewText(art);
+            html += `
+                <div class="article-card" data-id="${art.id}">
+                    ${imgUrl ? `<img src="${imgUrl}" class="article-img" loading="lazy" onerror="this.src='https://placehold.co/600x400/1a1c25/D4AF37?text=AWJ'">` : '<div class="article-img" style="background: #1a1c25; display: flex; align-items: center; justify-content: center;"><i class="fas fa-newspaper" style="font-size: 3rem; color: #D4AF37;"></i></div>'}
+                    <div class="article-content">
+                        <div class="article-title" onclick="viewFullArticle('${art.id}')">${escapeHtml(art.title)}</div>
+                        <div class="meta">
+                            <span><i class="fas fa-user"></i> ${escapeHtml(art.author)}</span>
+                            <span><i class="fas fa-eye"></i> ${art.views || 0}</span>
+                            <span><i class="fas fa-calendar"></i> ${art.date ? new Date(art.date.toDate()).toLocaleDateString('ar-EG') : 'قديم'}</span>
+                        </div>
+                        <div>${escapeHtml(preview)}...</div>
+                        <button class="summary-trigger" onclick="showSummary('${art.id}')"><i class="fas fa-lightbulb"></i> زبدة المقال</button>
+                        <div class="article-actions">
+                            <button class="dots-btn" onclick="toggleMenu(event, '${art.id}')"><i class="fas fa-ellipsis-v"></i></button>
+                            <div id="drop-${art.id}" class="dropdown">
+                                <button onclick="copyLink('${art.id}')"><i class="fas fa-copy"></i> نسخ الرابط</button>
+                                <button onclick="shareArticle('${art.id}')"><i class="fas fa-share-alt"></i> مشاركة</button>
+                                <button onclick="focusArticle('${art.id}')"><i class="fas fa-expand"></i> وضع التركيز</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        grid.innerHTML = html;
+    }
+
+    // =====================================================================
+    // رقم 16: عرض المقال كاملاً (زيادة المشاهدات + عرض الكتل)
+    // الوظيفة: فتح المقال، زيادة عدد المشاهدات، وعرض المحتوى بتنسيق كتل.
+    // =====================================================================
+    window.viewFullArticle = async function(id) {
+        const art = allArticles.find(a => a.id === id);
+        if (!art) return;
+        await db.collection('articles').doc(id).update({ views: firebase.firestore.FieldValue.increment(1) });
+        art.views = (art.views || 0) + 1;
+        let fullHtml = '';
+        if (art.contentBlocks) {
+            fullHtml = art.contentBlocks.map(block => {
+                if (block.type === 'text') return `<div style="margin:1rem 0;">${block.value}</div>`;
+                if (block.type === 'image') return `<div class="image-block"><img src="${block.value.url}" alt="${escapeHtml(block.value.caption)}"><div class="caption">${escapeHtml(block.value.caption)}</div></div>`;
+                if (block.type === 'code') return `<pre><code class="language-${block.value.language}">${escapeHtml(block.value.code)}</code></pre>`;
+                if (block.type === 'summary') return `<div style="background:rgba(212,175,55,0.1); padding:1rem; border-right:3px solid #D4AF37;">✨ ${block.value}</div>`;
+                return '';
+            }).join('');
+        } else fullHtml = `<div>${art.content || ''}</div>`;
+        document.getElementById('articlesGrid').innerHTML = `
+            <div style="max-width: 1000px; margin: auto; width: 100%;">
+                <div class="article-card" style="padding: 1.5rem;">
+                    <div class="article-title">${escapeHtml(art.title)}</div>
+                    <div class="meta"><span><i class="fas fa-user"></i> ${escapeHtml(art.author)}</span><span><i class="fas fa-eye"></i> ${art.views}</span></div>
+                    ${fullHtml}
+                    <button onclick="location.reload()" style="margin-top:1.5rem; background:#D4AF37; border:none; padding:0.5rem 1.5rem; border-radius:30px;">← العودة</button>
+                </div>
+            </div>
+        `;
+        document.querySelectorAll('pre code').forEach(block => hljs.highlightElement(block));
+        attachCopyButtons();
+        updateSidePanels();
+    };
+    function attachCopyButtons() {
+        document.querySelectorAll('pre').forEach(pre => {
+            if (pre.querySelector('.copy-code')) return;
+            const btn = document.createElement('button');
+            btn.innerHTML = '<i class="fas fa-copy"></i> نسخ';
+            btn.className = 'copy-code';
+            btn.onclick = () => { navigator.clipboard.writeText(pre.querySelector('code')?.innerText || ''); alert('تم نسخ الكود'); };
+            pre.style.position = 'relative';
+            pre.appendChild(btn);
+        });
+    }
+
+    // =====================================================================
+    // رقم 17: دوال التفاعل (زبدة المقال، نسخ الرابط، مشاركة، تركيز، القائمة)
+    // الوظيفة: تقديم خيارات إضافية للمقال.
+    // =====================================================================
+    window.showSummary = function(id) {
+        const art = allArticles.find(a => a.id === id);
+        if (!art) return;
+        let sum = '';
+        if (art.contentBlocks) {
+            const sBlock = art.contentBlocks.find(b => b.type === 'summary');
+            sum = sBlock ? sBlock.value : (art.contentBlocks[0]?.value?.slice(0, 300) || '');
+        } else sum = (art.content || '').slice(0, 300);
+        document.getElementById('summaryContent').innerHTML = `<div>${sum}...</div><p style="margin-top:1rem;">ملخص سريع. اضغط على العنوان للقراءة الكاملة.</p>`;
+        document.getElementById('summaryModal').style.display = 'flex';
+    };
+    window.copyLink = (id) => { const url = `${window.location.origin}${window.location.pathname}?article=${id}`; navigator.clipboard.writeText(url); alert('تم نسخ الرابط'); closeDropdown(); };
+    window.shareArticle = (id) => { if (navigator.share) navigator.share({ title: allArticles.find(a=>a.id===id)?.title }); else alert('المشاركة غير مدعومة'); closeDropdown(); };
+    window.focusArticle = (id) => {
+        const card = document.querySelector(`.article-card[data-id="${id}"]`);
+        if (card) {
+            card.style.position = 'fixed'; card.style.top = '50%'; card.style.left = '50%'; card.style.transform = 'translate(-50%, -50%)';
+            card.style.width = '90%'; card.style.maxWidth = '800px'; card.style.zIndex = '30000'; card.style.maxHeight = '90vh'; card.style.overflow = 'auto';
+            const out = (e) => { if (!card.contains(e.target)) { card.style.position = ''; card.style.top = ''; card.style.left = ''; card.style.transform = ''; card.style.width = ''; card.style.zIndex = ''; card.style.maxHeight = ''; card.style.overflow = ''; document.removeEventListener('click', out); } };
+            setTimeout(() => document.addEventListener('click', out), 100);
+        }
+        closeDropdown();
+    };
+    window.toggleMenu = (e, id) => { e.stopPropagation(); const menu = document.getElementById(`drop-${id}`); if (activeDropdown && activeDropdown !== menu) activeDropdown.classList.remove('show'); menu.classList.toggle('show'); activeDropdown = menu.classList.contains('show') ? menu : null; };
+    function closeDropdown() { if (activeDropdown) activeDropdown.classList.remove('show'); activeDropdown = null; }
+    document.addEventListener('click', closeDropdown);
+
+    // =====================================================================
+    // رقم 18: تحديث الأقسام السفلية (أحدث، الأكثر مشاهدة، ذات صلة)
+    // الوظيفة: عرض قوائم ديناميكية لمساعدة المستخدم.
+    // =====================================================================
+    async function updateSidePanels() {
+        const latest = [...allArticles].sort((a,b) => (b.date?.toMillis()||0) - (a.date?.toMillis()||0)).slice(0,5);
+        const most = [...allArticles].sort((a,b) => (b.views||0) - (a.views||0)).slice(0,5);
+        let related = currentCat ? allArticles.filter(a => a.category === currentCat).slice(0,5) : allArticles.slice(0,5);
+        document.getElementById('latestList').innerHTML = latest.map(a => `<li onclick="viewFullArticle('${a.id}')">${escapeHtml(a.title)}</li>`).join('');
+        document.getElementById('mostViewedList').innerHTML = most.map(a => `<li onclick="viewFullArticle('${a.id}')">${escapeHtml(a.title)} (${a.views||0})</li>`).join('');
+        document.getElementById('relatedList').innerHTML = related.map(a => `<li onclick="viewFullArticle('${a.id}')">${escapeHtml(a.title)}</li>`).join('');
+    }
+
+    // =====================================================================
+    // رقم 19: البحث والاشتراك والمودالات
+    // الوظيفة: تمكين المستخدم من البحث والاشتراك في النشرة.
+    // =====================================================================
+    function performSearch() {
+        const q = document.getElementById('searchInput').value.toLowerCase();
+        const res = allArticles.filter(a => a.title.toLowerCase().includes(q) || (a.content?.toLowerCase().includes(q)));
+        const div = document.getElementById('searchResults');
+        if (!res.length) div.innerHTML = '<p>لا نتائج</p>';
+        else div.innerHTML = res.map(a => `<div style="padding:0.6rem; border-bottom:1px solid #333; cursor:pointer;" onclick="viewFullArticle('${a.id}');closeModal(null)">${escapeHtml(a.title)} - ${escapeHtml(a.author)}</div>`).join('');
+    }
+    document.getElementById('searchInput')?.addEventListener('input', performSearch);
+    document.getElementById('doSubscribeBtn')?.addEventListener('click', () => {
+        const email = document.getElementById('subEmail').value;
+        if (email.includes('@')) { document.getElementById('subMsg').innerHTML = '<p style="color:green;">✅ تم الاشتراك</p>'; setTimeout(()=>closeModal(null),1500); }
+        else document.getElementById('subMsg').innerHTML = '<p style="color:red;">❌ بريد غير صالح</p>';
+    });
+    function closeModal(el) { document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); }
+    document.getElementById('openSearchBtn').onclick = () => { document.getElementById('searchModal').style.display = 'flex'; document.getElementById('searchInput').value = ''; document.getElementById('searchResults').innerHTML = ''; };
+    document.getElementById('openSubscribeBtn').onclick = () => { document.getElementById('subscribeModal').style.display = 'flex'; };
+    window.closeModal = closeModal;
+
+    // =====================================================================
+    // رقم 20: الصفحات الثابتة (من نحن، الخصوصية، إلخ)
+    // الوظيفة: عرض معلومات الموقع في مودال.
+    // =====================================================================
+    window.openStaticPage = (page) => {
+        const titles = { about: 'من نحن', privacy: 'الخصوصية', cookies: 'سياسة الكوكيز', terms: 'شروط الاستخدام' };
+        const contents = {
+            about: '<p>أوج هي منصة معرفية سيادية تقدم محتوى استراتيجياً وفلسفياً وعلمياً. نهدف إلى تمكين العقول بالنخبة الفكرية.</p><p>تأسست المنصة لتكون ملتقى للمفكرين والباحثين في مجالات الذكاء الاستراتيجي والأمن الرقمي والفلسفة.</p>',
+            privacy: '<p>نحن لا نشارك بياناتك مع أي طرف ثالث. جميع البيانات مخزنة بأمان على خوادم Firebase. يمكنك طلب حذف بياناتك في أي وقت.</p>',
+            cookies: '<p>نستخدم التخزين المحلي (localStorage) لتحسين تجربتك. لا نستخدم كوكيز خارجية ولا نتتبعك.</p>',
+            terms: '<p>المحتوى محمي بحقوق النشر. يمنع النسخ أو إعادة النشر دون إذن خطي. استخدام الموقع يعني موافقتك على هذه الشروط.</p>'
+        };
+        document.getElementById('staticTitle').innerText = titles[page];
+        document.getElementById('staticBody').innerHTML = contents[page];
+        document.getElementById('staticModal').style.display = 'flex';
+    };
+
+    // =====================================================================
+    // رقم 21: زر العودة للأعلى والخزنة السرية
+    // الوظيفة: تحسين تجربة المستخدم وإضافة ميزة ترفيهية.
+    // =====================================================================
+    const scrollBtn = document.getElementById('scrollTopBtn');
+    window.onscroll = () => { if (window.scrollY > 300) scrollBtn.classList.add('visible'); else scrollBtn.classList.remove('visible'); };
+    scrollBtn.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+    let vaultClicks = 0;
+    document.getElementById('vaultTrigger').onclick = () => {
+        vaultClicks++;
+        setTimeout(() => vaultClicks = 0, 1500);
+        if (vaultClicks === 3) {
+            const pwd = prompt("شَفَرَةُ العُبُورِ:");
+            if (pwd === "@...Alshanfricc_1998...@") {
+                document.getElementById('vaultContent').innerHTML = `<h3>🔓 مرحباً سيد أوج</h3><p>📚 عدد المقالات: ${allArticles.length}</p><p>🏷️ التصنيفات: ${categories.map(c=>c.name).join(', ')}</p><p>🕰️ آخر تحديث: ${new Date().toLocaleString('ar-EG')}</p>`;
+                document.getElementById('vaultModal').style.display = 'flex';
+            } else alert("شَفَرَةٌ خَاطِئَةٌ.");
+            vaultClicks = 0;
+        }
+    };
+    function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => m==='&'?'&amp;':m==='<'?'&lt;':'&gt;'); }
+
+    fetchAll();
+</script>
+</body>
+  </html>

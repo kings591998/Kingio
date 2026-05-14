@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>أوج | لوحة التحكم السيادية</title>
+    
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
@@ -12,43 +13,180 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui; }
-        body { background: #0A0B10; color: #eee; direction: rtl; padding: 1.5rem; }
+        :root { --gold: #D4AF37; --dark: #0A0B10; --card: #0C0F17; --border: #2a2a35; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: var(--dark); color: #eee; direction: rtl;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            padding: 1.5rem; min-height: 100vh;
+        }
         .container { max-width: 1400px; margin: auto; }
-        .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; border-bottom: 1px solid #2a2a35; padding-bottom: 1rem; flex-wrap: wrap; gap: 1rem; }
-        .logo { font-size: 2rem; color: #D4AF37; font-weight: bold; }
+        
+        .admin-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 2rem; border-bottom: 1px solid var(--border);
+            padding-bottom: 1rem; flex-wrap: wrap; gap: 1rem;
+        }
+        .logo { font-size: 2rem; color: var(--gold); font-weight: bold; letter-spacing: 2px; }
         .stats-badge { background: #1e1e2a; padding: 0.4rem 1rem; border-radius: 40px; font-size: 0.8rem; }
-        .grid-2col { display: grid; grid-template-columns: repeat(2,1fr); gap: 1.5rem; margin-bottom: 2rem; }
-        .card { background: #0C0F17; border: 1px solid #2a2a35; border-radius: 1.5rem; padding: 1.5rem; margin-bottom: 1.5rem; }
-        .card h2 { color: #D4AF37; margin-bottom: 1rem; border-right: 3px solid #D4AF37; padding-right: 0.8rem; }
-        .flex-row { display: flex; gap: 1rem; flex-wrap: wrap; align-items: center; margin-bottom: 1rem; }
-        input, select, textarea { background: #1a1c25; border: 1px solid #2a2a35; padding: 0.7rem 1rem; border-radius: 1rem; color: white; width: 100%; margin-bottom: 0.8rem; }
-        button { background: #D4AF37; color: #000; border: none; padding: 0.6rem 1.2rem; border-radius: 2rem; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        
+        .grid-2col { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; margin-bottom: 2rem; }
+        .card {
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: 1.5rem; padding: 1.5rem; margin-bottom: 1.5rem;
+        }
+        .card h2 {
+            color: var(--gold); margin-bottom: 1rem;
+            border-right: 3px solid var(--gold); padding-right: 0.8rem;
+            font-size: 1.2rem;
+        }
+        .flex-row {
+            display: flex; gap: 1rem; flex-wrap: wrap;
+            align-items: center; margin-bottom: 1rem;
+        }
+        
+        input, select, textarea {
+            background: #1a1c25; border: 1px solid var(--border);
+            padding: 0.7rem 1rem; border-radius: 1rem;
+            color: white; width: 100%; margin-bottom: 0.8rem;
+            font-size: 0.95rem; transition: 0.2s;
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none; border-color: var(--gold);
+        }
+        textarea { resize: vertical; min-height: 80px; }
+        
+        button {
+            background: var(--gold); color: #000; border: none;
+            padding: 0.6rem 1.2rem; border-radius: 2rem;
+            cursor: pointer; font-weight: bold; transition: 0.2s;
+            font-size: 0.9rem; white-space: nowrap;
+        }
         button:hover { opacity: 0.85; transform: scale(0.98); }
-        .btn-outline { background: transparent; border: 1px solid #D4AF37; color: #D4AF37; }
-        .block { background: #12141E; border-radius: 1rem; padding: 1rem; margin-bottom: 1rem; border: 1px solid #2a2a35; }
-        .block-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; cursor: move; }
-        .delete-block { background: none; border: none; color: #ff7777; font-size: 1.2rem; cursor: pointer; }
-        .image-preview { max-width: 100%; max-height: 180px; margin-top: 0.5rem; border-radius: 0.8rem; }
-        .code-preview { background: #0D0F14; padding: 0.8rem; border-radius: 0.8rem; margin-top: 0.5rem; overflow-x: auto; }
-        .message { padding: 0.8rem; border-radius: 1rem; margin-top: 1rem; text-align: center; display: none; }
-        .success { background: #1e4620; display: block; }
-        .error { background: #8b2c2c; display: block; }
-        .sub-item { background: #2a2a35; display: inline-block; padding: 0.2rem 0.8rem; border-radius: 40px; margin-left: 0.5rem; margin-bottom: 0.3rem; font-size: 0.8rem; }
-        .sub-item i { margin-right: 0.5rem; cursor: pointer; }
-        .scroll-top { position: fixed; bottom: 1.5rem; left: 1.5rem; background: #D4AF37; width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; opacity: 0; transition: 0.3s; z-index: 999; }
+        .btn-outline {
+            background: transparent; border: 1px solid var(--gold);
+            color: var(--gold);
+        }
+        .btn-outline:hover { background: var(--gold); color: #000; }
+        .btn-danger {
+            background: transparent; border: 1px solid #ff4444;
+            color: #ff4444;
+        }
+        .btn-danger:hover { background: #ff4444; color: white; }
+        .btn-sm { padding: 0.4rem 0.8rem; font-size: 0.8rem; }
+        
+        .block-editor {
+            background: #12141E; border-radius: 1rem;
+            padding: 1rem; margin-bottom: 1rem;
+            border: 1px solid var(--border);
+        }
+        .block-header {
+            display: flex; justify-content: space-between;
+            align-items: center; margin-bottom: 0.8rem;
+            cursor: move; padding-bottom: 0.5rem;
+            border-bottom: 1px solid #1e1e2a;
+        }
+        .block-type-label {
+            font-weight: bold; color: var(--gold);
+            display: flex; align-items: center; gap: 0.5rem;
+        }
+        .delete-block {
+            background: none; border: none; color: #ff7777;
+            font-size: 1.2rem; cursor: pointer; transition: 0.2s;
+            padding: 0.2rem;
+        }
+        .delete-block:hover { color: #ff4444; transform: scale(1.1); }
+        .image-preview {
+            max-width: 100%; max-height: 180px;
+            margin-top: 0.5rem; border-radius: 0.8rem;
+            border: 1px solid var(--border);
+        }
+        .code-preview {
+            background: #0D0F14; padding: 0.8rem;
+            border-radius: 0.8rem; margin-top: 0.5rem;
+            overflow-x: auto; border: 1px solid var(--border);
+        }
+        .block-actions {
+            display: flex; gap: 0.5rem; margin-top: 0.5rem;
+        }
+        
+        .message {
+            padding: 0.8rem; border-radius: 1rem;
+            margin-top: 1rem; text-align: center;
+            display: none; font-size: 0.9rem;
+        }
+        .message.show { display: block; }
+        .success { background: #1e4620; color: #4caf50; border: 1px solid #2e7d32; }
+        .error { background: #3b1515; color: #ff7777; border: 1px solid #8b2c2c; }
+        .info { background: #1a237e; color: #7986cb; border: 1px solid #3949ab; }
+        
+        .sub-item {
+            background: #2a2a35; display: inline-flex;
+            align-items: center; gap: 0.4rem;
+            padding: 0.3rem 0.8rem; border-radius: 40px;
+            margin-left: 0.5rem; margin-bottom: 0.3rem;
+            font-size: 0.85rem;
+        }
+        .sub-item i { cursor: pointer; color: #ff7777; transition: 0.2s; }
+        .sub-item i:hover { color: #ff4444; }
+        .category-box {
+            background: #12141E; border-radius: 1rem;
+            padding: 1rem; margin-bottom: 1rem;
+            border: 1px solid var(--border);
+        }
+        .category-box h4 { color: var(--gold); margin-bottom: 0.5rem; }
+        
+        .social-item {
+            display: flex; justify-content: space-between;
+            align-items: center; padding: 0.6rem 0;
+            border-bottom: 1px solid #1e1e2a;
+        }
+        .social-item:last-child { border-bottom: none; }
+        
+        .scroll-top {
+            position: fixed; bottom: 1.5rem; left: 1.5rem;
+            background: var(--gold); width: 45px; height: 45px;
+            border-radius: 50%; display: flex;
+            align-items: center; justify-content: center;
+            cursor: pointer; opacity: 0; transition: 0.3s;
+            z-index: 999; border: none;
+        }
         .scroll-top.visible { opacity: 1; }
-        @media (max-width: 800px) { .grid-2col { grid-template-columns: 1fr; } }
+        .scroll-top:hover { transform: scale(1.1); }
+        
+        .login-card {
+            max-width: 450px; margin: 5rem auto;
+            text-align: center;
+        }
+        .login-card h2 { text-align: right; }
+        .login-card input { margin-bottom: 1rem; }
+        .login-card button { width: 100%; margin-top: 0.5rem; }
+        
+        .empty-state { color: #666; text-align: center; padding: 1rem; }
+        
+        .chart-container { position: relative; height: 250px; width: 100%; }
+        
+        @media (max-width: 900px) {
+            .grid-2col { grid-template-columns: 1fr; }
+            body { padding: 1rem; }
+        }
+        @media (max-width: 500px) {
+            .logo { font-size: 1.5rem; }
+            .card { padding: 1rem; }
+            .flex-row { flex-direction: column; align-items: stretch; }
+            .flex-row > * { width: 100% !important; }
+        }
     </style>
 </head>
 <body>
 <div class="container">
-    <div id="loginPanel" class="card" style="max-width: 500px; margin: 5rem auto;">
+    <div id="loginPanel" class="card login-card">
         <h2>🔐 دخول الإدارة</h2>
-        <input type="email" id="loginEmail" placeholder="البريد الإلكتروني">
-        <input type="password" id="loginPassword" placeholder="كلمة المرور">
+        <input type="email" id="loginEmail" placeholder="البريد الإلكتروني" autocomplete="email">
+        <input type="password" id="loginPassword" placeholder="كلمة المرور" autocomplete="current-password">
         <button id="doLoginBtn">تسجيل الدخول</button>
         <div id="loginMsg" class="message"></div>
     </div>
@@ -56,38 +194,59 @@
     <div id="adminPanel" style="display: none;">
         <div class="admin-header">
             <div class="logo">AWJ Admin</div>
-            <div><span class="stats-badge" id="statsInfo"></span> <button id="logoutBtn" style="background:#333; color:#eee;">تسجيل الخروج</button></div>
+            <div style="display:flex; gap:0.5rem; align-items:center; flex-wrap:wrap;">
+                <span class="stats-badge" id="statsInfo"></span>
+                <button id="logoutBtn" class="btn-danger btn-sm">تسجيل الخروج</button>
+            </div>
         </div>
 
-        <div class="card">
+        <div class="card" id="statsCard">
             <h2><i class="fas fa-chart-line"></i> إحصائيات متقدمة</h2>
-            <div style="display: flex; flex-wrap: wrap; gap: 1rem; justify-content: space-around; margin-bottom: 1.5rem;">
-                <div><strong>📄 المقالات:</strong> <span id="statArticles">0</span></div>
-                <div><strong>👁️ إجمالي المشاهدات:</strong> <span id="statViews">0</span></div>
-                <div><strong>✍️ الكتّاب:</strong> <span id="statAuthors">0</span></div>
-                <div><strong>🗂️ التبويبات:</strong> <span id="statCategories">0</span></div>
+            <div style="display: flex; flex-wrap: wrap; gap: 1.5rem; justify-content: space-around; margin-bottom: 1.5rem;">
+                <div style="text-align:center;">
+                    <div style="font-size:1.8rem; color:var(--gold); font-weight:bold;" id="statArticles">0</div>
+                    <div style="font-size:0.85rem; color:#888;">📄 مقال</div>
+                </div>
+                <div style="text-align:center;">
+                    <div style="font-size:1.8rem; color:var(--gold); font-weight:bold;" id="statViews">0</div>
+                    <div style="font-size:0.85rem; color:#888;">👁️ مشاهدة</div>
+                </div>
+                <div style="text-align:center;">
+                    <div style="font-size:1.8rem; color:var(--gold); font-weight:bold;" id="statAuthors">0</div>
+                    <div style="font-size:0.85rem; color:#888;">✍️ كاتب</div>
+                </div>
+                <div style="text-align:center;">
+                    <div style="font-size:1.8rem; color:var(--gold); font-weight:bold;" id="statCategories">0</div>
+                    <div style="font-size:0.85rem; color:#888;">🗂️ تصنيف</div>
+                </div>
             </div>
-            <canvas id="viewsChart" width="400" height="200" style="max-height: 250px; width: 100%;"></canvas>
+            <div class="chart-container">
+                <canvas id="viewsChart"></canvas>
+            </div>
         </div>
 
         <div class="grid-2col">
             <div class="card">
                 <h2><i class="fas fa-folder-tree"></i> التبويبات والفروع</h2>
+                
                 <div class="flex-row">
                     <input type="text" id="newCatName" placeholder="اسم التبويبة الجديدة" style="flex:2;">
-                    <button id="addCatBtn">➕ إضافة تبويبة</button>
+                    <button id="addCatBtn">➕ إضافة</button>
                 </div>
-                <div class="flex-row">
-                    <textarea id="multiSubs" rows="2" placeholder="أدخل فروع متعددة (سطر لكل فرع أو مفصولة بفواصل)" style="flex:3;"></textarea>
-                    <button id="addMultiSubsBtn">📌 إضافة فروع متعددة</button>
+                
+                <div class="flex-row" style="align-items:flex-start;">
+                    <textarea id="multiSubs" rows="2" placeholder="فروع متعددة (سطر لكل فرع أو مفصولة بفواصل)" style="flex:3;"></textarea>
+                    <button id="addMultiSubsBtn" class="btn-outline">📌 إضافة فروع</button>
                 </div>
+                
                 <div id="catsList"></div>
             </div>
+            
             <div class="card">
                 <h2><i class="fas fa-users"></i> الكتّاب</h2>
                 <div class="flex-row">
                     <input type="text" id="newAuthorName" placeholder="اسم الكاتب الجديد" style="flex:2;">
-                    <button id="addAuthorBtn">➕ إضافة كاتب</button>
+                    <button id="addAuthorBtn">➕ إضافة</button>
                 </div>
                 <div id="authorsList"></div>
             </div>
@@ -95,46 +254,66 @@
 
         <div class="card">
             <h2><i class="fas fa-share-alt"></i> إعدادات التواصل والموقع التابع</h2>
+            
             <div class="flex-row">
-                <input type="text" id="secondarySiteName" placeholder="اسم الموقع التابع (مثل: مدونتي)">
-                <input type="text" id="secondarySiteUrl" placeholder="رابط الموقع التابع">
-                <button id="saveSecondaryBtn">💾 حفظ</button>
+                <input type="text" id="secondarySiteName" placeholder="اسم الموقع التابع (مثل: مدونتي)" style="flex:1;">
+                <input type="text" id="secondarySiteUrl" placeholder="رابط الموقع التابع" style="flex:2;">
+                <button id="saveSecondaryBtn" class="btn-outline">💾 حفظ</button>
             </div>
-            <div id="socialLinksList"></div>
+            
+            <div id="socialLinksList" style="margin-bottom:1rem;"></div>
+            
             <div class="flex-row">
-                <select id="platformSelect">
-                    <option value="facebook">فيسبوك</option><option value="twitter">تويتر</option>
-                    <option value="instagram">انستغرام</option><option value="youtube">يوتيوب</option>
-                    <option value="linkedin">لينكدإن</option><option value="telegram">تيليجرام</option>
+                <select id="platformSelect" style="flex:1;">
+                    <option value="facebook">فيسبوك</option>
+                    <option value="twitter">تويتر (X)</option>
+                    <option value="instagram">انستغرام</option>
+                    <option value="youtube">يوتيوب</option>
+                    <option value="linkedin">لينكدإن</option>
+                    <option value="telegram">تيليجرام</option>
+                    <option value="github">GitHub</option>
+                    <option value="discord">Discord</option>
                 </select>
-                <input type="text" id="socialUsername" placeholder="اسم المستخدم (ظاهر)">
-                <input type="text" id="socialUrl" placeholder="الرابط الكامل">
-                <button id="addSocialBtn">➕ إضافة حساب</button>
+                <input type="text" id="socialUsername" placeholder="اسم المستخدم (ظاهر)" style="flex:1;">
+                <input type="text" id="socialUrl" placeholder="الرابط الكامل" style="flex:2;">
+                <button id="addSocialBtn">➕ إضافة</button>
             </div>
         </div>
 
         <div class="card">
             <h2><i class="fas fa-feather-alt"></i> محرر المقال المتقدم</h2>
+            
             <input type="text" id="articleTitle" placeholder="عنوان المقال">
-            <select id="authorSelect"></select>
+            <select id="authorSelect"><option value="">اختر الكاتب</option></select>
+            
             <div class="flex-row">
-                <select id="catSelect" style="flex:1"></select>
-                <select id="subSelect" style="flex:1"></select>
+                <select id="catSelect" style="flex:1;"><option value="">اختر التبويبة</option></select>
+                <select id="subSelect" style="flex:1;"><option value="">اختر الفرع</option></select>
             </div>
+            
             <div id="blocksEditor"></div>
-            <div class="flex-row">
-                <button id="addTextBtn"><i class="fas fa-paragraph"></i> نص (HTML)</button>
-                <button id="addImageBtn"><i class="fas fa-image"></i> صورة</button>
-                <button id="addCodeBtn"><i class="fas fa-code"></i> كود</button>
-                <button id="addSummaryBtn"><i class="fas fa-lightbulb"></i> مختصر</button>
+            
+            <div class="flex-row" style="justify-content:center;">
+                <button id="addTextBtn" class="btn-outline"><i class="fas fa-paragraph"></i> نص HTML</button>
+                <button id="addImageBtn" class="btn-outline"><i class="fas fa-image"></i> صورة</button>
+                <button id="addCodeBtn" class="btn-outline"><i class="fas fa-code"></i> كود</button>
+                <button id="addSummaryBtn" class="btn-outline"><i class="fas fa-lightbulb"></i> مختصر</button>
             </div>
-            <hr>
-            <button id="publishBtn" style="width:100%;">🚀 نشر المقال</button>
+            
+            <hr style="margin: 1.5rem 0; border-color:var(--border);">
+            <button id="publishBtn" style="width:100%; font-size:1.1rem;">🚀 نشر المقال</button>
             <div id="publishMsg" class="message"></div>
+        </div>
+        
+        <div class="card">
+            <h2><i class="fas fa-list"></i> إدارة المقالات المنشورة</h2>
+            <div id="articlesList"></div>
         </div>
     </div>
 </div>
-<div id="scrollTopBtn" class="scroll-top"><i class="fas fa-arrow-up"></i></div>
+
+<button id="scrollTopBtn" class="scroll-top"><i class="fas fa-arrow-up"></i></button>
+
 <script>
     const firebaseConfig = {
         apiKey: "AIzaSyDjgVxvtPXTn1tpr4IxOK3wOW4r3gzB1VU",
@@ -145,226 +324,752 @@
         appId: "1:406747568578:web:741821d3c60df0011b5e5b",
         measurementId: "G-DFB0GYH7LN"
     };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-    const auth = firebase.auth();
-    const storage = firebase.storage();
+    
+    let db, auth, storage;
+    try {
+        firebase.initializeApp(firebaseConfig);
+        db = firebase.firestore();
+        auth = firebase.auth();
+        storage = firebase.storage();
+    } catch (e) {
+        console.error("Firebase init error:", e);
+        alert("خطأ في تهيئة Firebase: " + e.message);
+    }
 
-    let categories = [], authors = [], blocks = [], viewsChart = null, socialLinks = [], secondarySite = { name: '', url: '' };
-    const languages = ["javascript","python","html","css","php","java","csharp","cpp","go","ruby","swift","kotlin","typescript","bash","sql","rust","perl","r","scala","lua"];
+    let categories = [];
+    let authors = [];
+    let blocks = [];
+    let viewsChart = null;
+    let socialLinks = [];
+    let secondarySite = { name: '', url: '' };
+    let sortableInstance = null;
+    
+    const languages = [
+        "javascript", "python", "html", "css", "php", "java", "csharp", "cpp",
+        "go", "ruby", "swift", "kotlin", "typescript", "bash", "sql", "rust",
+        "perl", "r", "scala", "lua", "json", "xml", "yaml", "markdown"
+    ];
 
     document.getElementById('doLoginBtn').onclick = async () => {
-        const email = document.getElementById('loginEmail').value, pass = document.getElementById('loginPassword').value;
-        try { await auth.signInWithEmailAndPassword(email, pass); } catch(e) { showMsg('loginMsg', '❌ '+e.message, 'error'); }
+        const email = document.getElementById('loginEmail').value.trim();
+        const pass = document.getElementById('loginPassword').value;
+        
+        if (!email || !pass) {
+            showMsg('loginMsg', '❌ أدخل البريد وكلمة المرور', 'error');
+            return;
+        }
+        
+        try {
+            await auth.signInWithEmailAndPassword(email, pass);
+        } catch(e) {
+            let msg = e يبدو أن الرد انقطع بسبب طول الكود. سأرسل لك الملف الثاني (admin.html) في جزء منفصل:
+
+---
+
+## 📄 ملف `admin.html` (الجزء الثاني - أكمال الكود)
+
+انسخ هذا الجزء والصقه بعد الجزء الأول في نفس الملف `admin.html`:
+
+```javascript
+            let msg = e.message;
+            if (e.code === 'auth/user-not-found') msg = 'المستخدم غير موجود';
+            else if (e.code === 'auth/wrong-password') msg = 'كلمة المرور خاطئة';
+            else if (e.code === 'auth/invalid-email') msg = 'بريد إلكتروني غير صالح';
+            showMsg('loginMsg', '❌ ' + msg, 'error');
+        }
     };
+
     auth.onAuthStateChanged(user => {
         if (user) {
             document.getElementById('loginPanel').style.display = 'none';
             document.getElementById('adminPanel').style.display = 'block';
-            loadCategories(); loadAuthors(); loadBlocksFromLocal(); loadSettings();
-            updateStats();
+            document.getElementById('statsInfo').textContent = `👤 ${user.email}`;
+            initAdmin();
         } else {
             document.getElementById('loginPanel').style.display = 'block';
             document.getElementById('adminPanel').style.display = 'none';
         }
     });
+
     document.getElementById('logoutBtn').onclick = () => auth.signOut();
-    function showMsg(elId, text, type) { let d = document.getElementById(elId); d.innerHTML = text; d.className = 'message '+type; setTimeout(() => d.className='message',3000); }
+
+    function showMsg(elId, text, type) {
+        const d = document.getElementById(elId);
+        d.innerHTML = text;
+        d.className = `message ${type} show`;
+        setTimeout(() => d.className = 'message', 4000);
+    }
+
+    async function initAdmin() {
+        await Promise.all([
+            loadCategories(),
+            loadAuthors(),
+            loadSettings(),
+            loadArticlesList()
+        ]);
+        loadBlocksFromLocal();
+        updateStats();
+    }
 
     async function updateStats() {
-        let articlesSnap = await db.collection('articles').get();
-        let articles = articlesSnap.docs.map(d => ({ id: d.id, views: d.data().views||0, title: d.data().title }));
-        let totalViews = articles.reduce((s,a)=>s+a.views,0);
-        document.getElementById('statArticles').innerText = articles.length;
-        document.getElementById('statViews').innerText = totalViews;
-        document.getElementById('statAuthors').innerText = authors.length;
-        document.getElementById('statCategories').innerText = categories.length;
-        let top5 = [...articles].sort((a,b)=>b.views-a.views).slice(0,5);
-        let labels = top5.map(a => a.title?.length>20? a.title.slice(0,20)+'...': a.title||'بدون عنوان');
-        let data = top5.map(a=>a.views);
-        if(viewsChart) viewsChart.destroy();
-        viewsChart = new Chart(document.getElementById('viewsChart'), { type:'bar', data:{ labels, datasets:[{ label:'عدد المشاهدات', data, backgroundColor:'#D4AF37', borderRadius:8 }] }, options:{ responsive:true, maintainAspectRatio:true } });
+        if (!db) return;
+        try {
+            const articlesSnap = await db.collection('articles').get();
+            const articles = articlesSnap.docs.map(d => ({ 
+                id: d.id, 
+                views: d.data().views || 0, 
+                title: d.data().title || 'بدون عنوان'
+            }));
+            
+            const totalViews = articles.reduce((sum, a) => sum + a.views, 0);
+            document.getElementById('statArticles').innerText = articles.length;
+            document.getElementById('statViews').innerText = totalViews.toLocaleString('ar-EG');
+            document.getElementById('statAuthors').innerText = authors.length;
+            document.getElementById('statCategories').innerText = categories.length;
+
+            const top5 = [...articles].sort((a, b) => b.views - a.views).slice(0, 5);
+            const labels = top5.map(a => a.title.length > 15 ? a.title.slice(0, 15) + '...' : a.title);
+            const data = top5.map(a => a.views);
+            
+            if (viewsChart) viewsChart.destroy();
+            
+            const ctx = document.getElementById('viewsChart').getContext('2d');
+            viewsChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels,
+                    datasets: [{
+                        label: 'عدد المشاهدات',
+                        data,
+                        backgroundColor: '#D4AF37',
+                        borderRadius: 6,
+                        borderSkipped: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#1e1e2a',
+                            titleColor: '#D4AF37',
+                            bodyColor: '#fff',
+                            borderColor: '#D4AF37',
+                            borderWidth: 1
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: '#1e1e2a' },
+                            ticks: { color: '#888' }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#888', font: { size: 11 } }
+                        }
+                    }
+                }
+            });
+        } catch (e) {
+            console.error("Stats error:", e);
+        }
     }
 
     async function loadCategories() {
-        let snap = await db.collection('categories').orderBy('name').get();
-        categories = snap.docs.map(d => ({ id:d.id, ...d.data() }));
-        renderCategoriesList(); updateCategorySelects(); updateStats();
+        if (!db) return;
+        try {
+            const snap = await db.collection('categories').orderBy('name').get();
+            categories = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+            renderCategoriesList();
+            updateCategorySelects();
+        } catch (e) {
+            console.error("Categories error:", e);
+        }
     }
+
     function renderCategoriesList() {
-        let div = document.getElementById('catsList');
-        if(!categories.length){ div.innerHTML='<p>لا توجد تبويبات</p>'; return; }
-        div.innerHTML = '';
-        categories.forEach(cat => {
-            div.innerHTML += `<div style="background:#12141E; border-radius:1rem; padding:0.8rem; margin-bottom:1rem;"><div class="flex-row" style="justify-content:space-between;"><b>📁 ${escapeHtml(cat.name)}</b><button class="btn-outline" onclick="deleteCategory('${cat.id}')">حذف التبويبة</button></div><div>${cat.subfields.map(sub=>`<span class="sub-item">${escapeHtml(sub)} <i class="fas fa-times-circle" onclick="removeSubfield('${cat.id}','${sub}')"></i></span>`).join('')}</div><div class="flex-row"><input type="text" id="sub-${cat.id}" placeholder="فرع جديد" style="flex:2;"><button class="btn-outline" onclick="addSubfield('${cat.id}')">إضافة فرع</button></div></div>`;
-        });
+        const div = document.getElementById('catsList');
+        if (!categories.length) {
+            div.innerHTML = '<div class="empty-state">لا توجد تبويبات. أضف تبويبة أولاً.</div>';
+            return;
+        }
+        
+        div.innerHTML = categories.map(cat => `
+            <div class="category-box">
+                <div class="flex-row" style="justify-content:space-between; margin-bottom:0.5rem;">
+                    <h4>📁 ${escapeHtml(cat.name)}</h4>
+                    <button class="btn-danger btn-sm" onclick="deleteCategory('${cat.id}')">🗑️ حذف</button>
+                </div>
+                <div style="margin: 0.5rem 0;">
+                    ${(cat.subfields || []).map(sub => `
+                        <span class="sub-item">
+                            ${escapeHtml(sub)}
+                            <i class="fas fa-times-circle" onclick="removeSubfield('${cat.id}', '${escapeHtml(sub)}')"></i>
+                        </span>
+                    `).join('')}
+                </div>
+                <div class="flex-row">
+                    <input type="text" id="sub-${cat.id}" placeholder="فرع جديد" style="flex:2;">
+                    <button class="btn-outline btn-sm" onclick="addSubfield('${cat.id}')">إضافة فرع</button>
+                </div>
+            </div>
+        `).join('');
     }
-    window.deleteCategory = async (id) => { if(confirm('حذف التبويبة؟')){ await db.collection('categories').doc(id).delete(); loadCategories(); } };
+
+    window.deleteCategory = async (id) => {
+        if (!confirm('⚠️ سيتم حذف التبويبة وجميع فروعها نهائياً. هل أنت متأكد؟')) return;
+        try {
+            await db.collection('categories').doc(id).delete();
+            loadCategories();
+            showMsg('publishMsg', '✅ تم حذف التبويبة', 'success');
+        } catch (e) {
+            showMsg('publishMsg', '❌ فشل الحذف: ' + e.message, 'error');
+        }
+    };
+
     window.addSubfield = async (catId) => {
-        let input = document.getElementById(`sub-${catId}`), subName = input.value.trim();
-        if(!subName) return;
-        let cat = categories.find(c=>c.id===catId);
-        let newSubs = [...cat.subfields, subName];
-        await db.collection('categories').doc(catId).update({ subfields: newSubs });
-        input.value=''; loadCategories();
+        const input = document.getElementById(`sub-${catId}`);
+        const subName = input.value.trim();
+        if (!subName) return;
+        
+        const cat = categories.find(c => c.id === catId);
+        if (!cat) return;
+        
+        const newSubs = [...(cat.subfields || []), subName];
+        try {
+            await db.collection('categories').doc(catId).update({ subfields: newSubs });
+            input.value = '';
+            loadCategories();
+        } catch (e) {
+            showMsg('publishMsg', '❌ ' + e.message, 'error');
+        }
     };
+
     window.removeSubfield = async (catId, subName) => {
-        let cat = categories.find(c=>c.id===catId);
-        let newSubs = cat.subfields.filter(s=>s!==subName);
-        await db.collection('categories').doc(catId).update({ subfields: newSubs });
-        loadCategories();
+        const cat = categories.find(c => c.id === catId);
+        if (!cat) return;
+        
+        const newSubs = (cat.subfields || []).filter(s => s !== subName);
+        try {
+            await db.collection('categories').doc(catId).update({ subfields: newSubs });
+            loadCategories();
+        } catch (e) {
+            showMsg('publishMsg', '❌ ' + e.message, 'error');
+        }
     };
+
     document.getElementById('addCatBtn').onclick = async () => {
-        let name = document.getElementById('newCatName').value.trim();
-        if(!name) return;
-        await db.collection('categories').add({ name, subfields: [] });
-        document.getElementById('newCatName').value=''; loadCategories();
+        const name = document.getElementById('newCatName').value.trim();
+        if (!name) {
+            showMsg('publishMsg', '❌ أدخل اسم التبويبة', 'error');
+            return;
+        }
+        try {
+            await db.collection('categories').add({ name, subfields: [] });
+            document.getElementById('newCatName').value = '';
+            loadCategories();
+            showMsg('publishMsg', '✅ تم إضافة التبويبة', 'success');
+        } catch (e) {
+            showMsg('publishMsg', '❌ ' + e.message, 'error');
+        }
     };
+
     document.getElementById('addMultiSubsBtn').onclick = async () => {
-        let catName = document.getElementById('newCatName').value.trim();
-        if(!catName){ alert('اكتب اسم تبويبة موجودة أولاً'); return; }
-        let cat = categories.find(c=>c.name===catName);
-        if(!cat) return;
-        let raw = document.getElementById('multiSubs').value;
-        let subs = raw.split(/\n|,|،/).map(s=>s.trim()).filter(s=>s!=='');
-        if(!subs.length) return;
-        let newSubs = [...cat.subfields, ...subs];
-        let unique = [...new Set(newSubs)];
-        await db.collection('categories').doc(cat.id).update({ subfields: unique });
-        document.getElementById('multiSubs').value=''; loadCategories();
+        const catName = document.getElementById('newCatName').value.trim();
+        if (!catName) {
+            showMsg('publishMsg', '❌ اكتب اسم التبويبة في حقل "اسم التبويبة الجديدة" أولاً', 'error');
+            return;
+        }
+        
+        const cat = categories.find(c => c.name === catName);
+        if (!cat) {
+            showMsg('publishMsg', '❌ التبويبة غير موجودة. أضفها أولاً.', 'error');
+            return;
+        }
+        
+        const raw = document.getElementById('multiSubs').value;
+        let subs = raw.split(/[\n,،]/).map(s => s.trim()).filter(s => s !== '');
+        if (subs.length === 0) {
+            showMsg('publishMsg', '❌ أدخل فروعاً صالحة', 'error');
+            return;
+        }
+        
+        const newSubs = [...new Set([...(cat.subfields || []), ...subs])];
+        try {
+            await db.collection('categories').doc(cat.id).update({ subfields: newSubs });
+            document.getElementById('multiSubs').value = '';
+            loadCategories();
+            showMsg('publishMsg', `✅ تم إضافة ${subs.length} فرع`, 'success');
+        } catch (e) {
+            showMsg('publishMsg', '❌ ' + e.message, 'error');
+        }
     };
+
     function updateCategorySelects() {
-        let catSelect = document.getElementById('catSelect'), subSelect = document.getElementById('subSelect');
+        const catSelect = document.getElementById('catSelect');
+        const subSelect = document.getElementById('subSelect');
+        
         catSelect.innerHTML = '<option value="">اختر التبويبة</option>';
-        categories.forEach(c=>catSelect.innerHTML+=`<option value="${c.name}">${c.name}</option>`);
+        categories.forEach(c => {
+            catSelect.innerHTML += `<option value="${escapeHtml(c.name)}">${escapeHtml(c.name)}</option>`;
+        });
+        
         catSelect.onchange = () => {
-            let catName = catSelect.value, cat = categories.find(c=>c.name===catName);
+            const catName = catSelect.value;
+            const cat = categories.find(c => c.name === catName);
             subSelect.innerHTML = '<option value="">اختر الفرع</option>';
-            if(cat && cat.subfields) cat.subfields.forEach(sub=>subSelect.innerHTML+=`<option value="${sub}">${sub}</option>`);
+            if (cat && cat.subfields) {
+                cat.subfields.forEach(sub => {
+                    subSelect.innerHTML += `<option value="${escapeHtml(sub)}">${escapeHtml(sub)}</option>`;
+                });
+            }
         };
     }
 
     async function loadAuthors() {
-        let snap = await db.collection('authors').orderBy('name').get();
-        authors = snap.docs.map(d=>({ id:d.id, name:d.data().name }));
-        renderAuthorsList(); updateAuthorSelect(); updateStats();
+        if (!db) return;
+        try {
+            const snap = await db.collection('authors').orderBy('name').get();
+            authors = snap.docs.map(d => ({ id: d.id, name: d.data().name }));
+            renderAuthorsList();
+            updateAuthorSelect();
+        } catch (e) {
+            console.error("Authors error:", e);
+        }
     }
+
     function renderAuthorsList() {
-        let div = document.getElementById('authorsList');
-        if(!authors.length){ div.innerHTML='<p>لا يوجد كتاب</p>'; return; }
-        div.innerHTML = authors.map(a=>`<div class="flex-row" style="justify-content:space-between;"><span>✍️ ${escapeHtml(a.name)}</span><button class="btn-outline" onclick="deleteAuthor('${a.id}')">حذف</button></div>`).join('');
+        const div = document.getElementById('authorsList');
+        if (!authors.length) {
+            div.innerHTML = '<div class="empty-state">لا يوجد كتاب. أضف كاتباً أولاً.</div>';
+            return;
+        }
+        
+        div.innerHTML = authors.map(a => `
+            <div class="flex-row" style="justify-content:space-between; margin-bottom:0.5rem; padding:0.5rem; background:#12141E; border-radius:0.5rem;">
+                <span>✍️ ${escapeHtml(a.name)}</span>
+                <button class="btn-danger btn-sm" onclick="deleteAuthor('${a.id}')">حذف</button>
+            </div>
+        `).join('');
     }
-    window.deleteAuthor = async (id) => { if(confirm('حذف الكاتب؟')){ await db.collection('authors').doc(id).delete(); loadAuthors(); } };
-    document.getElementById('addAuthorBtn').onclick = async () => {
-        let name = document.getElementById('newAuthorName').value.trim();
-        if(!name) return;
-        await db.collection('authors').add({ name });
-        document.getElementById('newAuthorName').value=''; loadAuthors();
+
+    window.deleteAuthor = async (id) => {
+        if (!confirm('سيتم حذف هذا الكاتب. متأكد؟')) return;
+        try {
+            await db.collection('authors').doc(id).delete();
+            loadAuthors();
+            showMsg('publishMsg', '✅ تم حذف الكاتب', 'success');
+        } catch (e) {
+            showMsg('publishMsg', '❌ ' + e.message, 'error');
+        }
     };
-    function updateAuthorSelect() { let sel = document.getElementById('authorSelect'); sel.innerHTML='<option value="">اختر الكاتب</option>'; authors.forEach(a=>sel.innerHTML+=`<option value="${a.name}">${a.name}</option>`); }
+
+    document.getElementById('addAuthorBtn').onclick = async () => {
+        const name = document.getElementById('newAuthorName').value.trim();
+        if (!name) {
+            showMsg('publishMsg', '❌ أدخل اسم الكاتب', 'error');
+            return;
+        }
+        try {
+            await db.collection('authors').add({ name });
+            document.getElementById('newAuthorName').value = '';
+            loadAuthors();
+            showMsg('publishMsg', '✅ تم إضافة الكاتب', 'success');
+        } catch (e) {
+            showMsg('publishMsg', '❌ ' + e.message, 'error');
+        }
+    };
+
+    function updateAuthorSelect() {
+        const sel = document.getElementById('authorSelect');
+        sel.innerHTML = '<option value="">اختر الكاتب</option>';
+        authors.forEach(a => {
+            sel.innerHTML += `<option value="${escapeHtml(a.name)}">${escapeHtml(a.name)}</option>`;
+        });
+    }
 
     async function loadSettings() {
-        let doc = await db.collection('settings').doc('social').get();
-        if(doc.exists){ let data=doc.data(); socialLinks=data.socialLinks||[]; secondarySite=data.secondarySite||{name:'',url:''}; }
-        renderSocialList();
-        document.getElementById('secondarySiteName').value=secondarySite.name;
-        document.getElementById('secondarySiteUrl').value=secondarySite.url;
+        if (!db) return;
+        try {
+            const doc = await db.collection('settings').doc('social').get();
+            if (doc.exists) {
+                const data = doc.data();
+                socialLinks = data.socialLinks || [];
+                secondarySite = data.secondarySite || { name: '', url: '' };
+            } else {
+                socialLinks = [];
+                secondarySite = { name: '', url: '' };
+            }
+            renderSocialList();
+            document.getElementById('secondarySiteName').value = secondarySite.name;
+            document.getElementById('secondarySiteUrl').value = secondarySite.url;
+        } catch (e) {
+            console.error("Settings error:", e);
+        }
     }
+
     function renderSocialList() {
-        let container = document.getElementById('socialLinksList');
-        if(!container) return;
-        container.innerHTML = '<strong>الحسابات المضافة:</strong><br>';
-        socialLinks.forEach((item,idx)=>{ container.innerHTML+=`<div class="flex-row" style="justify-content:space-between;"><span><i class="fab fa-${item.platform}"></i> ${escapeHtml(item.username)} : ${escapeHtml(item.url)}</span><button class="btn-outline" onclick="removeSocial(${idx})">🗑️</button></div>`; });
+        const container = document.getElementById('socialLinksList');
+        if (!socialLinks.length) {
+            container.innerHTML = '<div class="empty-state">لا توجد حسابات تواصل اجتماعي مضافة.</div>';
+            return;
+        }
+        
+        container.innerHTML = '<strong style="color:var(--gold); display:block; margin-bottom:0.5rem;">الحسابات المضافة:</strong>';
+        container.innerHTML += socialLinks.map((item, idx) => `
+            <div class="social-item">
+                <span><i class="fab fa-${escapeHtml(item.platform)}"></i> ${escapeHtml(item.username)} — ${escapeHtml(item.url)}</span>
+                <button class="btn-danger btn-sm" onclick="removeSocial(${idx})">🗑️</button>
+            </div>
+        `).join('');
     }
-    window.removeSocial = (idx) => { socialLinks.splice(idx,1); saveSocialSettings(); };
-    document.getElementById('addSocialBtn').onclick = () => {
-        let platform = document.getElementById('platformSelect').value;
-        let username = document.getElementById('socialUsername').value.trim();
-        let url = document.getElementById('socialUrl').value.trim();
-        if(!username||!url) return;
-        socialLinks.push({ platform, username, url });
-        saveSocialSettings();
-        document.getElementById('socialUsername').value=''; document.getElementById('socialUrl').value='';
+
+    window.removeSocial = async (idx) => {
+        socialLinks.splice(idx, 1);
+        await saveSocialSettings();
     };
-    document.getElementById('saveSecondaryBtn').onclick = () => {
+
+    document.getElementById('addSocialBtn').onclick = async () => {
+        const platform = document.getElementById('platformSelect').value;
+        const username = document.getElementById('socialUsername').value.trim();
+        const url = document.getElementById('socialUrl').value.trim();
+        
+        if (!username || !url) {
+            showMsg('publishMsg', '❌ أدخل اسم المستخدم والرابط', 'error');
+            return;
+        }
+        
+        socialLinks.push({ platform, username, url });
+        await saveSocialSettings();
+        document.getElementById('socialUsername').value = '';
+        document.getElementById('socialUrl').value = '';
+    };
+
+    document.getElementById('saveSecondaryBtn').onclick = async () => {
         secondarySite.name = document.getElementById('secondarySiteName').value.trim();
         secondarySite.url = document.getElementById('secondarySiteUrl').value.trim();
-        saveSocialSettings();
+        await saveSocialSettings();
     };
+
     async function saveSocialSettings() {
-        await db.collection('settings').doc('social').set({ socialLinks, secondarySite });
-        loadSettings();
+        if (!db) return;
+        try {
+            await db.collection('settings').doc('social').set({ socialLinks, secondarySite });
+            loadSettings();
+            showMsg('publishMsg', '✅ تم حفظ الإعدادات', 'success');
+        } catch (e) {
+            showMsg('publishMsg', '❌ ' + e.message, 'error');
+        }
     }
 
     function addBlock(type) {
         let newBlock;
-        if(type==='text') newBlock={ type, value:'<p>نص جديد HTML</p>' };
-        else if(type==='image') newBlock={ type, value:{ url:'', caption:'' } };
-        else if(type==='code') newBlock={ type, value:{ code:'// كود', language:'javascript' } };
-        else if(type==='summary') newBlock={ type, value:'ملخص المقال...' };
-        blocks.push(newBlock); renderBlocks(); saveBlocksToLocal();
+        switch (type) {
+            case 'text':
+                newBlock = { type, value: '<p>اكتب محتوى النص هنا. يدعم <strong>HTML</strong> بالكامل.</p>' };
+                break;
+            case 'image':
+                newBlock = { type, value: { url: '', caption: '' } };
+                break;
+            case 'code':
+                newBlock = { type, value: { code: '// اكتب كودك هنا\nconsole.log("Hello AWJ");', language: 'javascript' } };
+                break;
+            case 'summary':
+                newBlock = { type, value: 'ملخص سريع للمقال...' };
+                break;
+        }
+        
+        if (newBlock) {
+            blocks.push(newBlock);
+            renderBlocks();
+            saveBlocksToLocal();
+        }
     }
-    window.deleteBlock = (idx) => { blocks.splice(idx,1); renderBlocks(); saveBlocksToLocal(); };
-    window.updateBlockValue = (idx, field, val) => {
-        if(typeof blocks[idx].value==='string') blocks[idx].value=val;
-        else blocks[idx].value[field]=val;
-        saveBlocksToLocal(); renderBlocks();
+
+    window.deleteBlock = (idx) => {
+        if (!confirm('حذف هذه الكتلة؟')) return;
+        blocks.splice(idx, 1);
+        renderBlocks();
+        saveBlocksToLocal();
     };
+
+    window.updateBlockValue = (idx, field, value) => {
+        if (!blocks[idx]) return;
+        if (field === null) {
+            blocks[idx].value = value;
+        } else {
+            if (typeof blocks[idx].value !== 'object') blocks[idx].value = {};
+            blocks[idx].value[field] = value;
+        }
+        saveBlocksToLocal();
+        if (field !== 'code' && field !== null) renderBlocks();
+    };
+
     window.uploadImage = async (idx, fileInput) => {
-        let file = fileInput.files[0];
-        if(!file) return;
-        let ref = storage.ref(`articles/${Date.now()}_${file.name}`);
-        await ref.put(file);
-        let url = await ref.getDownloadURL();
-        blocks[idx].value.url = url;
-        saveBlocksToLocal(); renderBlocks();
+        const file = fileInput.files[0];
+        if (!file) return;
+        
+        if (!file.type.startsWith('image/')) {
+            showMsg('publishMsg', '❌ الملف يجب أن يكون صورة', 'error');
+            return;
+        }
+        
+        if (file.size > 5 * 1024 * 1024) {
+            showMsg('publishMsg', '❌ حجم الصورة يجب أن يكون أقل من 5 ميجا', 'error');
+            return;
+        }
+        
+        try {
+            const storageRef = storage.ref(`articles/${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.]/g, '_')}`);
+            await storageRef.put(file);
+            const url = await storageRef.getDownloadURL();
+            blocks[idx].value.url = url;
+            saveBlocksToLocal();
+            renderBlocks();
+            showMsg('publishMsg', '✅ تم رفع الصورة', 'success');
+        } catch (e) {
+            showMsg('publishMsg', '❌ فشل رفع الصورة: ' + e.message, 'error');
+        }
     };
+
     function renderBlocks() {
-        let container = document.getElementById('blocksEditor');
-        if(!blocks.length){ container.innerHTML='<div style="text-align:center; padding:1rem;">➕ أضف كتلة</div>'; return; }
-        container.innerHTML='';
-        blocks.forEach((block,idx)=>{
-            let div = document.createElement('div'); div.className='block'; div.setAttribute('data-idx',idx);
-            let inner = `<div class="block-header"><span>${block.type==='text'?'📝 نص':block.type==='image'?'🖼️ صورة':block.type==='code'?'💻 كود':'✨ مختصر'}</span><button class="delete-block" onclick="deleteBlock(${idx})"><i class="fas fa-trash"></i></button></div>`;
-            if(block.type==='text') inner+=`<textarea rows="5" onchange="updateBlockValue(${idx}, null, this.value)">${escapeHtml(block.value)}</textarea>`;
-            else if(block.type==='image'){
-                inner+=`<input type="file" accept="image/*" onchange="uploadImage(${idx}, this)"><div id="preview-${idx}">${block.value.url?`<img src="${block.value.url}" class="image-preview"><br><input type="text" placeholder="التسمية" value="${escapeHtml(block.value.caption)}" onchange="updateBlockValue(${idx}, 'caption', this.value)">`:''}</div>`;
-            } else if(block.type==='code'){
-                inner+=`<select onchange="updateBlockValue(${idx}, 'language', this.value)">${languages.map(l=>`<option value="${l}" ${block.value.language===l?'selected':''}>${l}</option>`).join('')}</select>`;
-                inner+=`<textarea rows="8" onchange="updateBlockValue(${idx}, 'code', this.value)">${escapeHtml(block.value.code)}</textarea>`;
-                inner+=`<div class="code-preview"><pre><code class="language-${block.value.language}">${escapeHtml(block.value.code)}</code></pre></div>`;
-            } else if(block.type==='summary') inner+=`<textarea rows="3" onchange="updateBlockValue(${idx}, null, this.value)">${escapeHtml(block.value)}</textarea>`;
-            div.innerHTML=inner;
+        const container = document.getElementById('blocksEditor');
+        if (!blocks.length) {
+            container.innerHTML = '<div class="empty-state">➕ أضف كتلة جديدة باستخدام الأزرار أعلاه</div>';
+            if (sortableInstance) sortableInstance.destroy();
+            return;
+        }
+        
+        container.innerHTML = '';
+        blocks.forEach((block, idx) => {
+            const div = document.createElement('div');
+            div.className = 'block-editor';
+            div.setAttribute('data-idx', idx);
+            
+            const typeLabels = {
+                text: '📝 نص HTML',
+                image: '🖼️ صورة',
+                code: '💻 كود',
+                summary: '✨ مختصر'
+            };
+            
+            let innerHtml = `
+                <div class="block-header">
+                    <span class="block-type-label">${typeLabels[block.type] || block.type}</span>
+                    <button class="delete-block" onclick="deleteBlock(${idx})" title="حذف الكتلة">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            `;
+            
+            switch (block.type) {
+                case 'text':
+                    innerHtml += `<textarea rows="6" placeholder="اكتب المحتوى هنا (يدعم HTML كامل)" onblur="updateBlockValue(${idx}, null, this.value)">${escapeHtml(block.value)}</textarea>`;
+                    break;
+                    
+                case 'image':
+                    innerHtml += `<input type="file" accept="image/*" onchange="uploadImage(${idx}, this)">`;
+                    if (block.value && block.value.url) {
+                        innerHtml += `
+                            <img src="${escapeHtml(block.value.url)}" class="image-preview" alt="معاينة">
+                            <input type="text" placeholder="التسمية (اختياري)" 
+                                value="${escapeHtml(block.value.caption || '')}" 
+                                onblur="updateBlockValue(${idx}, 'caption', this.value)">
+                        `;
+                    }
+                    break;
+                    
+                case 'code':
+                    innerHtml += `
+                        <select onchange="updateBlockValue(${idx}, 'language', this.value)" style="margin-bottom:0.5rem;">
+                            ${languages.map(lang => `<option value="${lang}" ${block.value.language === lang ? 'selected' : ''}>${lang}</option>`).join('')}
+                        </select>
+                        <textarea rows="8" placeholder="اكتب الكود هنا" 
+                            onblur="updateBlockValue(${idx}, 'code', this.value)">${escapeHtml(block.value.code)}</textarea>
+                        <div class="code-preview">
+                            <strong style="color:var(--gold); display:block; margin-bottom:0.5rem;">معاينة:</strong>
+                            <pre><code class="language-${escapeHtml(block.value.language)}">${escapeHtml(block.value.code)}</code></pre>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'summary':
+                    innerHtml += `<textarea rows="3" placeholder="مختصر المقال (يدعم HTML)" 
+                        onblur="updateBlockValue(${idx}, null, this.value)">${escapeHtml(block.value)}</textarea>`;
+                    break;
+            }
+            
+            div.innerHTML = innerHtml;
             container.appendChild(div);
-            if(block.type==='code') hljs.highlightElement(div.querySelector('pre code'));
+            
+            if (block.type === 'code') {
+                const codeElem = div.querySelector('pre code');
+                if (codeElem && window.hljs) hljs.highlightElement(codeElem);
+            }
         });
-        new Sortable(container, { animation:200, onEnd:()=>{ let newBlocks=[]; document.querySelectorAll('.block').forEach(el=>{ let oldIdx=parseInt(el.getAttribute('data-idx')); newBlocks.push(blocks[oldIdx]); }); blocks=newBlocks; saveBlocksToLocal(); renderBlocks(); } });
+        
+        if (sortableInstance) sortableInstance.destroy();
+        sortableInstance = new Sortable(container, {
+            animation: 200,
+            handle: '.block-header',
+            ghostClass: 'sortable-ghost',
+            onEnd: () => {
+                const newBlocks = [];
+                document.querySelectorAll('.block-editor').forEach(el => {
+                    const oldIdx = parseInt(el.getAttribute('data-idx'));
+                    if (blocks[oldIdx]) newBlocks.push(blocks[oldIdx]);
+                });
+                blocks = newBlocks;
+                saveBlocksToLocal();
+                renderBlocks();
+            }
+        });
     }
-    function saveBlocksToLocal() { localStorage.setItem('admin_blocks', JSON.stringify(blocks)); }
-    function loadBlocksFromLocal() { let saved = localStorage.getItem('admin_blocks'); if(saved) try{ blocks=JSON.parse(saved); }catch(e){ blocks=[]; } else blocks=[]; renderBlocks(); }
-    function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, m=> m==='&'?'&amp;':m==='<'?'&lt;':'&gt;'); }
+
+    function saveBlocksToLocal() {
+        localStorage.setItem('admin_blocks', JSON.stringify(blocks));
+    }
+
+    function loadBlocksFromLocal() {
+        const saved = localStorage.getItem('admin_blocks');
+        if (saved) {
+            try {
+                blocks = JSON.parse(saved);
+            } catch (e) {
+                blocks = [];
+                console.error("Local blocks parse error:", e);
+            }
+        } else {
+            blocks = [];
+        }
+        renderBlocks();
+    }
 
     document.getElementById('publishBtn').onclick = async () => {
-        let title = document.getElementById('articleTitle').value.trim();
-        let author = document.getElementById('authorSelect').value;
-        let category = document.getElementById('catSelect').value;
-        let subfield = document.getElementById('subSelect').value;
-        if(!title||!author||!category||!subfield||blocks.length===0){ showMsg('publishMsg','❌ جميع الحقول مطلوبة','error'); return; }
-        let clean = blocks.map(b=>{ if(b.type==='image') return { type:'image', value:{ url:b.value.url||'', caption:b.value.caption||'' } }; return b; });
+        const title = document.getElementById('articleTitle').value.trim();
+        const author = document.getElementById('authorSelect').value;
+        const category = document.getElementById('catSelect').value;
+        const subfield = document.getElementById('subSelect').value;
+        
+        if (!title) {
+            showMsg('publishMsg', '❌ أدخل عنوان المقال', 'error');
+            return;
+        }
+        if (!author) {
+            showMsg('publishMsg', '❌ اختر الكاتب', 'error');
+            return;
+        }
+        if (!category) {
+            showMsg('publishMsg', '❌ اختر التبويبة', 'error');
+            return;
+        }
+        if (!subfield) {
+            showMsg('publishMsg', '❌ اختر الفرع', 'error');
+            return;
+        }
+        if (blocks.length === 0) {
+            showMsg('publishMsg', '❌ أضف كتلة واحدة على الأقل', 'error');
+            return;
+        }
+        
+        const cleanBlocks = blocks.map(b => {
+            if (b.type === 'image') {
+                return {
+                    type: 'image',
+                    value: {
+                        url: (b.value && b.value.url) || '',
+                        caption: (b.value && b.value.caption) || ''
+                    }
+                };
+            }
+            return b;
+        });
+        
         try {
-            await db.collection('articles').add({ title, author, category, subfield, contentBlocks:clean, views:0, date: firebase.firestore.FieldValue.serverTimestamp() });
-            showMsg('publishMsg','✅ تم النشر','success');
-            blocks=[]; localStorage.removeItem('admin_blocks'); document.getElementById('articleTitle').value=''; renderBlocks(); updateStats();
-        } catch(e){ showMsg('publishMsg','❌ '+e.message,'error'); }
+            await db.collection('articles').add({
+                title,
+                author,
+                category,
+                subfield,
+                contentBlocks: cleanBlocks,
+                views: 0,
+                date: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            
+            showMsg('publishMsg', '✅ تم نشر المقال بنجاح!', 'success');
+            blocks = [];
+            localStorage.removeItem('admin_blocks');
+            document.getElementById('articleTitle').value = '';
+            document.getElementById('catSelect').value = '';
+            document.getElementById('subSelect').innerHTML = '<option value="">اختر الفرع</option>';
+            renderBlocks();
+            updateStats();
+            loadArticlesList();
+        } catch (err) {
+            showMsg('publishMsg', '❌ فشل النشر: ' + err.message, 'error');
+        }
     };
+
     document.getElementById('addTextBtn').onclick = () => addBlock('text');
     document.getElementById('addImageBtn').onclick = () => addBlock('image');
     document.getElementById('addCodeBtn').onclick = () => addBlock('code');
     document.getElementById('addSummaryBtn').onclick = () => addBlock('summary');
 
-    let scrollBtn = document.getElementById('scrollTopBtn');
-    window.onscroll = () => { if(window.scrollY>300) scrollBtn.classList.add('visible'); else scrollBtn.classList.remove('visible'); };
-    scrollBtn.onclick = () => window.scrollTo({ top:0, behavior:'smooth' });
+    async function loadArticlesList() {
+        if (!db) return;
+        try {
+            const snap = await db.collection('articles').orderBy('date', 'desc').get();
+            const articles = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+            
+            const div = document.getElementById('articlesList');
+            if (!articles.length) {
+                div.innerHTML = '<div class="empty-state">لا توجد مقالات منشورة.</div>';
+                return;
+            }
+            
+            div.innerHTML = articles.map(a => `
+                <div class="flex-row" style="justify-content:space-between; padding:0.8rem; background:#12141E; border-radius:0.8rem; margin-bottom:0.5rem;">
+                    <div style="flex:1;">
+                        <strong style="color:var(--gold);">${escapeHtml(a.title)}</strong>
+                        <div style="font-size:0.8rem; color:#888; margin-top:0.3rem;">
+                            ${escapeHtml(a.author || '')} | ${escapeHtml(a.category || '')} | ${escapeHtml(a.subfield || '')} | 👁️ ${a.views || 0}
+                        </div>
+                    </div>
+                    <button class="btn-danger btn-sm" onclick="deleteArticle('${a.id}')">🗑️ حذف</button>
+                </div>
+            `).join('');
+        } catch (e) {
+            console.error("Articles list error:", e);
+        }
+    }
+
+    window.deleteArticle = async (id) => {
+        if (!confirm('⚠️ سيتم حذف المقال نهائياً. هل أنت متأكد؟')) return;
+        try {
+            await db.collection('articles').doc(id).delete();
+            loadArticlesList();
+            updateStats();
+            showMsg('publishMsg', '✅ تم حذف المقال', 'success');
+        } catch (e) {
+            showMsg('publishMsg', '❌ ' + e.message, 'error');
+        }
+    };
+
+    const scrollBtn = document.getElementById('scrollTopBtn');
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 400) scrollBtn.classList.add('visible');
+        else scrollBtn.classList.remove('visible');
+    });
+    scrollBtn.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    function escapeHtml(str) {
+        if (str === null || str === undefined) return '';
+        return String(str).replace(/[&<>"']/g, m => ({
+            '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
+        })[m]);
+    }
 </script>
 </body>
-  </html>
+</html>
